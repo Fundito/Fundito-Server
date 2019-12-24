@@ -6,8 +6,6 @@ const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
 const pool = require('../../module/db/pool');
 
-const THIS_LOG = '회원가입';
-
 /*
     [POST] auth/signup
     회원가입
@@ -20,19 +18,20 @@ router.post('/', async (req,res) => {
     } = req.body;
 
     if (!name || !password || !id){
-        res.status(statusCode.BAD_REQUEST).send(responseMessage.NULL_VALUE);
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.NULL_VALUE));
         return;
     }
 
-    const insertSql = 'INSERT INTO user(name,password,id) VALUES (?,?,?)';
-    const result = await pool.queryParam_Arr(insertSql, [name, password, id]);
+    // 유저의 이름,아이디,패스워드를 저장
+    const insertUserInfoQuery = 'INSERT INTO user(name,password,id) VALUES (?,?,?)';
+    const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [name, password, id]);
 
-    if (!result) {
-        res.status(statusCode.BAD_REQUEST).send(responseMessage.BAD_REQUEST);
+    if (!insertUserInfoResult) {
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.BAD_REQUEST));
         return;
     }
 
-    res.status(statusCode.OK).send(responseMessage.SIGN_UP_SUCCESS);
+    res.status(statusCode.OK).send(authUtil.successTrue(responseMessage.SIGN_UP_SUCCESS));
 
 });
 
