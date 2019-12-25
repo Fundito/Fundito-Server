@@ -73,4 +73,25 @@ router.get('/', async(req, res) => {
     });
 });
 
+/**
+ * [DELETE] /storefund/:storeIdx
+ * 해당 상점의 펀드 정보 삭제
+ * @author ChoSooMin
+ * @param storeIdx
+ */
+router.delete('/:storeIdx', async(req, res) => {
+    const {
+        storeIdx
+    } = req.params;
+
+    StoreFund.delete(storeIdx)
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
 module.exports = router;

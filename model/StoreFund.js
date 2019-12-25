@@ -97,8 +97,24 @@ const storeFund = {
 
     },
 
-    delete: () => {
-        
+    delete: (storeIdx) => {
+        return new Promise(async (resolve, reject) => {
+            const deleteStoreFundQuery = `DELETE FROM ${table} WHERE store_idx = ?`;
+            const deleteStoreFundResult = await pool.queryParam_Arr(deleteStoreFundQuery, [storeIdx]);
+
+            if (!deleteStoreFundResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            resolve({
+                code : statusCode.OK,
+                json : authUtil.successTrue(responseMessage.X_DELETE_SUCCESS(THIS_LOG))
+            });
+        });
     }
 };
 
