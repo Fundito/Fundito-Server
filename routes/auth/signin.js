@@ -4,11 +4,10 @@ const passport = require('passport');
 const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
-const pool = require('../../module/db/pool');
 const jwt = require('../../module/token/jwt');
 
 router.get('/', (req, res) => {
-    console.log(req.session.passport); // idx가 나옴
+    console.log(req.session.passport); // idx가 나옴s
 });
 
 // facebook 로그인

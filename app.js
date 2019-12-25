@@ -15,9 +15,9 @@ const passportConfig = require('./config/passport');
 app.use(session({ secret: 'jdjajfklajfekaf;lkj', resave: true, saveUninitialized: false })); // 세션 활성화
 app.use(passport.initialize()); // passport 구동 (꼭 필요)
 app.use(passport.session()); // 세션 연결 (꼭 필요)
-passportConfig(); // 이 부분 추가
+// passportConfig(); // 이 부분 추가
 
-// view engine setup
+// view engine setups
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
