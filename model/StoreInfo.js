@@ -11,10 +11,10 @@ const THIS_LOG = '상점 정보';
  * storeInfo는 update가 없어도 된다.
  */
 const storeInfo = {
-    create: (name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, qrCodeID, menu) => {
+    create: (name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, menu) => {
         return new Promise(async (resolve, reject) => {
-            const createStoreQuery = `INSERT INTO ${storeInfoTable}(name, tel_number, location_latitude, location_longitude, address, business_hours, breaktime, holiday, thumbnail, wifi_SSID, qrcode_ID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            const createStoreResult = await pool.queryParam_Arr(createStoreQuery, [name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, qrCodeID]);
+            const createStoreQuery = `INSERT INTO ${storeInfoTable}(name, tel_number, location_latitude, location_longitude, address, business_hours, breaktime, holiday, thumbnail, wifi_SSID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const createStoreResult = await pool.queryParam_Arr(createStoreQuery, [name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID]);
 
             console.log(createStoreResult);
 
@@ -46,7 +46,7 @@ const storeInfo = {
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_CREATE_SUCCESS(THIS_LOG), createStoreResult)
+                json : authUtil.successTrue(responseMessage.X_CREATE_SUCCESS(THIS_LOG), createStoreResult.insertId)
             });
         });
     },

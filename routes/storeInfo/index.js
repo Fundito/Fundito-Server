@@ -12,7 +12,7 @@ const StoreInfo = require('../../model/StoreInfo');
  * [POST] /storeInfo
  * 식당 추가
  * @author ChoSooMin
- * @body name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, qrCodeID, menu
+ * @body name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, menu
  */
 router.post('/', async(req, res) => {
     const {
@@ -26,11 +26,10 @@ router.post('/', async(req, res) => {
         holiday,
         thumbnail,
         wifiSSID,
-        qrCodeID,
         menu
     } = req.body;
 
-    StoreInfo.create(name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, qrCodeID, menu)
+    StoreInfo.create(name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, menu)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
