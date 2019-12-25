@@ -5,7 +5,6 @@ module.exports = {
     INTERNAL_SERVER_ERROR: "서버 내부 오류",
     DUPLICATE_VALUE_ERROR: "파라미터 값 중복",
     SIGN_UP_SUCCESS: "회원가입 성공",
-<<<<<<< HEAD
 
     STORE_FUND_INSERT_FAILED: "가게 펀드 정보 입력 실패",
     STORE_FUND_INSERT_SUCCESS: "가게 펀드 정보 입력 성공",
@@ -30,11 +29,9 @@ module.exports = {
     X_DELETE_FAIL: (x) => `${x} 삭제 실패`,  
     NO_X: (x) => `존재하는 ${x} 입니다.`,
     ALREADY_X: (x) => `존재하는 ${x} 입니다.`,
-=======
     DB_ERROR: "데이터베이스 에러",
     
 	EMPTY_TOKEN: "헤더에 토큰이 없음",
 	EXPIRED_TOKEN: "유효기간이 지난 토큰",
 	INVALID_TOKEN: "잘못된 토큰",
->>>>>>> feature/passport
 }
