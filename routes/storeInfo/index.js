@@ -6,6 +6,8 @@ var responseMessage = require('../../module/utils/responseMessage');
 var authUtil = require('../../module/utils/authUtil');
 var pool = require('../../module/db/pool');
 
+const StoreInfo = require('../../model/StoreInfo');
+
 /**
  * [POST] /storeInfo/wifi
  * @author ChoSooMin
@@ -17,36 +19,28 @@ router.post('/wifi', async(req, res) => {
         storeIdx
     } = req.body;
 
-    if (!wifiSSID) {
+    if (!wifiSSID || !storeIdx) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.NULL_VALUE));
         return;
     }
 
-    const postWifiCheckQuery = `SELECT wifi_SSID FROM store_info WHERE store_idx=?`;
-    const postWifiCheckResult = await pool.queryParam_Arr(postWifiCheckQuery, [storeIdx]);
+    StoreInfo.read(storeIdx)
+    .then(({ code, json }) => {
+        const data = json.data;
+        const storeData = data[0];
+        console.log(storeData);
 
-    if (!postWifiCheckResult) {
-        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.BAD_REQUEST));
-        return;
-    }
-
-    /**
-     * @todo 이렇게 하는게 맞나?
-     */
-    // console.log(postWifiCheckResult);
-    // console.log(postWifiCheckResult[0].wifi_SSID);
-    const getData = postWifiCheckResult[0];
-
-    if (wifiSSID == getData.wifi_SSID) {
-        res.status(statusCode.OK).send(authUtil.successTrue(
-            responseMessage.WIFI_CHECK_SUCCESS
-        ));
-    }
-    else {
-        res.status(statusCode.OK).send(authUtil.successTrue(
-            responseMessage.WIFI_CHECK_FAIL
-        ));
-    }
+        if (wifiSSID == storeData.wifi_SSID) {
+            res.status(code).send(authUtil.successTrue(responseMessage.WIFI_CHECK_SUCCESS));
+        }
+        else {
+            res.status(code).send(authUtil.successTrue(responseMessage.WIFI_CHECK_FAIL));
+        }
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+    });
 });
 
 module.exports = router;
