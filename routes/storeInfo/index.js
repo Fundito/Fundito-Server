@@ -82,16 +82,18 @@ router.get('/:storeIdx', async(req, res) => {
 });
 
 /**
- * [POST] /storeInfo/wifi
+ * [POST] /storeInfo/:storeIdx/wifi
  * 와이파이 SSID 확인
  * @author ChoSooMin
- * @body wifiSSID, store_idx
+ * @param storeIdx
+ * @body wifiSSID
  */
-router.post('/wifi', async(req, res) => {
+router.post('/:storeIdx/wifi', async(req, res) => {
     const {
-        wifiSSID,
-        storeIdx
+        wifiSSID
     } = req.body;
+
+    const { storeIdx } = req.params;
 
     if (!wifiSSID || !storeIdx) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.NULL_VALUE));
@@ -101,10 +103,9 @@ router.post('/wifi', async(req, res) => {
     StoreInfo.read(storeIdx)
     .then(({ code, json }) => {
         const data = json.data;
-        const storeData = data[0];
-        console.log(storeData);
+        console.log(data);
 
-        if (wifiSSID == storeData.wifi_SSID) {
+        if (wifiSSID == data.wifi_SSID) {
             res.status(code).send(authUtil.successTrue(responseMessage.WIFI_CHECK_SUCCESS));
         }
         else {
