@@ -12,10 +12,10 @@ const THIS_LOG = `펀딩 정보`;
 const funding = {
     create: (userIdx, password, storeIdx, fundingMoney) => {
         return new Promise(async (resolve, reject) => {
-            const userQuery = `SELECT password FROM ${userTable} WHERE user_idx = ?`;
-            const userResult = await pool.queryParam_Arr(userQuery, [userIdx]);
+            const fundingQuery = `SELECT * FROM ${table} WHERE user_idx = ? AND store_idx = ?`;
+            const fundingResult = await pool.queryParam_Arr(fundingQuery, [userIdx, storeIdx]);
 
-            if (!userResult) {
+            if (!fundingResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
                     json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
@@ -23,34 +23,52 @@ const funding = {
                 return;
             }
             else {
-                console.log(userResult[0].password);
-
-                if (userResult[0].password == password) {
-                    const createFundQuery = `INSERT INTO ${table}(user_idx, store_idx, funding_money) VALUES(?, ?, ?)`;
-                    const createFundResult = await pool.queryParam_Arr(createFundQuery, [userIdx, storeIdx, fundingMoney]);
-        
-                    if (!createFundResult) {
-                        resolve({
-                            code : statusCode.INTERNAL_SERVER_ERROR,
-                            json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
-                        });
-                        return;
-                    }
-        
+                if (fundingResult[0] != undefined) {
                     resolve({
-                        code : statusCode.OK,
-                        json : authUtil.successTrue(responseMessage.X_CREATE_SUCCESS(THIS_LOG))
+                        code : statusCode.BAD_REQUEST,
+                        json : authUtil.successFalse(responseMessage.DUPLICATE_FUNDING)
                     });
+                    return;
+                }
+                
+                const userQuery = `SELECT password FROM ${userTable} WHERE user_idx = ?`;
+                const userResult = await pool.queryParam_Arr(userQuery, [userIdx]);
+    
+                if (!userResult) {
+                    resolve({
+                        code : statusCode.INTERNAL_SERVER_ERROR,
+                        json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    });
+                    return;
                 }
                 else {
-                    resolve({
-                        code : statusCode.OK,
-                        json : authUtil.successTrue(responseMessage.MISS_MATCH_PASSWORD)
-                    });
+                    console.log(userResult[0].password);
+    
+                    if (userResult[0].password == password) {
+                        const createFundQuery = `INSERT INTO ${table}(user_idx, store_idx, funding_money) VALUES(?, ?, ?)`;
+                        const createFundResult = await pool.queryParam_Arr(createFundQuery, [userIdx, storeIdx, fundingMoney]);
+            
+                        if (!createFundResult) {
+                            resolve({
+                                code : statusCode.INTERNAL_SERVER_ERROR,
+                                json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                            });
+                            return;
+                        }
+            
+                        resolve({
+                            code : statusCode.OK,
+                            json : authUtil.successTrue(responseMessage.FUNDING_SUCCESS)
+                        });
+                    }
+                    else {
+                        resolve({
+                            code : statusCode.OK,
+                            json : authUtil.successTrue(responseMessage.MISS_MATCH_PASSWORD)
+                        });
+                    }
                 }
             }
-
-            
         });
     },
 
