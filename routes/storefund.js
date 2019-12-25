@@ -74,6 +74,32 @@ router.get('/', async(req, res) => {
 });
 
 /**
+ * [UPDATE] /storefund/:storeIdx
+ * 해당 상점의 정보 수정
+ * @author ChoSooMin
+ * @param storeIdx
+ * @body customerCount, marginPercent, goalMoney
+ */
+router.put('/:storeIdx', async(req, res) => {
+    const {
+        customerCount,
+        marginPercent,
+        goalMoney
+    } = req.body;
+
+    const { storeIdx } = req.params;
+
+    StoreFund.update(storeIdx, customerCount, marginPercent, goalMoney)
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
+/**
  * [DELETE] /storefund/:storeIdx
  * 해당 상점의 펀드 정보 삭제
  * @author ChoSooMin

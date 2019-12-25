@@ -93,8 +93,24 @@ const storeFund = {
         })
     },
 
-    update: () => {
+    update: (storeIdx, customerCount, marginPercent, goalMoney) => {
+        return new Promise(async (resolve, reject) => {
+            const updateStoreFundInfoQuery = `UPDATE ${table} SET customer_count = ?, margin_percent = ?, goal_money = ? WHERE store_idx = ?`;
+            const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [customerCount, marginPercent, goalMoney, storeIdx]);
 
+            if(!updateStoreFundInfoResult){
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            resolve({
+                code : statusCode.OK,
+                json : authUtil.successTrue(responseMessage.X_UPDATE_SUCCESS(THIS_LOG))
+            });
+        });
     },
 
     delete: (storeIdx) => {
