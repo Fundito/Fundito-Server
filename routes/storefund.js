@@ -34,7 +34,7 @@ router.post('/:storeIdx', async (req, res) => {
 });
 
 /*
-    [GET] /storefund
+    [GET] /storefund/:storeIdx
     가게 펀드 정보 조회
 */
 router.get('/:storeIdx', async (req,res) => {
@@ -57,5 +57,20 @@ router.get('/:storeIdx', async (req,res) => {
     })
 });
 
+/**
+ * [GET] /storefund
+ * 모든 펀드 정보 조회
+ * @author ChoSooMin
+ */
+router.get('/', async(req, res) => {
+    StoreFund.readAll()
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
 
 module.exports = router;
