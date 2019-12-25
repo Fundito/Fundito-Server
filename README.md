@@ -1,2 +1,5 @@
 # Fundito-Server
-SOPT 25기 펀디토 Server 저장소
+<h3>ER Diagram</h3>
+
+<img src="https://github.com/Fundito/Fundito-Server/blob/master/Fundito%20Server%20ER%20Diagram.png"/>
+
