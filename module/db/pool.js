@@ -35,6 +35,7 @@ module.exports = {
     queryParam_Parse: async (inputquery, inputvalue) => {
         const query = inputquery
         const value = inputvalue
+        const pool = await poolPromise;
         let result
         try {
             var connection = await pool.getConnection()
