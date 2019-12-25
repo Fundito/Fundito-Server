@@ -11,10 +11,30 @@ const THIS_LOG = '상점 정보';
  * storeInfo는 update가 없어도 된다.
  */
 const storeInfo = {
-    create: (name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, qrCodeID) => {
+    create: (name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, qrCodeID, menu) => {
         return new Promise(async (resolve, reject) => {
             const createStoreQuery = `INSERT INTO ${storeInfoTable}(name, tel_number, location_latitude, location_longitude, address, business_hours, breaktime, holiday, thumbnail, wifi_SSID, qrcode_ID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             const createStoreResult = await pool.queryParam_Arr(createStoreQuery, [name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, qrCodeID]);
+
+            console.log(createStoreResult);
+
+            // 클라이언트에서 menu는 배열로 넘어온다.
+            for (const i in menu) {
+                const currentMenu = menu[i];
+                const currentMenuName = currentMenu.menuName;
+                const currentMenuPrice = currentMenu.menuPrice;
+
+                const createMenuQuery = `INSERT INTO ${menuTable}(store_idx, menu_name, menu_price) VALUES(?, ?, ?)`;
+                const createMenuResult = await pool.queryParam_Arr(createMenuQuery, [createStoreResult.insertId, currentMenuName, currentMenuPrice]);
+
+                if (!createMenuResult) {
+                    resolve({
+                        code : statusCode.INTERNAL_SERVER_ERROR,
+                        json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    });
+                    return;
+                }
+            }
 
             if (!createStoreResult) {
                 resolve({

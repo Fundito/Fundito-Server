@@ -9,6 +9,38 @@ var pool = require('../../module/db/pool');
 const StoreInfo = require('../../model/StoreInfo');
 
 /**
+ * [POST] /storeInfo
+ * 식당 추가
+ * @author ChoSooMin
+ * @body name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, qrCodeID, menu
+ */
+router.post('/', async(req, res) => {
+    const {
+        name,
+        telNumber,
+        latitude,
+        longitude,
+        address,
+        businessHours,
+        breaktime,
+        holiday,
+        thumbnail,
+        wifiSSID,
+        qrCodeID,
+        menu
+    } = req.body;
+
+    StoreInfo.create(name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, qrCodeID, menu)
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
+/**
  * [GET] /storeInfo
  * 전체 식당 정보 조회
  * @author ChoSooMin
