@@ -5,6 +5,7 @@ const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
 const pool = require('../../module/db/pool');
+const jwt = require('../../module/utils/jwt');
 
 router.get('/', (req, res) => {
     console.log(req.session.passport); // idx가 나옴
@@ -32,7 +33,8 @@ router.get('/fail', (req, res) => {
 //로그인 성공했을때 뜨는 api
 router.get('/success', (req, res) => {
     console.log(req._passport.session);
-    res.status(statusCode.OK).send(authUtil.successTrue(responseMessage.LOGIN_SUCCESS, req._passport.session.user));
+    const tokenValue = jwt.sign(req._passport.session.user.idx);
+    res.status(statusCode.OK).send(authUtil.successTrue(responseMessage.LOGIN_SUCCESS, tokenValue));
 });
 
 module.exports = router;
