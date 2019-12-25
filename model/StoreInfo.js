@@ -106,7 +106,7 @@ const storeInfo = {
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_DELETE_SUCCESS(THIS_LOG), deleteStoreResult)
+                json : authUtil.successTrue(responseMessage.X_DELETE_SUCCESS(THIS_LOG))
             });
         });
     }
