@@ -9,7 +9,50 @@ var pool = require('../../module/db/pool');
 const StoreInfo = require('../../model/StoreInfo');
 
 /**
+ * [GET] /storeInfo
+ * 전체 식당 정보 조회
+ * @author ChoSooMin
+ */
+router.get('/', async(req, res) => {
+    StoreInfo.readAll()
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
+/**
+ * [GET] /storeInfo/:storeIdx
+ * 식당 정보 조회
+ * @author ChoSooMin
+ * @param storeIdx
+ */
+router.get('/:storeIdx', async(req, res) => {
+    const {
+        storeIdx
+    } = req.params;
+
+    if (!storeIdx) {
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.NULL_VALUE));
+        return;
+    }
+
+    StoreInfo.read(storeIdx)
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
+/**
  * [POST] /storeInfo/wifi
+ * 와이파이 SSID 확인
  * @author ChoSooMin
  * @body wifiSSID, store_idx
  */
