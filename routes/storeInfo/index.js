@@ -39,14 +39,12 @@ router.post('/wifi', async(req, res) => {
 
     if (wifiSSID == getData.wifi_SSID) {
         res.status(statusCode.OK).send(authUtil.successTrue(
-            responseMessage.WIFI_CHECK_SUCCESS,
-            postWifiCheckResult
+            responseMessage.WIFI_CHECK_SUCCESS
         ));
     }
     else {
         res.status(statusCode.OK).send(authUtil.successTrue(
-            responseMessage.WIFI_CHECK_FAIL,
-            postWifiCheckResult
+            responseMessage.WIFI_CHECK_FAIL
         ));
     }
 });
