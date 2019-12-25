@@ -4,7 +4,7 @@ const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
 
 const table = `user`;
-const THIS_LOG = '유저';
+const THIS_LOG = `사용자`;
 
 const user = {
     create: () => {
