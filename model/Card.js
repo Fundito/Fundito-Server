@@ -11,7 +11,6 @@ const THIS_LOG = `카드`;
 const card = {
     create: (userIdx, cardNumber, cvc, password) => {
         return new Promise(async (resolve, reject) => {
-            /*
             const cardEncryptionResult = await encryptionModule.encryption(cardNumber);
             const cvcEncryptionResult = await encryptionModule.encryption(cvc);
             const passwordEncryptionResult = await encryptionModule.encryption(password);
@@ -32,7 +31,6 @@ const card = {
                 code : statusCode.OK,
                 json : authUtil.successTrue(responseMessage.CARD_CREATE_SUCCESS)
             });
-            */
         });
     },
 
@@ -41,21 +39,25 @@ const card = {
 
     read: (cardIdx) => {
         return new Promise(async (resolve, reject) => {
-            /*
             const readCardQuery = `SELECT * FROM ${table} WHERE card_idx = ?`;
             const readCardResult = await pool.queryParam_Arr(readCardQuery, [cardIdx]);
 
             const cardData = readCardResult[0];
 
+            const cardNumberDecryptionResult = await decryptionModule.decryption(cardData.card_number, cardData.card_salt);
+            const cardCVCDecryptionResult = await decryptionModule.decryption(cardData.cvc, cardData.cvc_salt);
+            const pwDecryptionResult = await decryptionModule.decryption(cardData.password, cardData.password_salt);
 
-            const decryptionResult = await decryptionModule.decryption(cardData.card_number, cardData.card_salt);
-            console.log(decryptionResult);
+            const result = {
+                "cardNumber" : cardNumberDecryptionResult,
+                "cvc" : cardCVCDecryptionResult,
+                "password" : pwDecryptionResult
+            };
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_READ_SUCCESS(THIS_LOG))
+                json : authUtil.successTrue(responseMessage.X_READ_SUCCESS(THIS_LOG), result)
             });
-            */
         });
     },
 
