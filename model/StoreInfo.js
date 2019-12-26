@@ -90,6 +90,14 @@ const storeInfo = {
             const getOneStoreQuery = `SELECT * FROM ${storeInfoTable} WHERE store_idx = ?`;
             const getOneStoreResult = await pool.queryParam_Arr(getOneStoreQuery, [storeIdx]);
 
+            if (getOneStoreResult[0] == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(responseMessage.NO_INDEX)
+                });
+                return;
+            }
+
             const getStoreMenuQuery = `SELECT menu_name, menu_price FROM ${menuTable} WHERE store_idx = ?`;
             const getStoreMenuResult = await pool.queryParam_Arr(getStoreMenuQuery, [storeIdx]);
 
