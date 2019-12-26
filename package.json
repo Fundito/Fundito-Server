@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "assert": "^2.0.0",
@@ -12,6 +12,7 @@
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "express-session": "^1.17.0",
+    "hangul-js": "^0.2.6",
     "helmet": "^3.21.2",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",

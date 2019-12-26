@@ -23,7 +23,6 @@ router.post('/:userIdx', async (req, res) => {
     } = req.body;
     const { userIdx } = req.params;
 
-    /*
     Card.create(userIdx, cardNumber, cvc, password)
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -32,7 +31,6 @@ router.post('/:userIdx', async (req, res) => {
         console.log(err);
         res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
     });
-    */
 });
 
 /**
@@ -44,7 +42,6 @@ router.post('/:userIdx', async (req, res) => {
 router.get('/:cardIdx', async(req, res) => {
     const { cardIdx } = req.params;
 
-    /*
     Card.read(cardIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -53,7 +50,6 @@ router.get('/:cardIdx', async(req, res) => {
         console.log(err);
         res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
     });
-    */
 });
 
 /**

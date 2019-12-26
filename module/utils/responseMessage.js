@@ -6,6 +6,8 @@ module.exports = {
     DUPLICATE_VALUE_ERROR: "파라미터 값 중복",
     SIGN_UP_SUCCESS: "회원가입 성공",
 
+    NO_INDEX : "존재하지 않는 인덱스 값",
+
     STORE_FUND_INSERT_FAILED: "가게 펀드 정보 입력 실패",
     STORE_FUND_INSERT_SUCCESS: "가게 펀드 정보 입력 성공",
     STORE_FUND_SELECT_SUCCESS: "가게 펀드 정보 조회 성공",
