@@ -13,17 +13,18 @@ var Card = require('../../model/Card');
  * 카드 생성
  * @author ChoSooMin
  * @param userIdx
- * @body cardNumber, cvc, password
+ * @body cardCompany, cardNumber, cvc, password
  */
 router.post('/:userIdx', async (req, res) => {
     const {
+        cardCompany,
         cardNumber,
         cvc,
         password
     } = req.body;
     const { userIdx } = req.params;
 
-    Card.create(userIdx, cardNumber, cvc, password)
+    Card.create(userIdx, cardCompany, cardNumber, cvc, password)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })

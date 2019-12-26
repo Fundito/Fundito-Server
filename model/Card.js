@@ -9,15 +9,14 @@ const table = `card`;
 const THIS_LOG = `카드`;
 
 const card = {
-    create: (userIdx, cardNumber, cvc, password) => {
+    create: (userIdx, cardCompany, cardNumber, cvc, password) => {
         return new Promise(async (resolve, reject) => {
             const cardEncryptionResult = await encryptionModule.encryption(cardNumber);
             const cvcEncryptionResult = await encryptionModule.encryption(cvc);
             const passwordEncryptionResult = await encryptionModule.encryption(password);
 
-
-            const cardCreateQuery = `INSERT INTO card(user_idx, card_number, cvc, password, card_salt, cvc_salt, password_salt) VALUES(?, ?, ?, ?, ?, ?, ?)`;
-            const cardCreateResult = await pool.queryParam_Arr(cardCreateQuery, [userIdx, cardEncryptionResult.hashedPassword, cvcEncryptionResult.hashedPassword, passwordEncryptionResult.hashedPassword, cardEncryptionResult.salt, cvcEncryptionResult.salt, passwordEncryptionResult.salt]);
+            const cardCreateQuery = `INSERT INTO card(user_idx, card_company_name, card_number, cvc, password, card_salt, cvc_salt, password_salt) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
+            const cardCreateResult = await pool.queryParam_Arr(cardCreateQuery, [userIdx, cardCompany, cardEncryptionResult.hashedPassword, cvcEncryptionResult.hashedPassword, passwordEncryptionResult.hashedPassword, cardEncryptionResult.salt, cvcEncryptionResult.salt, passwordEncryptionResult.salt]);
 
             if (!cardCreateResult) {
                 resolve({
@@ -49,6 +48,7 @@ const card = {
             const pwDecryptionResult = await decryptionModule.decryption(cardData.password, cardData.password_salt);
 
             const result = {
+                "cardCompany" : cardData.card_company_name,
                 "cardNumber" : cardNumberDecryptionResult,
                 "cvc" : cardCVCDecryptionResult,
                 "password" : pwDecryptionResult

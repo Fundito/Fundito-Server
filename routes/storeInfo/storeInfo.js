@@ -101,10 +101,9 @@ router.post('/wifi', async(req, res) => {
     StoreInfo.read(storeIdx)
     .then(({ code, json }) => {
         const data = json.data;
-        const storeData = data[0];
         console.log(storeData);
 
-        if (wifiSSID == storeData.wifi_SSID) {
+        if (wifiSSID == data.wifi_SSID) {
             res.status(code).send(authUtil.successTrue(responseMessage.WIFI_CHECK_SUCCESS));
         }
         else {
