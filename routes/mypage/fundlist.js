@@ -6,8 +6,10 @@ const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
 const pool = require('../../module/db/pool');
 
+const Funding = require('../../model/Funding');
+
 /**
- * [GET] mypage/fundlist
+ * [GET] /mypage/fundlist/:userIdx
  * 내 투자내역 조회
  * @author ChoSooMin
  * @param user_idx
@@ -22,17 +24,14 @@ router.get('/:userIdx', async (req, res) => {
         return;
     }
 
-    const getMyFundListQuery = `SELECT * FROM funding WHERE user_idx = ?`;
-    const getMyFundListResult = await pool.queryParam_Arr(getMyFundListQuery, [userIdx]);
-
-    if (!getMyFundListResult) {
-        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.BAD_REQUEST));
-        return;
-    }
-
-    res.status(statusCode.OK).send(authUtil.successTrue(
-        responseMessage.MYPAGE_FUNDLIST_SELECT_SUCCESS,
-        getMyFundListResult));
+    Funding.read(userIdx)
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+    });
 });
 
 module.exports = router;

@@ -86,6 +86,7 @@ const storeFund = {
                 return;
             }
 
+            console.log(selectStoreFundInfoResult);
             resolve({
                 code : statusCode.OK,
                 json : authUtil.successTrue(responseMessage.X_READ_SUCCESS(THIS_LOG), selectStoreFundInfoResult)

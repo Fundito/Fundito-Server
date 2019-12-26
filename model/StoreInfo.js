@@ -93,7 +93,7 @@ const storeInfo = {
             if (getOneStoreResult[0] == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(responseMessage.OUT_OF_VALUE)
+                    json : authUtil.successFalse(responseMessage.NO_INDEX)
                 });
                 return;
             }
