@@ -90,6 +90,14 @@ const storeInfo = {
             const getOneStoreQuery = `SELECT * FROM ${storeInfoTable} WHERE store_idx = ?`;
             const getOneStoreResult = await pool.queryParam_Arr(getOneStoreQuery, [storeIdx]);
 
+            if (getOneStoreResult[0] == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(responseMessage.OUT_OF_VALUE)
+                });
+                return;
+            }
+
             const getStoreMenuQuery = `SELECT menu_name, menu_price FROM ${menuTable} WHERE store_idx = ?`;
             const getStoreMenuResult = await pool.queryParam_Arr(getStoreMenuQuery, [storeIdx]);
 
@@ -107,6 +115,26 @@ const storeInfo = {
             resolve({
                 code : statusCode.OK,
                 json : authUtil.successTrue(responseMessage.X_READ_SUCCESS(THIS_LOG), storeResult)
+            });
+        });
+    },
+
+    readAllName: () => {
+        return new Promise(async (resolve, reject) => {
+            const getStoreNameListQuery = `SELECT store_idx, name FROM ${storeInfoTable}`;
+            const getStoreNameListResult = await pool.queryParam_None(getStoreNameListQuery);
+
+            if (!getStoreNameListResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            resolve({
+                result: getStoreNameListResult,
+                code : statusCode.OK
             });
         });
     },
