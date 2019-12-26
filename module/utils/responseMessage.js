@@ -28,6 +28,8 @@ module.exports = {
     DUPLICATE_FUNDING : "이미 투자한 가게입니다",
     FUNDING_SUCCESS : "투자에 성공했습니다",
 
+    CARD_CREATE_SUCCESS : "카드 생성 성공",
+
     X_CREATE_SUCCESS: (x) => `${x} 작성 성공`,
     X_CREATE_FAIL: (x) => `${x} 작성 실패`,
     X_READ_ALL_SUCCESS: (x) => `${x} 전체 조회 성공`,
