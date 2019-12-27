@@ -12,7 +12,28 @@ const THIS_LOG = `펀딩 정보`;
 const storeFund = {
     create: (storeIdx, customerCount, marginPercent, goalMoney) => {
         return new Promise(async (resolve, reject) => {
-            
+            const storeIdxQuery = `SELECT * FROM store_info WHERE store_idx = ?`;
+            const storeIdxResult = await pool.queryParam_Arr(storeIdxQuery, [storeIdx]);
+
+            /**
+             * 예외 처리
+             */
+            if (!storeIdxResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+            if (storeIdxResult[0] == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `존재하지 않는 가게입니다`)
+                });
+                return;
+            }
+
+
             /** [TODO]: remaining_days 계산하기 */
             // 이미 펀드 정보가 삽입된 가게 인덱스 조회
             const selectStoreIdxQuery = 'SELECT store_idx FROM store_fund WHERE store_idx = ?';
@@ -20,7 +41,7 @@ const storeFund = {
             if (selectStoreIdxResult[0] != undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.DUPLICATE_VALUE_ERROR)
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `이미 펀드 정보가 삽입된 가게입니다`)
                 });
                 return;
             }

@@ -31,10 +31,10 @@ router.post('/', async(req, res) => {
         menu
     } = req.body;
 
-    // if (!name || !telNumber || !latitude || !longitude || !address || !businessHours || !breaktime || !holiday || !thumbnail || wifiSSID || !menu) {
-    //     res.status(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
-    //     return;
-    // }
+    if (!name || !wifiSSID ) {
+        res.status(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+        return;
+    }
 
     StoreInfo.create(name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, menu)
     .then(({ code, json }) => {
