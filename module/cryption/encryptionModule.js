@@ -30,6 +30,21 @@ const encryption = {
             })
             
         });
+    },
+    encryption : (pw, salt) => {
+        return new Promise(async (resolve, reject) => {
+            crypto.randomBytes(32, (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const cipher = crypto.createCipher('aes-256-cbc', salt);
+                    let hashedPW = cipher.update(pw, 'utf8', 'base64');
+                    hashedPW += cipher.final('base64');
+
+                    resolve(hashedPW);
+                }
+            })
+        })
     }
 };
 

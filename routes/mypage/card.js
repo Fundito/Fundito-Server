@@ -74,16 +74,19 @@ router.get('/:cardIdx', async(req, res) => {
         const cardData = json.data;
 
         console.log(cardData);
-        const sendData = cardData.cardNickname;
 
-        if (sendData == '') {
+        let sendData = new Object();
+        sendData.cardNickname = cardData.cardNickname;
+        sendData.userName = cardData.userName
+
+        if (sendData.cardNickname == '') {
             const cardNumber = cardData.cardNumber;
             const subStrNumber = (cardData.cardNumber).substr(cardNumber.length - 4, 4);
             console.log(subStrNumber);
 
-            const result = `${cardData.cardCompany}(${subStrNumber})`;
+            sendData.cardNickname = `${cardData.cardCompany}(${subStrNumber})`;
 
-            res.status(code).send(authUtil.successTrue(code, json.message, result));
+            res.status(code).send(authUtil.successTrue(code, json.message, sendData));
         }
         else {
             res.status(code).send(authUtil.successTrue(code, json.message, sendData));
