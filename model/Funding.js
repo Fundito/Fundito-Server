@@ -239,7 +239,7 @@ const funding = {
                 return;
             }
 
-            const getMyFundListQuery = `SELECT * FROM ${table} WHERE user_idx = ?`; 
+            const getMyFundListQuery = `SELECT * FROM ${table} WHERE user_idx = ? ORDER BY funding_time DESC`; 
             const getMyFundListResult = await pool.queryParam_Arr(getMyFundListQuery, [userIdx]);
 
             if (!getMyFundListResult) {
