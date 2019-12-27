@@ -55,9 +55,14 @@ const card = {
                 return;
             }
 
+            //이름도 조회 할게요..
+            const getUserNameQuery = `SELECT name FROM user WHERE user_idx = ${cardData.user_idx}`;
+            const getUserNameResult = await pool.queryParam_None(getUserNameQuery);
+
             const cardNumberDecryptionResult = await decryptionModule.decryption(cardData.card_number, cardData.card_salt);
 
             const result = {
+                "userName" : getUserNameResult[0].name,
                 "cardNickname" : cardData.card_nickname,
                 "cardCompany" : cardData.card_company_name,
                 "cardNumber" : cardNumberDecryptionResult
