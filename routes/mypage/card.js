@@ -69,7 +69,25 @@ router.get('/:cardIdx', async(req, res) => {
 
     Card.read(cardIdx)
     .then(({ code, json }) => {
-        res.status(code).send(json);
+        console.log(json);
+
+        const cardData = json.data;
+
+        console.log(cardData);
+        const sendData = cardData.cardNickname;
+
+        if (sendData == '') {
+            const cardNumber = cardData.cardNumber;
+            const subStrNumber = (cardData.cardNumber).substr(cardNumber.length - 4, 4);
+            console.log(subStrNumber);
+
+            const result = `${cardData.cardCompany}(${subStrNumber})`;
+
+            res.status(code).send(authUtil.successTrue(code, json.message, result));
+        }
+        else {
+            res.status(code).send(authUtil.successTrue(code, json.message, sendData));
+        }
     })
     .catch((err) => {
         console.log(err);
