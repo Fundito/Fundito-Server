@@ -24,6 +24,18 @@ router.post('/:userIdx', async (req, res) => {
     } = req.body;
     const { userIdx } = req.params;
 
+    if (!userIdx || !cardCompany || !cardNumber || !cvc || !password) {
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+        return;
+    }
+
+    console.log(typeof(cardNumber));
+
+    if (typeof(cardNumber) != `string` || typeof(cvc) != `string` || typeof(password) != `string`) {
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.BODY_VALUE_ERROR));
+        return;
+    }
+    
     Card.create(userIdx, cardCompany, cardNumber, cvc, password)
     .then(({ code, json }) => {
         res.status(code).send(json);
