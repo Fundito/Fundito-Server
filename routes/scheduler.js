@@ -6,7 +6,7 @@ const moment = require('moment');
 const storeFund = require('../model/StoreFund');
 
 // 하루에 한 번 마감기한 확인 
-const idx1 = csvManager.addTask('0 24 * * *', async () => {
+const idx1 = csvManager.addTask('0 0 * * *', async () => {
     console.log(`매일 오전 12시 마다 실행`, moment().format());
 
     storeFund.checkDueDate()
