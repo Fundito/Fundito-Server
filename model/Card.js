@@ -15,6 +15,10 @@ const card = {
             const cvcEncryptionResult = await encryptionModule.encryption(cvc);
             const passwordEncryptionResult = await encryptionModule.encryption(password);
 
+            console.log(cardEncryptionResult);
+            console.log(cvcEncryptionResult);
+            console.log(passwordEncryptionResult);
+
             const cardCreateQuery = `INSERT INTO card(user_idx, card_company_name, card_number, cvc, password, card_salt, cvc_salt, password_salt) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
             const cardCreateResult = await pool.queryParam_Arr(cardCreateQuery, [userIdx, cardCompany, cardEncryptionResult.hashedPassword, cvcEncryptionResult.hashedPassword, passwordEncryptionResult.hashedPassword, cardEncryptionResult.salt, cvcEncryptionResult.salt, passwordEncryptionResult.salt]);
 
@@ -42,16 +46,20 @@ const card = {
             const readCardResult = await pool.queryParam_Arr(readCardQuery, [cardIdx]);
 
             const cardData = readCardResult[0];
+            console.log(cardData);
+            if (cardData == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(responseMessage.NO_INDEX)
+                });
+                return;
+            }
 
             const cardNumberDecryptionResult = await decryptionModule.decryption(cardData.card_number, cardData.card_salt);
-            const cardCVCDecryptionResult = await decryptionModule.decryption(cardData.cvc, cardData.cvc_salt);
-            const pwDecryptionResult = await decryptionModule.decryption(cardData.password, cardData.password_salt);
 
             const result = {
                 "cardCompany" : cardData.card_company_name,
-                "cardNumber" : cardNumberDecryptionResult,
-                "cvc" : cardCVCDecryptionResult,
-                "password" : pwDecryptionResult
+                "cardNumber" : cardNumberDecryptionResult
             };
 
             resolve({
