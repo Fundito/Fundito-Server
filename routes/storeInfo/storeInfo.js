@@ -57,6 +57,39 @@ router.get('/', async(req, res) => {
     });
 });
 
+
+/**
+ * [GET] /storeInfo/search?keyword={타이핑 시 검색어}
+ * 식당 이름 검색
+ * @author 100yeeun
+ * @params 검색키워드
+ */
+
+router.get('/search', async(req, res) => {
+    StoreInfo.readAllName()
+    .then(({ result, code }) => {
+
+        const searcher = new hangul.Searcher(req.query.keyword);
+
+        const findStoreNameList = new Array();
+
+		for (var i =0 ; i<result.length; i++){
+			if (searcher.search(result[i].name)>=0){
+				findStoreNameList.push(result[i]); 
+			}
+		}
+
+        const json = authUtil.successTrue(responseMessage.X_READ_SUCCESS('검색'), findStoreNameList)
+
+        
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
 /**
  * [GET] /storeInfo/:storeIdx
  * 식당 정보 조회
@@ -132,39 +165,6 @@ router.delete('/:storeIdx', async(req, res) => {
 
     StoreInfo.delete(storeIdx)
     .then(({ code, json }) => {
-        res.status(code).send(json);
-    })
-    .catch((err) => {
-        console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
-    });
-});
-
-
-/**
- * [GET] /storeInfo/search/search?keyword={타이핑 시 검색어}
- * 식당 이름 검색
- * @author 100yeeun
- * @params 검색키워드
- */
-
-router.get('/search/search', async(req, res) => {
-    StoreInfo.readAllName()
-    .then(({ result, code }) => {
-
-        const searcher = new hangul.Searcher(req.query.keyword);
-
-        const findStoreNameList = new Array();
-
-		for (var i =0 ; i<result.length; i++){
-			if (searcher.search(result[i].name)>=0){
-				findStoreNameList.push(result[i]); 
-			}
-		}
-
-        const json = authUtil.successTrue(responseMessage.X_READ_SUCCESS('검색'), findStoreNameList)
-
-        
         res.status(code).send(json);
     })
     .catch((err) => {
