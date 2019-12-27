@@ -15,16 +15,27 @@ var Card = require('../../model/Card');
  * @param userIdx
  * @body cardCompany, cardNumber, cvc, password
  */
+/**
+ * Request Body
+ * {
+	"cardCompany" : "국민",
+	"cardNickname" : "별칭",
+	"cardNumber" : "12312312",
+	"cvc" : "123",
+	"password" : "123123123"
+    }
+ */
 router.post('/:userIdx', async (req, res) => {
     const {
-        cardCompany,
-        cardNumber,
-        cvc,
+        cardCompany, 
+        cardNickname, 
+        cardNumber, 
+        cvc, 
         password
     } = req.body;
     const { userIdx } = req.params;
 
-    if (!userIdx || !cardCompany || !cardNumber || !cvc || !password) {
+    if (!userIdx || !cardCompany || !cardNickname || !cardNumber || !cvc || !password) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
@@ -37,7 +48,7 @@ router.post('/:userIdx', async (req, res) => {
         return;
     }
     
-    Card.create(userIdx, cardCompany, cardNumber, cvc, password)
+    Card.create(userIdx, cardCompany, cardNickname, cardNumber, cvc, password)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
