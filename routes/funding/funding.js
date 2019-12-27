@@ -12,7 +12,7 @@ var Funding = require('../../model/Funding');
  * [POST] /funding
  * 투자 생성
  * @author ChoSooMin
- * @body userIdx, password, storeIdx, fundingMoney
+ * @body userIdx, fundingPassword, storeIdx, fundingMoney
  */
 router.post('/', async(req, res) => {
     const {
