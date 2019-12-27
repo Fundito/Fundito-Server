@@ -113,6 +113,11 @@ router.put('/:storeIdx', async(req, res) => {
 
     const { storeIdx } = req.params;
 
+    if (!customerCount || !marginPercent || !goalMoney) {
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+        return;
+    }
+
     StoreFund.update(storeIdx, customerCount, marginPercent, goalMoney)
     .then(({ code, json }) => {
         res.status(code).send(json);
