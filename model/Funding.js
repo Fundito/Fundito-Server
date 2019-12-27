@@ -2,6 +2,9 @@ const statusCode = require('../module/utils/statusCode');
 const responseMessage = require('../module/utils/responseMessage');
 const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
+const decryptionModule = require('../module/cryption/decryptionModule');
+
+const moment = require('moment');
 
 const User = require('../model/User');
 
@@ -11,7 +14,7 @@ const userTable = `user`;
 const THIS_LOG = `펀딩 정보`;
 
 const funding = {
-    create: (userIdx, password, storeIdx, fundingMoney) => {
+    create: (userIdx, payPassword, storeIdx, fundingMoney) => {
         return new Promise(async (resolve, reject) => {
             const storeIdxQuery = `SELECT * FROM store_info WHERE store_idx = ?`;
             const storeIdxResult = await pool.queryParam_Arr(storeIdxQuery, [storeIdx]);
@@ -24,7 +27,6 @@ const funding = {
                 return;
             }
 
-
             const fundingQuery = `SELECT * FROM ${table} WHERE user_idx = ? AND store_idx = ?`;
             const fundingResult = await pool.queryParam_Arr(fundingQuery, [userIdx, storeIdx]);
 
@@ -36,17 +38,30 @@ const funding = {
                 return;
             }
             else {
-                if (fundingResult[0] != undefined) {
+                const statusQuery = `SELECT fund_status FROM ${storeFundTable} WHERE store_idx = ?`;
+                const statusResult = await pool.queryParam_Arr(statusQuery, [storeIdx]);
+
+                if (!statusResult) {
                     resolve({
-                        code : statusCode.BAD_REQUEST,
-                        json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.DUPLICATE_FUNDING)
+                        code : statusCode.INTERNAL_SERVER_ERROR,
+                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                     });
                     return;
                 }
-                
-                const userQuery = `SELECT password FROM ${userTable} WHERE user_idx = ?`;
+
+                if (statusResult[0].fund_status != 0) {
+                    resolve({
+                        code : statusCode.BAD_REQUEST,
+                        json : authUtil.successFalse(statusCode.BAD_REQUEST, `이미 마감된 펀딩입니다`)
+                    });
+                    return;
+                }
+
+                const userQuery = `SELECT * FROM ${userTable} WHERE user_idx = ?`;
                 const userResult = await pool.queryParam_Arr(userQuery, [userIdx]);
     
+                console.log(userResult[0]);
+
                 if (userResult[0] == undefined) {
                     resolve({
                         code : statusCode.BAD_REQUEST,
@@ -63,9 +78,13 @@ const funding = {
                     return;
                 }
                 else {
-                    console.log(userResult[0].password);
+                    // 암호화된 사용자의 결제 비밀번호 복호화한 후, 비교
+                    const userHashedPayPassword = userResult[0].pay_password;
+                    const userPayPasswordSalt = userResult[0].salt;
     
-                    if (userResult[0].password == password) {
+                    const cardNumberDecryptionResult = await decryptionModule.decryption(userHashedPayPassword, userPayPasswordSalt);
+
+                    if (cardNumberDecryptionResult == payPassword) {
                         // 가게의 목표 금액 가져오기
                         const selectStoreGoalMoneyQuery = `SELECT goal_money FROM ${storeFundTable} WHERE store_idx = ?`;
                         const selectStoreGoalMoneyResult = await pool.queryParam_Arr(selectStoreGoalMoneyQuery, [storeIdx]);
@@ -123,10 +142,43 @@ const funding = {
                                 }
                             }
 
+                        // 펀딩 올렸을 때 시간 가져오기
+                        const date = Date.now();
+                        console.log(date);
+                        const fundingTime = moment(date).format('YYYY-MM-DD HH:mm:ss');
+                        console.log(fundingTime);
+
                         // 펀딩하기
-                        const createFundQuery = `INSERT INTO ${table}(user_idx, store_idx, funding_money) VALUES(?, ?, ?)`;
-                        const createFundResult = await pool.queryParam_Arr(createFundQuery, [userIdx, storeIdx, fundingMoney]);
+                        const createFundQuery = `INSERT INTO ${table}(user_idx, store_idx, funding_money, funding_time) VALUES(?, ?, ?, ?)`;
+                        const createFundResult = await pool.queryParam_Arr(createFundQuery, [userIdx, storeIdx, fundingMoney, fundingTime]);
                         if (!createFundResult) {
+                            resolve({
+                                code : statusCode.INTERNAL_SERVER_ERROR,
+                                json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                            });
+                            console.log(`FUND DB ERROR`);
+                            return;
+                        }
+
+                        // 투자 성공하면 store_fund 테이블에서 해당 store_idx의 contributer_count +1
+                        const getContributerQuery = `SELECT contributer_count FROM ${storeFundTable} WHERE store_idx = ?`;
+                        const getContributerResult = await pool.queryParam_Arr(getContributerQuery, [storeIdx]);
+
+                        if (!getContributerResult) {
+                            resolve({
+                                code : statusCode.INTERNAL_SERVER_ERROR,
+                                json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                            });
+                            console.log(`FUND DB ERROR`);
+                            return;
+                        }
+
+                        const contributer = getContributerResult[0].contributer_count;
+
+                        const plusContributerCountQuery = `UPDATE ${storeFundTable} SET contributer_count = ? WHERE store_idx = ?`;
+                        const plusContributerCountResult = await pool.queryParam_Arr(plusContributerCountQuery, [contributer + 1, storeIdx]);
+
+                        if (!plusContributerCountResult) {
                             resolve({
                                 code : statusCode.INTERNAL_SERVER_ERROR,
                                 json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)

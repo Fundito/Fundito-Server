@@ -12,22 +12,22 @@ var Funding = require('../../model/Funding');
  * [POST] /funding
  * 투자 생성
  * @author ChoSooMin
- * @body userIdx, password, storeIdx, fundingMoney
+ * @body userIdx, fundingPassword, storeIdx, fundingMoney
  */
 router.post('/', async(req, res) => {
     const {
         userIdx,
-        password,
+        payPassword,
         storeIdx,
         fundingMoney
     } = req.body;
 
-    if (!userIdx || !password || !storeIdx || !fundingMoney) {
+    if (!userIdx || !payPassword || !storeIdx || !fundingMoney) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
 
-    Funding.create(userIdx, password, storeIdx, fundingMoney)
+    Funding.create(userIdx, payPassword, storeIdx, fundingMoney)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
