@@ -25,7 +25,7 @@ router.post('/:storeIdx', async (req, res) => {
         } = req.params;
 
         if (!storeIdx || !customerCount || !marginPercent || !goalMoney) {
-            res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.NULL_VALUE));
+            res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
             return;
         }
 
@@ -38,7 +38,7 @@ router.post('/:storeIdx', async (req, res) => {
             })
             .catch((err) => {
                 console.log(err);
-                res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+                res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
             });
 
         } catch (err) {
@@ -61,7 +61,7 @@ router.get('/:storeIdx', async (req,res) => {
         } = req.params;
 
         if (!storeIdx) {
-            res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.NULL_VALUE));
+            res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
             return;
         }
 
@@ -74,7 +74,7 @@ router.get('/:storeIdx', async (req,res) => {
             })
             .catch((err) => {
                 console.log(err);
-                res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+                res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
             })
     } catch (err) {
         console.log(err);
@@ -93,7 +93,7 @@ router.get('/', async(req, res) => {
     })
     .catch((err) => {
         console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
 
@@ -119,7 +119,7 @@ router.put('/:storeIdx', async(req, res) => {
     })
     .catch((err) => {
         console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
 
@@ -140,7 +140,7 @@ router.delete('/:storeIdx', async(req, res) => {
     })
     .catch((err) => {
         console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
 

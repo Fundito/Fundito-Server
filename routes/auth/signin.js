@@ -26,14 +26,14 @@ router.get('/facebook/callback',
 
 //로그인 실패했을때 뜨는 api
 router.get('/fail', (req, res) => {
-    res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.LOGIN_FAIL));
+    res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
 });
 
 //로그인 성공했을때 뜨는 api
 router.get('/success', (req, res) => {
     console.log(req._passport.session);
     const tokenValue = jwt.sign(req._passport.session.user.idx);
-    res.status(statusCode.OK).send(authUtil.successTrue(responseMessage.LOGIN_SUCCESS, tokenValue));
+    res.status(statusCode.OK).send(authUtil.successTrue(statusCode.OK, responseMessage.LOGIN_SUCCESS, tokenValue));
 });
 
 module.exports = router;

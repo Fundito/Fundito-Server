@@ -6,25 +6,23 @@ var responseMessage = require('../../module/utils/responseMessage');
 var authUtil = require('../../module/utils/authUtil');
 var pool = require('../../module/db/pool');
 
-var Card = require('../../model/Card');
+var Funding = require('../../model/Funding');
 
 /**
- * [POST] /mypage/card/:userIdx
- * 카드 생성
+ * [POST] /funding
+ * 투자 생성
  * @author ChoSooMin
- * @param userIdx
- * @body cardCompany, cardNumber, cvc, password
+ * @body userIdx, password, storeIdx, fundingMoney
  */
-router.post('/:userIdx', async (req, res) => {
+router.post('/', async(req, res) => {
     const {
-        cardCompany,
-        cardNumber,
-        cvc,
-        password
+        userIdx,
+        password,
+        storeIdx,
+        fundingMoney
     } = req.body;
-    const { userIdx } = req.params;
 
-    Card.create(userIdx, cardCompany, cardNumber, cvc, password)
+    Funding.create(userIdx, password, storeIdx, fundingMoney)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
@@ -35,15 +33,12 @@ router.post('/:userIdx', async (req, res) => {
 });
 
 /**
- * [GET] /mypage/card/:cardIdx
- * 카드 조회
+ * [GET] /funding
+ * 모든 투자 내역 조회
  * @author ChoSooMin
- * @param cardIdx
  */
-router.get('/:cardIdx', async(req, res) => {
-    const { cardIdx } = req.params;
-
-    Card.read(cardIdx)
+router.get('/', async(req, res) => {
+    Funding.readAll()
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
@@ -54,19 +49,18 @@ router.get('/:cardIdx', async(req, res) => {
 });
 
 /**
- * [DELETE] /mypage/card/:userIdx
- * 카드 삭제
+ * [DELETE] /funding
+ * 펀딩 내역 삭제
  * @author ChoSooMin
- * @param userIdx
- * @body cardIdx
+ * @body userIdx, storeIdx
  */
-router.delete('/:userIdx', async(req, res) => {
+router.delete('/', async(req, res) => {
     const {
-        cardIdx
+        userIdx,
+        storeIdx
     } = req.body;
-    const { userIdx } = req.params;
 
-    Card.delete(userIdx, cardIdx)
+    Funding.delete(userIdx, storeIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })

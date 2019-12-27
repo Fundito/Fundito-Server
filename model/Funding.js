@@ -19,7 +19,7 @@ const funding = {
             if (!fundingResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
@@ -27,7 +27,7 @@ const funding = {
                 if (fundingResult[0] != undefined) {
                     resolve({
                         code : statusCode.BAD_REQUEST,
-                        json : authUtil.successFalse(responseMessage.DUPLICATE_FUNDING)
+                        json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.DUPLICATE_FUNDING)
                     });
                     return;
                 }
@@ -38,7 +38,7 @@ const funding = {
                 if (!userResult) {
                     resolve({
                         code : statusCode.INTERNAL_SERVER_ERROR,
-                        json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                     });
                     return;
                 }
@@ -61,7 +61,7 @@ const funding = {
                         if (!selectStoreGoalMoneyResult || !selectFundingMoneyResult) {
                             resolve({
                                 code : statusCode.INTERNAL_SERVER_ERROR,
-                                json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                                json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
                             console.log(`DB ERROR`);
                             return;
@@ -75,7 +75,7 @@ const funding = {
                                 if (!updateStoreFundInfoResult) {
                                     resolve({
                                         code : statusCode.INTERNAL_SERVER_ERROR,
-                                        json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                                     });
                                     console.log(`update error`);
                                     return;
@@ -87,7 +87,7 @@ const funding = {
                                 if (!updateStoreFundInfoResult) {
                                     resolve({
                                         code : statusCode.INTERNAL_SERVER_ERROR,
-                                        json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                                     });
                                     console.log(`update error`);
                                     return;
@@ -100,7 +100,7 @@ const funding = {
                         if (!createFundResult) {
                             resolve({
                                 code : statusCode.INTERNAL_SERVER_ERROR,
-                                json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                                json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
                             console.log(`FUND DB ERROR`);
                             return;
@@ -108,13 +108,13 @@ const funding = {
             
                         resolve({
                             code : statusCode.OK,
-                            json : authUtil.successTrue(responseMessage.FUNDING_SUCCESS)
+                            json : authUtil.successTrue(statusCode.OK, responseMessage.FUNDING_SUCCESS)
                         });
                     }
                     else {
                         resolve({
                             code : statusCode.UNAUTHORIZED,
-                            json : authUtil.successTrue(responseMessage.MISS_MATCH_PASSWORD)
+                            json : authUtil.successTrue(statusCode.UNAUTHORIZED, responseMessage.MISS_MATCH_PASSWORD)
                         });
                     }
                 }
@@ -130,34 +130,37 @@ const funding = {
             if (!getFundListResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_READ_ALL_SUCCESS(THIS_LOG), getFundListResult)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_ALL_SUCCESS(THIS_LOG), getFundListResult)
             });
         });
     },
 
     read: (userIdx) => {
         return new Promise(async (resolve, reject) => {
-            const getMyFundListQuery = `SELECT * FROM ${table} WHERE user_idx = ?`;
+            /**
+             * @todo user_idx가 없는 값이면 ? 예외 처리 안해도 되나?
+             */
+            const getMyFundListQuery = `SELECT * FROM ${table} WHERE user_idx = ?`; 
             const getMyFundListResult = await pool.queryParam_Arr(getMyFundListQuery, [userIdx]);
 
             if (!getMyFundListResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_READ_SUCCESS(THIS_LOG), getMyFundListResult)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getMyFundListResult)
             });
         });
     },
@@ -174,14 +177,14 @@ const funding = {
             if (!deleteFundingResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_DELETE_SUCCESS(THIS_LOG))
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_DELETE_SUCCESS(THIS_LOG))
             });
         });
     }

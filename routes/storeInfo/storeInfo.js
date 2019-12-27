@@ -37,7 +37,7 @@ router.post('/', async(req, res) => {
     })
     .catch((err) => {
         console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
 
@@ -53,7 +53,7 @@ router.get('/', async(req, res) => {
     })
     .catch((err) => {
         console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
 
@@ -79,14 +79,14 @@ router.get('/search', async(req, res) => {
 			}
 		}
 
-        const json = authUtil.successTrue(responseMessage.X_READ_SUCCESS('검색'), findStoreNameList)
+        const json = authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS('검색'), findStoreNameList)
 
         
         res.status(code).send(json);
     })
     .catch((err) => {
         console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
 
@@ -102,7 +102,7 @@ router.get('/:storeIdx', async(req, res) => {
     } = req.params;
 
     if (!storeIdx) {
-        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.NULL_VALUE));
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
 
@@ -112,7 +112,7 @@ router.get('/:storeIdx', async(req, res) => {
     })
     .catch((err) => {
         console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
 
@@ -129,7 +129,7 @@ router.post('/wifi', async(req, res) => {
     } = req.body;
 
     if (!wifiSSID || !storeIdx) {
-        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.NULL_VALUE));
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
 
@@ -139,15 +139,15 @@ router.post('/wifi', async(req, res) => {
         console.log(storeData);
 
         if (wifiSSID == data.wifi_SSID) {
-            res.status(code).send(authUtil.successTrue(responseMessage.WIFI_CHECK_SUCCESS));
+            res.status(code).send(authUtil.successTrue(code, responseMessage.WIFI_CHECK_SUCCESS));
         }
         else {
-            res.status(code).send(authUtil.successTrue(responseMessage.WIFI_CHECK_FAIL));
+            res.status(code).send(authUtil.successTrue(code, responseMessage.WIFI_CHECK_FAIL));
         }
     })
     .catch((err) => {
         console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
 
@@ -168,7 +168,7 @@ router.delete('/:storeIdx', async(req, res) => {
     })
     .catch((err) => {
         console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
 

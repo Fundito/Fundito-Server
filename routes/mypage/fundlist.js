@@ -20,7 +20,7 @@ router.get('/:userIdx', async (req, res) => {
     } = req.params;
 
     if (!userIdx) {
-        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.NULL_VALUE));
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
 
@@ -30,7 +30,7 @@ router.get('/:userIdx', async (req, res) => {
     })
     .catch((err) => {
         console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR));
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
 

@@ -20,7 +20,7 @@ const storeFund = {
             if (selectStoreIdxResult[0] != undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(responseMessage.DUPLICATE_VALUE_ERROR)
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.DUPLICATE_VALUE_ERROR)
                 });
                 return;
             }
@@ -44,14 +44,14 @@ const storeFund = {
             if (!insertStoreFundInfoResult) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(responseMessage.STORE_FUND_INSERT_FAILED)
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.STORE_FUND_INSERT_FAILED)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.STORE_FUND_INSERT_SUCCESS)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.STORE_FUND_INSERT_SUCCESS)
             });
         });
     },
@@ -64,14 +64,14 @@ const storeFund = {
             if (!selectStoreFundListResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_READ_ALL_SUCCESS(THIS_LOG), selectStoreFundListResult)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_ALL_SUCCESS(THIS_LOG), selectStoreFundListResult)
             });
         });
     },
@@ -85,7 +85,7 @@ const storeFund = {
             if(!selectStoreFundInfoResult){
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
@@ -120,7 +120,7 @@ const storeFund = {
 
                     resolve({
                         code : statusCode.OK,
-                        json : authUtil.successTrue(responseMessage.X_READ_SUCCESS(THIS_LOG), selectStoreFundInfoResult)
+                        json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), selectStoreFundInfoResult)
                     });
                     return;
                 }
@@ -130,7 +130,7 @@ const storeFund = {
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_READ_SUCCESS(THIS_LOG), selectStoreFundInfoResult)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), selectStoreFundInfoResult)
             });
         })
     },
@@ -144,14 +144,14 @@ const storeFund = {
             if(!updateStoreFundInfoResult){
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_UPDATE_SUCCESS(THIS_LOG))
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_UPDATE_SUCCESS(THIS_LOG))
             });
         });
     },
@@ -164,14 +164,14 @@ const storeFund = {
             if (!deleteStoreFundResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_DELETE_SUCCESS(THIS_LOG))
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_DELETE_SUCCESS(THIS_LOG))
             });
         });
     }

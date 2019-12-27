@@ -23,14 +23,14 @@ const user = {
             if (!getCertainUserResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_READ_SUCCESS(THIS_LOG), getCertainUserResult)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getCertainUserResult)
             });
         });
     },

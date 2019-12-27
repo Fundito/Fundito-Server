@@ -25,14 +25,14 @@ const card = {
             if (!cardCreateResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR,responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.CARD_CREATE_SUCCESS)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.CARD_CREATE_SUCCESS)
             });
         });
     },
@@ -50,7 +50,7 @@ const card = {
             if (cardData == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(responseMessage.NO_INDEX)
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
                 });
                 return;
             }
@@ -64,7 +64,7 @@ const card = {
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_READ_SUCCESS(THIS_LOG), result)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), result)
             });
         });
     },
@@ -81,14 +81,14 @@ const card = {
             if (!deleteCardResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_DELETE_SUCCESS(THIS_LOG))
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_DELETE_SUCCESS(THIS_LOG))
             });
         });
     }

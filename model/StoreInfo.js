@@ -30,7 +30,7 @@ const storeInfo = {
                 if (!createMenuResult) {
                     resolve({
                         code : statusCode.INTERNAL_SERVER_ERROR,
-                        json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                     });
                     return;
                 }
@@ -39,14 +39,14 @@ const storeInfo = {
             if (!createStoreResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_CREATE_SUCCESS(THIS_LOG), createStoreResult.insertId)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_CREATE_SUCCESS(THIS_LOG), createStoreResult.insertId)
             });
         });
     },
@@ -59,7 +59,7 @@ const storeInfo = {
             if (!getStoreListResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
@@ -80,7 +80,7 @@ const storeInfo = {
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_READ_ALL_SUCCESS(THIS_LOG), storeListResult)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_ALL_SUCCESS(THIS_LOG), storeListResult)
             });
         });
     },
@@ -93,7 +93,7 @@ const storeInfo = {
             if (getOneStoreResult[0] == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(responseMessage.NO_INDEX)
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
                 });
                 return;
             }
@@ -104,7 +104,7 @@ const storeInfo = {
             if (!getOneStoreResult || !getStoreMenuResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
@@ -114,7 +114,7 @@ const storeInfo = {
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_READ_SUCCESS(THIS_LOG), storeResult)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), storeResult)
             });
         });
     },
@@ -127,7 +127,7 @@ const storeInfo = {
             if (!getStoreNameListResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
@@ -147,14 +147,14 @@ const storeInfo = {
             if (!deleteStoreResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(responseMessage.X_DELETE_SUCCESS(THIS_LOG))
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_DELETE_SUCCESS(THIS_LOG))
             });
         });
     }

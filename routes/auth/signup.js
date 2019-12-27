@@ -20,7 +20,7 @@ router.post('/', async (req,res) => {
     } = req.body;
 
     if (!name || !password || !id || !point){
-        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(responseMessage.NULL_VALUE));
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
 
@@ -31,11 +31,11 @@ router.post('/', async (req,res) => {
     const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [name, hashed, id, salt, point]);
 
     if (!insertUserInfoResult) {
-        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse("DB ERROR"));
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, "DB ERROR"));
         return;
     }
 
-    res.status(statusCode.OK).send(authUtil.successTrue(responseMessage.SIGN_UP_SUCCESS));
+    res.status(statusCode.OK).send(authUtil.successTrue(statusCode.OK, responseMessage.SIGN_UP_SUCCESS));
     } catch (e) {
         console.log(e.message);
         
