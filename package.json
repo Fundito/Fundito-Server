@@ -28,6 +28,8 @@
     "pbkdf2": "^3.0.17",
     "promise-mysql": "^4.1.1",
     "rand-token": "^0.4.0",
-    "random-token": "0.0.8"
+    "random-token": "0.0.8",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5"
   }
 }
