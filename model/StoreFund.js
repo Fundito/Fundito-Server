@@ -111,7 +111,6 @@ const storeFund = {
             }
             /** [TODO] remaining_days 계산하기, 실행하고 5초뒤에 fund_status 바뀌는거 수정하기 */
             for (var i=0; i< selectStoreFundInfoResult.length; i++) {
-                console.log(i);
                 const result = selectStoreFundInfoResult[i];
                 const date = Date.now();
                 const nowDate = moment(date).format('YYYY-MM-DD');
