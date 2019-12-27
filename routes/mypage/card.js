@@ -29,8 +29,9 @@ router.post('/:userIdx', async (req, res) => {
         return;
     }
 
-    console.log(typeof(cardNumber));
+    // console.log(typeof(cardNumber));
 
+    // cardNumber, cvc, password 형이 string이 아니면 오류 (암호화, 복호화를 위해)
     if (typeof(cardNumber) != `string` || typeof(cvc) != `string` || typeof(password) != `string`) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.BODY_VALUE_ERROR));
         return;

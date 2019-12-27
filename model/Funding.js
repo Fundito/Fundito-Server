@@ -13,6 +13,18 @@ const THIS_LOG = `펀딩 정보`;
 const funding = {
     create: (userIdx, password, storeIdx, fundingMoney) => {
         return new Promise(async (resolve, reject) => {
+            const storeIdxQuery = `SELECT * FROM store_info WHERE store_idx = ?`;
+            const storeIdxResult = await pool.queryParam_Arr(storeIdxQuery, [storeIdx]);
+
+            if (storeIdxResult[0] == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `해당하지 않는 storeIdx 값입니다.`)
+                });
+                return;
+            }
+
+
             const fundingQuery = `SELECT * FROM ${table} WHERE user_idx = ? AND store_idx = ?`;
             const fundingResult = await pool.queryParam_Arr(fundingQuery, [userIdx, storeIdx]);
 
@@ -35,6 +47,14 @@ const funding = {
                 const userQuery = `SELECT password FROM ${userTable} WHERE user_idx = ?`;
                 const userResult = await pool.queryParam_Arr(userQuery, [userIdx]);
     
+                if (userResult[0] == undefined) {
+                    resolve({
+                        code : statusCode.BAD_REQUEST,
+                        json : authUtil.successFalse(statusCode.BAD_REQUEST, `해당하지 않는 userIdx값입니다.`)
+                    });
+                    return;
+                }
+
                 if (!userResult) {
                     resolve({
                         code : statusCode.INTERNAL_SERVER_ERROR,
@@ -49,6 +69,15 @@ const funding = {
                         // 가게의 목표 금액 가져오기
                         const selectStoreGoalMoneyQuery = `SELECT goal_money FROM ${storeFundTable} WHERE store_idx = ?`;
                         const selectStoreGoalMoneyResult = await pool.queryParam_Arr(selectStoreGoalMoneyQuery, [storeIdx]);
+                        
+                        if (selectStoreGoalMoneyResult[0] == undefined) {
+                            resolve({
+                                code : statusCode.BAD_REQUEST,
+                                json : authUtil.successFalse(statusCode.BAD_REQUEST, `아직 펀딩에 등록하지 않은 가게입니다`)
+                            });
+                            return;
+                        }
+
                         const goalMoney = selectStoreGoalMoneyResult[0].goal_money;
                         console.log(goalMoney);
 
@@ -144,9 +173,20 @@ const funding = {
 
     read: (userIdx) => {
         return new Promise(async (resolve, reject) => {
+            const userQuery = `SELECT user_idx FROM user WHERE user_idx = ?`;
+            const getUserQuery = await pool.queryParam_Arr(userQuery, [userIdx]);
+
             /**
-             * @todo user_idx가 없는 값이면 ? 예외 처리 안해도 되나?
+             * user_idx가 user 디비에 없는 값일 때
              */
+            if (getUserQuery[0] == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `해당하지 않는 userIdx값입니다.`)
+                });
+                return;
+            }
+
             const getMyFundListQuery = `SELECT * FROM ${table} WHERE user_idx = ?`; 
             const getMyFundListResult = await pool.queryParam_Arr(getMyFundListQuery, [userIdx]);
 
@@ -178,6 +218,14 @@ const funding = {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
                     json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            if (deleteFundingResult[0] == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `존재하지 않는 펀딩입니다.`)
                 });
                 return;
             }

@@ -22,6 +22,11 @@ router.post('/', async(req, res) => {
         fundingMoney
     } = req.body;
 
+    if (!userIdx || !password || !storeIdx || !fundingMoney) {
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+        return;
+    }
+
     Funding.create(userIdx, password, storeIdx, fundingMoney)
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -59,6 +64,11 @@ router.delete('/', async(req, res) => {
         userIdx,
         storeIdx
     } = req.body;
+
+    if (!userIdx || !storeIdx) {
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+        return;
+    }
 
     Funding.delete(userIdx, storeIdx)
     .then(({ code, json }) => {

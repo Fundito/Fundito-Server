@@ -31,6 +31,11 @@ router.post('/', async(req, res) => {
         menu
     } = req.body;
 
+    // if (!name || !telNumber || !latitude || !longitude || !address || !businessHours || !breaktime || !holiday || !thumbnail || wifiSSID || !menu) {
+    //     res.status(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    //     return;
+    // }
+
     StoreInfo.create(name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, menu)
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -135,10 +140,16 @@ router.post('/wifi', async(req, res) => {
 
     StoreInfo.read(storeIdx)
     .then(({ code, json }) => {
-        const data = json.data;
+        const storeData = json.data;
         console.log(storeData);
 
-        if (wifiSSID == data.wifi_SSID) {
+        // storeIdx가 존재하지 않을 경우
+        if (storeData == undefined) {
+            res.status(code).send(authUtil.successFalse(code, json.message));
+            return;
+        }
+
+        if (wifiSSID == storeData.wifi_SSID) {
             res.status(code).send(authUtil.successTrue(code, responseMessage.WIFI_CHECK_SUCCESS));
         }
         else {

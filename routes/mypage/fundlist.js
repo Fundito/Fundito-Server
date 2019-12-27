@@ -19,11 +19,6 @@ router.get('/:userIdx', async (req, res) => {
         userIdx
     } = req.params;
 
-    if (!userIdx) {
-        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
-        return;
-    }
-
     Funding.read(userIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
