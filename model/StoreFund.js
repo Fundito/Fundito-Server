@@ -4,7 +4,6 @@ const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
 
 const moment = require('moment');
-const csvManager = require('../module/cronManager');
 
 const table = `store_fund`;
 const THIS_LOG = `펀딩 정보`;
@@ -97,65 +96,65 @@ const storeFund = {
         });
     },
 
-    read: (storeIdx) => {
+    checkDueDate: () =>{
         return new Promise(async (resolve, reject) => {
-            
-            const selectStoreFundInfoQuery = `SELECT * FROM ${table} WHERE store_idx = ?`;
-            const selectStoreFundInfoResult = await pool.queryParam_Arr(selectStoreFundInfoQuery, [storeIdx]);
+            const selectStoreFundInfoQuery = `SELECT * FROM ${table}`;
+            const selectStoreFundInfoResult = await pool.queryParam_None(selectStoreFundInfoQuery);
 
             if(!selectStoreFundInfoResult){
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
                     json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
+                console.log(`select StoreFund Info ERROR`);
                 return;
             }
-
-            const idx1 = csvManager.addTask('0 12 * * *', async () => {
-                console.log('매일 12시 마다 실행', moment().format());
-                /** [TODO] remaining_days 계산하기, 실행하고 5초뒤에 fund_status 바뀌는거 수정하기 */
-                const result = selectStoreFundInfoResult[0];
+            /** [TODO] remaining_days 계산하기, 실행하고 5초뒤에 fund_status 바뀌는거 수정하기 */
+            for (var i=0; i< selectStoreFundInfoResult.length; i++) {
+                console.log(i);
+                const result = selectStoreFundInfoResult[i];
                 const date = Date.now();
                 const nowDate = moment(date).format('YYYY-MM-DD');
                 const dueDate = moment(result.due_date).format('YYYY-MM-DD');
 
                 if (nowDate >= dueDate) {
-                    if (result.goal_money <= result.collected_money) { // 펀딩 성공
-                    console.log(`${result.goal_money} 그리고 ${result.collected_money}`);
-                        const fund_status = 1;
-                        const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
-                        const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, storeIdx]);
-                        if (!updateStoreFundInfoResult) {
-                            console.log(`err`);
-                        }
-                    } else if (result.goal_money > result.collected_money) { // 펀딩 실패
+                    if (result.fund_status !== 1) {
                         const fund_status = 2;
                         const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
-                        const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, storeIdx]);
+                        const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
+                    
                         if (!updateStoreFundInfoResult) {
-                            console.log(`err`);
+                            resolve({
+                                code: statusCode.INTERNAL_SERVER_ERROR,
+                                json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                            });
+                            console.log(`update StoreFund Info ERROR`);
+                            return;
                         }
                     }
-                    const selectStoreFundInfoQuery = `SELECT * FROM ${table} WHERE store_idx = ?`;
-                    const selectStoreFundInfoResult = await pool.queryParam_Arr(selectStoreFundInfoQuery, [storeIdx]);
-
-                    resolve({
-                        code : statusCode.OK,
-                        json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), selectStoreFundInfoResult)
-                    });
-                    return;
                 }
-            });
+            }
+        });
+    },
+    read: (storeIdx) => {
+        return new Promise(async (resolve, reject) => {
+            const selectStoreFundInfoQuery = `SELECT * FROM ${table} WHERE store_idx = ?`;
+            const selectStoreFundInfoResult = await pool.queryParam_Arr(selectStoreFundInfoQuery, [storeIdx]);
 
-            csvManager.startTask(idx1);
+            if (!selectStoreFundInfoResult) {
+                resolve({
+                    code: statusCode.INTERNAL_SERVER_ERROR,
+                    json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
 
             resolve({
-                code : statusCode.OK,
-                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), selectStoreFundInfoResult)
+                code: statusCode.OK,
+                json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), selectStoreFundInfoResult)
             });
-        })
+        });
     },
-
     update: (storeIdx, customerCount, marginPercent, goalMoney, remaining_days, fund_status ) => {
         return new Promise(async (resolve, reject) => {
             
