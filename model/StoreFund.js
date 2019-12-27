@@ -90,8 +90,8 @@ const storeFund = {
                 return;
             }
 
-            const idx1 = csvManager.addTask('*/5 * * * * *', async () => {
-                console.log('5초 마다 실행', moment().format());
+            const idx1 = csvManager.addTask('0 12 * * *', async () => {
+                console.log('매일 12시 마다 실행', moment().format());
                 /** [TODO] remaining_days 계산하기, 실행하고 5초뒤에 fund_status 바뀌는거 수정하기 */
                 const result = selectStoreFundInfoResult[0];
                 const date = Date.now();
