@@ -3,10 +3,11 @@ var router = express.Router();
 
 const hangul = require('hangul-js');
 
-var statusCode = require('../../module/utils/statusCode');
-var responseMessage = require('../../module/utils/responseMessage');
-var authUtil = require('../../module/utils/authUtil');
-var pool = require('../../module/db/pool');
+const statusCode = require('../../module/utils/statusCode');
+const responseMessage = require('../../module/utils/responseMessage');
+const authUtil = require('../../module/utils/authUtil');
+const upload = require('../../config/multer');
+
 
 const StoreInfo = require('../../model/StoreInfo');
 
@@ -16,7 +17,7 @@ const StoreInfo = require('../../model/StoreInfo');
  * @author ChoSooMin
  * @body name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, menu
  */
-router.post('/', async(req, res) => {
+router.post('/', upload.single('thumbnail'), async(req, res) => {
     const {
         name,
         telNumber,
@@ -26,17 +27,18 @@ router.post('/', async(req, res) => {
         businessHours,
         breaktime,
         holiday,
-        thumbnail,
         wifiSSID,
         menu
     } = req.body;
+
+    const thumbnailImg = req.file.location;
 
     if (!name || !wifiSSID ) {
         res.status(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
-
-    StoreInfo.create(name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, menu)
+    
+    StoreInfo.create(name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnailImg, wifiSSID, menu)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
