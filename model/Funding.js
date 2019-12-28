@@ -109,6 +109,7 @@ const funding = {
                     console.log(cardNumberDecryptionResult);
 
                     if (cardNumberDecryptionResult == payPassword) {
+                        /** [TODO] 펀딩 금액이 A 보다 커지면 fund_status 3으로 교체 */
                         // 가게의 목표 금액 가져오기
                         const selectStoreGoalMoneyQuery = `SELECT goal_money FROM ${storeFundTable} WHERE store_idx = ?`;
                         const selectStoreGoalMoneyResult = await pool.queryParam_Arr(selectStoreGoalMoneyQuery, [storeIdx]);
@@ -125,11 +126,11 @@ const funding = {
                         console.log(goalMoney);
 
                         // 가게에 펀딩 된 금액들을 가져오기
-                        const selectFundingMoneyQuery = `SELECT funding_money FROM ${table} WHERE store_idx = ?`;
-                        const selectFundingMoneyResult = await pool.queryParam_Arr(selectFundingMoneyQuery, [storeIdx]);
-                        console.log(selectFundingMoneyResult);
+                        const selectCurrentSalesQuery = `SELECT current_sales FROM ${table} WHERE store_idx = ?`;
+                        const selectCurrentSalesResult = await pool.queryParam_Arr(selectCurrentSalesQuery, [storeIdx]);
+                        console.log(selectCurrentSalesResult);
 
-                        if (!selectStoreGoalMoneyResult || !selectFundingMoneyResult) {
+                        if (!selectStoreGoalMoneyResult || !selectCurrentSalesResult) {
                             resolve({
                                 code : statusCode.INTERNAL_SERVER_ERROR,
                                 json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
@@ -138,14 +139,9 @@ const funding = {
                             return;
                         }
 
-                        // 가게에 펀딩된 금액 합계
-                        var fundingMoneySum = 0;
-                        for(var i=0; i< selectFundingMoneyResult.length; i++){
-                            fundingMoneySum += selectFundingMoneyResult[i].funding_money;
-                        }
-
-                        // 펀딩할 때마다 펀딩 성공 여부를 체크
-                        if (goalMoney <= fundingMoneySum) { 
+                        const currentSales = selectCurrentSalesResult[0].current_sales;
+                        // 매일 오전 12시 펀딩 성공 여부를 체크
+                        if (goalMoney <= currentSales) { 
                                 const fund_status = 1;
                                 // 펀딩 성공 업데이트
                                 const updateStoreFundInfoQuery = `UPDATE ${storeFundTable} SET fund_status = ? WHERE store_idx = ?`;
@@ -255,7 +251,7 @@ const funding = {
                 return;
             }
 
-            const getMyFundListQuery = `SELECT * FROM ${table} WHERE user_idx = ? ORDER BY funding_time DESC`; 
+            const getMyFundListQuery = `SELECT * FROM ${table} WHERE user_idx = ?`; 
             const getMyFundListResult = await pool.queryParam_Arr(getMyFundListQuery, [userIdx]);
 
             if (!getMyFundListResult) {
