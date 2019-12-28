@@ -273,6 +273,31 @@ const funding = {
         });
     },
 
+    readTimeline: (storeIdx) => {
+        return new Promise(async (resolve, reject) => {
+            const getTimelineQuery = 
+                `SELECT u.nickname, f.* 
+                FROM ${table} AS f JOIN ${userTable} AS u ON u.user_idx = f.user_idx 
+                WHERE f.store_idx = ${storeIdx}
+                ORDER BY f.funding_time DESC LIMIT 4`;
+            
+            const getTimelineResult = await pool.queryParam_None(getTimelineQuery);
+
+            if (!getTimelineResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            resolve({
+                code : statusCode.OK,
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getTimelineResult)
+            });
+        });
+    },
+
     update: () => {
         // 이건 할 필요 없을듯!
     },
