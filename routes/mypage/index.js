@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-router.use('/fundlist', require('./fundlist'));
+router.use('/fund', require('./fund'));
 router.use('/card', require('./card'));
 router.use('/point', require('./point'));
 
