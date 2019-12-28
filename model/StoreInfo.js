@@ -87,6 +87,7 @@ const storeInfo = {
 
     read: (storeIdx) => {
         return new Promise(async (resolve, reject) => {
+            // 식당 정보 가져오기
             const getOneStoreQuery = `SELECT * FROM ${storeInfoTable} WHERE store_idx = ?`;
             const getOneStoreResult = await pool.queryParam_Arr(getOneStoreQuery, [storeIdx]);
 
@@ -98,6 +99,7 @@ const storeInfo = {
                 return;
             }
 
+            // 식당 메뉴 가져오기 
             const getStoreMenuQuery = `SELECT menu_name, menu_price FROM ${menuTable} WHERE store_idx = ?`;
             const getStoreMenuResult = await pool.queryParam_Arr(getStoreMenuQuery, [storeIdx]);
 
@@ -109,8 +111,17 @@ const storeInfo = {
                 return;
             }
 
+            /** [TODO] : 지금 펀딩하면 000% 환급 ! 계산하기
+             * 마목 - 마기 = 투자이윤 
+             * 투자 이윤 / 3 
+             */
+            var refund_percent;
+            
             const storeResult = getOneStoreResult[0];
+            storeResult.refund_percent = refund_percent;
             storeResult.menu = getStoreMenuResult;
+
+            console.log(storeResult);
 
             resolve({
                 code : statusCode.OK,
