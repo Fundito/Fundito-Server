@@ -16,7 +16,6 @@ const StoreFund = require('../../model/StoreFund');
 router.post('/:storeIdx', async (req, res) => {
     try {
         const {
-            customerCount,
             marginPercent,
             goalMoney
         } = req.body;
@@ -24,7 +23,7 @@ router.post('/:storeIdx', async (req, res) => {
             storeIdx
         } = req.params;
 
-        if (!storeIdx || !customerCount || !marginPercent || !goalMoney) {
+        if (!storeIdx  || !marginPercent || !goalMoney) {
             res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
             return;
         }

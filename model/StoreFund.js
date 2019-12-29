@@ -47,7 +47,7 @@ const storeFund = {
             }
             
             // 가게의 펀드 정보(기존 고객 수, 마진율, 등록날짜, 마감기한, 목표매출, 펀딩인원, 진행상태)를 삽입
-            const insertStoreFundInfoQuery = 'INSERT INTO store_fund(store_idx, customer_count, margin_percent, register_time, due_date, goal_money) VALUES (?, ?, ?, ?, ?, ?)';
+            const insertStoreFundInfoQuery = 'INSERT INTO store_fund(store_idx, margin_percent, register_time, due_date, goal_money) VALUES (?, ?, ?, ?, ?, ?)';
             
             // registerTime 구하기
             const date = Date.now();
@@ -60,7 +60,7 @@ const storeFund = {
             const dueDate = moment(d.getTime()).add('1', 'M').format('YYYY-MM-DD HH:mm:ss');
             console.log(dueDate);
 
-            const insertStoreFundInfoResult = await pool.queryParam_Arr(insertStoreFundInfoQuery, [storeIdx, customerCount, marginPercent, registerTime, dueDate, goalMoney]);
+            const insertStoreFundInfoResult = await pool.queryParam_Arr(insertStoreFundInfoQuery, [storeIdx, marginPercent, registerTime, dueDate, goalMoney]);
             console.log(insertStoreFundInfoResult);
             if (!insertStoreFundInfoResult) {
                 resolve({
