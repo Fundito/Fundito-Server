@@ -109,7 +109,7 @@ router.get('/:storeIdx', async(req, res) => {
     } = req.params;
 
     if (!storeIdx) {
-        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX));
         return;
     }
 
