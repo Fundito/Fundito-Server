@@ -6,6 +6,7 @@ module.exports = {
     INTERNAL_SERVER_ERROR: "서버 내부 오류",
     DUPLICATE_VALUE_ERROR: "파라미터 값 중복",
     SIGN_UP_SUCCESS: "회원가입 성공",
+    SIGN_IN_SUCCESS: "로그인 성공",
 
     NO_INDEX : "존재하지 않는 인덱스 값",
     NO_STORE : "존재하지 않는 가게",
