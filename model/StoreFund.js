@@ -10,7 +10,7 @@ const table = `store_fund`;
 const THIS_LOG = `펀딩 정보`;
 
 const storeFund = {
-    create: (storeIdx, customerCount, marginPercent, goalMoney) => {
+    create: (storeIdx, marginPercent, regularMoney, goalMoney) => {
         return new Promise(async (resolve, reject) => {
             const storeIdxQuery = `SELECT * FROM store_info WHERE store_idx = ?`;
             const storeIdxResult = await pool.queryParam_Arr(storeIdxQuery, [storeIdx]);
@@ -27,8 +27,8 @@ const storeFund = {
             }
             if (storeIdxResult[0] == undefined) {
                 resolve({
-                    code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `존재하지 않는 가게입니다`)
+                    code : statusCode.DB_ERROR,
+                    json : authUtil.successFalse(statusCode.DB_ERROR, `존재하지 않는 가게입니다`)
                 });
                 return;
             }
@@ -47,7 +47,7 @@ const storeFund = {
             }
             
             // 가게의 펀드 정보(기존 고객 수, 마진율, 등록날짜, 마감기한, 목표매출, 펀딩인원, 진행상태)를 삽입
-            const insertStoreFundInfoQuery = 'INSERT INTO store_fund(store_idx, margin_percent, register_time, due_date, goal_money) VALUES (?, ?, ?, ?, ?, ?)';
+            const insertStoreFundInfoQuery = 'INSERT INTO store_fund(store_idx, margin_percent, register_time, due_date, regular_money, goal_money) VALUES (?, ?, ?, ?, ?, ?)';
             
             // registerTime 구하기
             const date = Date.now();
@@ -60,7 +60,7 @@ const storeFund = {
             const dueDate = moment(d.getTime()).add('1', 'M').format('YYYY-MM-DD HH:mm:ss');
             console.log(dueDate);
 
-            const insertStoreFundInfoResult = await pool.queryParam_Arr(insertStoreFundInfoQuery, [storeIdx, marginPercent, registerTime, dueDate, goalMoney]);
+            const insertStoreFundInfoResult = await pool.queryParam_Arr(insertStoreFundInfoQuery, [storeIdx, marginPercent, registerTime, dueDate, regularMoney, goalMoney]);
             console.log(insertStoreFundInfoResult);
             if (!insertStoreFundInfoResult) {
                 resolve({
@@ -70,10 +70,15 @@ const storeFund = {
                 return;
             }
 
+            // resolve({
+            //     code : statusCode.OK,
+            //     json : authUtil.successTrue(statusCode.OK, responseMessage.STORE_FUND_INSERT_SUCCESS)
+            // });
             resolve({
-                code : statusCode.OK,
-                json : authUtil.successTrue(statusCode.OK, responseMessage.STORE_FUND_INSERT_SUCCESS)
+                code : statusCode.DB_ERROR,
+                json : authUtil.successFalse(statusCode.DB_ERROR, `존재하지 않는 가게입니다`)
             });
+            return;
         });
     },
 

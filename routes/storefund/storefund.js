@@ -9,26 +9,27 @@ const StoreFund = require('../../model/StoreFund');
 /**
  * [POST] /storefund
  * 가게 펀드 정보 입력
- * @author LeeSohee
+ * @author LeeSohee, ChoSooMin
  * @param storeIdx
- * @body customerCount, marginPercent, goalMoney
+ * @body marginPercent, regularMoney, goalMoney
  */
 router.post('/:storeIdx', async (req, res) => {
     try {
         const {
             marginPercent,
+            regularMoney,
             goalMoney
         } = req.body;
         const {
             storeIdx
         } = req.params;
 
-        if (!storeIdx  || !marginPercent || !goalMoney) {
+        if (!storeIdx  || !marginPercent || !regularMoney || !goalMoney) {
             res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
             return;
         }
 
-        StoreFund.create(storeIdx, customerCount, marginPercent, goalMoney)
+        StoreFund.create(storeIdx, marginPercent, regularMoney,  goalMoney)
             .then(({
                 code,
                 json
