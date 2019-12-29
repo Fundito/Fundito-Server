@@ -3,13 +3,40 @@ const responseMessage = require('../module/utils/responseMessage');
 const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
 const encryptionModule = require('../module/cryption/encryptionModule');
-
+const jwt = require('../module/auth/jwt');
 
 const table = `user`;
 const THIS_LOG = `사용자`;
 
 const user = {
-    create: () => {
+    login: (id, name) => {
+        return new Promise(async(resolve, reject) => {
+            if (!id || !name) {
+                resolve({
+                    code: statusCode.BAD_REQUEST,
+                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE)
+                });
+            }
+            
+            const getUserIndexQuery = `SELECT user_idx FROM user WHERE id = '${id}' AND name = '${name}'`;
+            const getUserIndexResult = await pool.queryParam_Parse(getUserIndexQuery);
+            
+            if (getUserIndexResult === undefined){
+                resolve({
+                    code: statusCode.UNAUTHORIZED,
+                    json: authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.NO_X("user"))
+                });
+            } else {
+                const token = jwt.sign(getUserIndexResult[0].user_idx);
+                resolve({
+                    code: statusCode.OK,
+                    json: authUtil.successTrue(statusCode.OK, responseMessage.SIGN_IN_SUCCESS, token)
+                });
+            }
+        })
+    },
+
+    signup: () => {
 
     },
 

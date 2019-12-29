@@ -21,7 +21,7 @@ module.exports = {
     sign: (user) => {
         // 토큰 발급기
         const payload = {
-            idx: user.idx
+            idx: user
         };
         // 발급받은 refreshToken은 반드시 디비에 저장해야 한다.
         const result = {
