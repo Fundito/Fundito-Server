@@ -195,26 +195,6 @@ const storeInfo = {
         });
     },
 
-    readAllName: () => {
-        return new Promise(async (resolve, reject) => {
-            const getStoreNameListQuery = `SELECT store_idx, name FROM ${storeInfoTable}`;
-            const getStoreNameListResult = await pool.queryParam_None(getStoreNameListQuery);
-
-            if (!getStoreNameListResult) {
-                resolve({
-                    code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
-                });
-                return;
-            }
-
-            resolve({
-                result: getStoreNameListResult,
-                code : statusCode.OK
-            });
-        });
-    },
-
     delete: (storeIdx) => {
         return new Promise(async (resolve, reject) => {
             const storeIdxQuery = `SELECT * FROM store_info WHERE store_idx = ?`;

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const hangul = require('hangul-js');
+
 const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
@@ -44,6 +46,38 @@ router.post('/:storeIdx', async (req, res) => {
         } catch (err) {
                 console.log(err);
         };
+});
+
+/**
+ * [GET] /storeInfo/search?keyword={타이핑 시 검색어}
+ * 식당 이름 검색
+ * @author 100yeeun
+ * @params 검색키워드
+ */
+
+router.get('/search', async(req, res) => {
+    StoreFund.readAllName()
+    .then(({ result, code }) => {
+
+        const searcher = new hangul.Searcher(req.query.keyword);
+
+        const findStoreNameList = new Array();
+
+		for (var i =0 ; i<result.length; i++){
+			if (searcher.search(result[i].name)>=0){
+				findStoreNameList.push(result[i]); 
+			}
+		}
+
+        const json = authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS('검색'), findStoreNameList)
+
+        
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    });
 });
 
 /**

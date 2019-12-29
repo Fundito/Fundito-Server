@@ -3,10 +3,12 @@ const responseMessage = require('../module/utils/responseMessage');
 const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
 const fundStatus = require(`../module/utils/fundStatus`);
+const calculate = require('../module/calculate');
 
 const moment = require('moment');
 
 const table = `store_fund`;
+const storeInfoTable = `store_info`;
 const THIS_LOG = `펀딩 정보`;
 
 const storeFund = {
@@ -210,6 +212,41 @@ const storeFund = {
             });
         });
     },
+
+    readAllName: () => {
+        return new Promise(async (resolve, reject) => {
+            const getStoreNameListQuery =
+            `SELECT i.name, i.thumbnail, f.* 
+            FROM ${storeInfoTable} AS i JOIN ${table} AS f ON i.store_idx = f.store_idx
+            WHERE i.store_idx = f.store_idx`;
+
+            const getStoreNameListResult = await pool.queryParam_None(getStoreNameListQuery);
+
+            const currentGaolPer = new Array();
+
+            for(let i = 0; i<getStoreNameListResult.length;i++){
+                currentGaolPer[i] = parseInt(calculate.getCurGoalPer(getStoreNameListResult[i].current_sales, getStoreNameListResult[i].goal_money));
+                getStoreNameListResult[i].currentGaolPercent = currentGaolPer[i];
+            }
+            
+        
+            console.log(getStoreNameListResult[0])
+
+            if (!getStoreNameListResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            resolve({
+                result: getStoreNameListResult,
+                code : statusCode.OK
+            });
+        });
+    },
+
     update: (storeIdx, customerCount, marginPercent, goalMoney, remaining_days, fund_status ) => {
         return new Promise(async (resolve, reject) => {
             const storeIdxQuery = `SELECT * FROM ${table} WHERE store_idx = ?`;
