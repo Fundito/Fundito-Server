@@ -36,15 +36,15 @@ const funding = {
 
             if (!storeFundResult) {
                 resolve({
-                    code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                    code : statusCode.DB_ERROR,
+                    json : authUtil.successFalse(statusCode.DB_ERROR, responseMessage.DB_ERROR)
                 });
                 return;
             }
             if (storeFundResult[0] === undefined) {
                 resolve({
-                    code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `펀딩에 등록하지 않은 가게입니다`)
+                    code : statusCode.DB_ERROR,
+                    json : authUtil.successFalse(statusCode.DB_ERROR, `펀딩에 등록하지 않은 가게입니다`)
                 });
                 return;
             }
@@ -88,8 +88,8 @@ const funding = {
 
                 if (userResult[0] == undefined) {
                     resolve({
-                        code : statusCode.BAD_REQUEST,
-                        json : authUtil.successFalse(statusCode.BAD_REQUEST, `해당하지 않는 userIdx값입니다.`)
+                        code : statusCode.DB_ERROR,
+                        json : authUtil.successFalse(statusCode.DB_ERROR, `해당하지 않는 userIdx값입니다.`)
                     });
                     return;
                 }
@@ -173,9 +173,9 @@ const funding = {
 
                         if (isAtLimit(moneyLimit150,fundingMoneySum)){
                             // fund_status 를 3으로 변경 
-                            const fundStatus = fundStatus.Disabled;
+                            const fund_status = fundStatus.Disabled;
                             const updateStoreFundInfoQuery = `UPDATE ${storeFundTable} SET fund_status = ? WHERE store_idx = ?`;
-                            const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fundStatus, storeIdx]);
+                            const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, storeIdx]);
                             if (!updateStoreFundInfoResult) {
                                 resolve({
                                     code: statusCode.INTERNAL_SERVER_ERROR,
@@ -221,7 +221,7 @@ const funding = {
                     else {
                         resolve({
                             code : statusCode.UNAUTHORIZED,
-                            json : authUtil.successTrue(statusCode.UNAUTHORIZED, responseMessage.MISS_MATCH_PASSWORD)
+                            json : authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.MISS_MATCH_PASSWORD)
                         });
                     }
                 }

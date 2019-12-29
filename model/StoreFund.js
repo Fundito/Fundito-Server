@@ -70,15 +70,10 @@ const storeFund = {
                 return;
             }
 
-            // resolve({
-            //     code : statusCode.OK,
-            //     json : authUtil.successTrue(statusCode.OK, responseMessage.STORE_FUND_INSERT_SUCCESS)
-            // });
             resolve({
-                code : statusCode.DB_ERROR,
-                json : authUtil.successFalse(statusCode.DB_ERROR, `존재하지 않는 가게입니다`)
+                code : statusCode.OK,
+                json : authUtil.successTrue(statusCode.OK, responseMessage.STORE_FUND_INSERT_SUCCESS)
             });
-            return;
         });
     },
 
