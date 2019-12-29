@@ -17,6 +17,8 @@ const idx1 = csvManager.addTask('0 0 * * *', async () => {
         console.log(err);
         res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
+
+    /** [TODO] 내가 펀딩한 가게 마감했으면 알림보내기 */
 });
 
 csvManager.startTask(idx1);
