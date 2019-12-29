@@ -328,7 +328,7 @@ const funding = {
              * 2. 1에서 받아온 데이터들을 가지고, store_fund 테이블에서 비교 후, fund_status 들을 가져옴
              * 3. fund_status들에 따라 store_info 테이블에서 데이터 가져옴
              */
-            const joinQuery = `SELECT store_info.name, funding.store_idx, store_fund.due_date, store_fund.goal_money, store_fund.current_sales FROM funding JOIN store_fund ON funding.store_idx = store_fund.store_idx JOIN store_info ON funding.store_idx = store_info.store_idx WHERE user_idx = ? AND fund_status = ?`;
+            const joinQuery = `SELECT store_info.name, funding.store_idx, store_fund.due_date, store_fund.goal_money, store_fund.current_sales, funding.funding_money, funding.reward_money FROM funding JOIN store_fund ON funding.store_idx = store_fund.store_idx JOIN store_info ON funding.store_idx = store_info.store_idx WHERE user_idx = ? AND fund_status = ?`;
             const joinResult = await pool.queryParam_Arr(joinQuery, [userIdx, fundStatus]);
 
             if (!joinResult) {
@@ -376,18 +376,34 @@ const funding = {
                     json : authUtil.successTrue(statusCode.OK, `투자 중인 음식점 조회`, result)
                 });
             }
-            else {
+            else { // 투자 완료된 음식점
+                for(const joinData of joinResult) {
+                    const storeName = joinData.name;
+                    const dueDate = joinData.due_date;
+                    const fundingMoney = joinData.funding_money;
+                    const rewardMoney = joinData.reward_money;
+                    const refundMoney = fundingMoney + rewardMoney;
+
+                    const clientResult = {
+                        "storeName" : storeName,
+                        "dueDate" : dueDate,
+                        "fundingMoney" : fundingMoney,
+                        "refundMoney" : refundMoney
+                    };
+                    console.log("*********")
+                    console.log(clientResult);
+                    console.log("*********")
+                    result.push(clientResult)
+                }
+
+                console.log(result);
+
                 resolve({
                     code : statusCode.OK,
-                    json : authUtil.successTrue(statusCode.OK, `투자 완료된 음식점 조회`, joinResult)
+                    json : authUtil.successTrue(statusCode.OK, `투자 완료된 음식점 조회`, result)
                 });
                 // message = `투자 완료된 음식점 조회`;
             }
-
-
-            
-            
-            
         });
     },
 
