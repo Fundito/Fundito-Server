@@ -184,7 +184,7 @@ const storeInfo = {
             storeResult.refund_percent = refundPercent;
             storeResult.refund_percent_of_percent = parseInt(refundPerOfPer);
             storeResult.left_day = leftDay; 
-            storeResult.due_date = dueDate.format('YYYY-MM-DD');
+            storeResult.due_date = dueDate.format('YYYY-MM-DD HH:mm');
 
             console.log(storeResult);
 
