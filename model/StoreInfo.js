@@ -230,7 +230,7 @@ const storeInfo = {
             if (storeIdxResult[0] == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `존재하지 않는 상점입니다`)
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_STORE)
                 });
                 return;
             }

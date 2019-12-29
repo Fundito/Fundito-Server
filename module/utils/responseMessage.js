@@ -8,10 +8,12 @@ module.exports = {
     SIGN_UP_SUCCESS: "회원가입 성공",
 
     NO_INDEX : "존재하지 않는 인덱스 값",
+    NO_STORE : "존재하지 않는 가게",
 
     STORE_FUND_INSERT_FAILED: "가게 펀드 정보 입력 실패",
     STORE_FUND_INSERT_SUCCESS: "가게 펀드 정보 입력 성공",
     STORE_FUND_SELECT_SUCCESS: "가게 펀드 정보 조회 성공",
+    STORE_FUND_NO_STORE: "존재하지 않는 가게 펀드 정보",
     
     // MYPAGE_FUNDLIST_INSERT_FAILED: "내 펀드 정보 입력 실패",
     MYPAGE_FUNDLIST_SELECT_SUCCESS: "내 투자 내역 조회 성공",

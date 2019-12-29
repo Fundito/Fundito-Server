@@ -199,7 +199,7 @@ const storeFund = {
             if (selectStoreFundInfoResult[0] == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `존재하지 않는 가게 펀드 정보`)
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.STORE_FUND_NO_STORE)
                 });
                 return;
             }
