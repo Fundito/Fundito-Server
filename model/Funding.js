@@ -164,8 +164,7 @@ const funding = {
                         const marginPercent = result.margin_percent;
                         const goalMoney = result.goal_money;
                         const regularMoney = result.regular_money;
-                        const fundingBenefits = marginPercent*goalMoney - marginPercent*regularMoney;
-                        //getFundingBenefits(marginPercent,goalMoney,regularMoney); // 투자이윤 
+                        const fundingBenefits = getFundingBenefits(marginPercent,goalMoney,regularMoney); // 투자이윤 
                         console.log(`투자이윤`);
                         console.log(fundingBenefits);
                         const moneyLimit150= getMoneyLimit150(fundingBenefits); // C (150% 마감금액)
