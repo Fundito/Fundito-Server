@@ -100,7 +100,7 @@ router.get('/search', async(req, res) => {
 /**
  * [GET] /storeInfo/:storeIdx
  * 식당 정보 조회
- * @author ChoSooMin
+ * @author ChoSooMin, LeeSohee
  * @param storeIdx
  */
 router.get('/:storeIdx', async(req, res) => {
