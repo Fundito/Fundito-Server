@@ -3,9 +3,7 @@ const jwt = require('jsonwebtoken');
 const resMessage = require('../utils/responseMessage');
 const statusCode = require('../utils/statusCode');
 const authUtil = require('../utils/authUtil');
-const {
-    secretOrPrivateKey
-} = require('../../config/secretKey');
+const secretOrPrivateKey = require('../../config/secretKey');
 
 const options = {
     algorithm: "HS256",
