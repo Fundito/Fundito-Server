@@ -26,7 +26,7 @@ module.exports = {
         // 발급받은 refreshToken은 반드시 디비에 저장해야 한다.
         const result = {
             token: jwt.sign(payload, secretOrPrivateKey, options),
-            refreshToken: randToken.uid(256)
+            // refreshToken: randToken.uid(256)
         };
         return result;
     },

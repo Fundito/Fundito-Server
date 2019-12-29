@@ -10,34 +10,69 @@ const THIS_LOG = `사용자`;
 
 const user = {
     login: (id, name) => {
-        return new Promise(async(resolve, reject) => {
+        return new Promise( async(resolve, reject) => {
             if (!id || !name) {
                 resolve({
                     code: statusCode.BAD_REQUEST,
                     json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE)
                 });
+                return;
             }
             
             const getUserIndexQuery = `SELECT user_idx FROM user WHERE id = '${id}' AND name = '${name}'`;
             const getUserIndexResult = await pool.queryParam_Parse(getUserIndexQuery);
             
-            if (getUserIndexResult === undefined){
+            if (getUserIndexResult[0] === undefined){
                 resolve({
                     code: statusCode.UNAUTHORIZED,
                     json: authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.NO_X("user"))
                 });
+                return;
             } else {
                 const token = jwt.sign(getUserIndexResult[0].user_idx);
                 resolve({
                     code: statusCode.OK,
                     json: authUtil.successTrue(statusCode.OK, responseMessage.SIGN_IN_SUCCESS, token)
                 });
+                return;
             }
         })
     },
 
-    signup: () => {
+    signup: (id, name, nickname, pay_password) => {
+        return new Promise( async(resolve, reject) => {
+            if (!name || !pay_password || !id || !nickname){
+                resolve({
+                    code: statusCode.BAD_REQUEST,
+                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE)
+                });
+                return;
+            }
+            const getNicknameQuery = `SELECT user_idx FROM user WHERE nickname = '${nickname}'`;
+            const getNicknameResult = await pool.queryParam_None(getNicknameQuery);
 
+            if (getNicknameResult[0] != null) {
+                resolve({
+                    code: statusCode.BAD_REQUEST,
+                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.ALREADY_X("닉네임"))
+                });
+                return;
+            }
+            const { salt, hashedPassword } = await encryptionModule.encryption(pay_password);
+
+            // 유저의 이름,아이디,패스워드를 저장
+            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?)';
+            const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt]);
+            
+            if (insertUserInfoResult.affectedRows == 1) {
+                const token = jwt.sign(insertUserInfoResult.insertId);
+                resolve({
+                    code: statusCode.CREATED,
+                    json: authUtil.successTrue(statusCode.CREATED, responseMessage.SIGN_UP_SUCCESS, token)
+                });
+                return;
+            }
+        });
     },
 
     readAll: () => {
