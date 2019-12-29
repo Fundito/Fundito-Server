@@ -2,6 +2,7 @@ const statusCode = require('../module/utils/statusCode');
 const responseMessage = require('../module/utils/responseMessage');
 const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
+const fundStatus = require(`../module/utils/fundStatus`);
 
 const moment = require('moment');
 
@@ -150,11 +151,10 @@ const storeFund = {
 
                 // 펀딩 성공 여부를 체크
                 if (goalMoney <= currentSales) {
-                    console.log(result.store_idx);
-                    const fund_status = 1;
+                    const fundStatus = fundStatus.Success;
                     // 펀딩 성공 업데이트
                     const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
-                    const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
+                    const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fundStatus, result.store_idx]);
                     if (!updateStoreFundInfoResult) {
                         resolve({
                             code: statusCode.INTERNAL_SERVER_ERROR,
@@ -164,11 +164,10 @@ const storeFund = {
                         return;
                     }
                 } else {
-                    console.log(`여기두 들옴 ㅡㅡ`)
-                    const fund_status = 2;
+                    const fundStatus = fundStatus.Fail;
                     
                     const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
-                    const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
+                    const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fundStatus, result.store_idx]);
 
                     if (!updateStoreFundInfoResult) {
                         resolve({

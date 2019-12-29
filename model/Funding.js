@@ -173,9 +173,9 @@ const funding = {
 
                         if (isAtLimit(moneyLimit150,fundingMoneySum)){
                             // fund_status 를 3으로 변경 
-                            const fund_status = fundStatus.Disabled;
+                            const fundStatus = fundStatus.Disabled;
                             const updateStoreFundInfoQuery = `UPDATE ${storeFundTable} SET fund_status = ? WHERE store_idx = ?`;
-                            const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, storeIdx]);
+                            const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fundStatus, storeIdx]);
                             if (!updateStoreFundInfoResult) {
                                 resolve({
                                     code: statusCode.INTERNAL_SERVER_ERROR,
