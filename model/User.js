@@ -104,6 +104,14 @@ const user = {
             const getUserPointQuery = `SELECT point FROM ${table} WHERE user_idx = ${userIdx}`;
             const getUserPointResult = await pool.queryParam_None(getUserPointQuery);
 
+            if (getUserPointResult[0] == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
+                });
+                return;
+            }
+
             if (!getUserPointResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
@@ -126,7 +134,6 @@ const user = {
 
             const getCertainUserResult = await pool.queryParam_Arr(getCertainUserQuery, [userIdx]);
 
-            console.log(getCertainUserQuery)
             if (!getCertainUserResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
@@ -134,6 +141,14 @@ const user = {
                 });
                 return;
             } else {
+
+                if (getCertainUserResult[0] == undefined) {
+                    resolve({
+                        code : statusCode.BAD_REQUEST,
+                        json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
+                    });
+                    return;
+                }
 
                 const checkPayPasswordEncryptionResult = await encryptionModule.encryption(payPassword, getCertainUserResult[0].salt);
 

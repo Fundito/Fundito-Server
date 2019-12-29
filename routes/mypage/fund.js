@@ -36,7 +36,6 @@ router.get ('/reward/:userIdx', async (req, res) => {
         let getMoneySum = 0;
         let fundedMoneySum = 0;
 
-        console.log(json.status)
         if (json.status < 300) { 
 
             for(let i = 0; i < json.data.length; i++){
