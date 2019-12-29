@@ -273,6 +273,124 @@ const funding = {
         });
     },
 
+    /**
+     * 사용자의 투자 음식점 리스트 받아오기
+     * @author ChoSooMin
+     */
+    readUserFundingList : (userIdx, fundStatus) => {
+        return new Promise(async (resolve, reject) => {
+            /**
+             * userIdx가 잘못 되었을 경우
+             */
+            const userIdxQuery = `SELECT * FROM ${userTable} WHERE user_idx = ?`;
+            const userIdxResult = await pool.queryParam_Arr(userIdxQuery, [userIdx]);
+
+
+            const result = new Array();
+
+            if (!userIdxResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+            if (userIdxResult[0] == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `해당하지 않는 userIdx값입니다.`)
+                });
+                return;
+            }
+
+            // userIdx=7은 아무것도 안나오고, 12는 나옴
+            const userFundingQuery = `SELECT * FROM ${table} WHERE user_idx = ? ORDER BY funding_time DESC`;
+            const userFundingResult = await pool.queryParam_Arr(userFundingQuery, [userIdx]);
+
+            if (!userFundingResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            // funding 테이블에 사용자 idx에 해당하는 데이터가 아무것도 없을 때 (사용자가 펀딩 안함)
+            if (userFundingResult[0] == undefined) {
+                resolve({
+                    code : statusCode.OK,
+                    json : authUtil.successTrue(statusCode.OK, `투자 음식점`, result)
+                });
+            } 
+
+            /**
+             * 1. funding 테이블에서 사용자 idx에 해당하는 데이터 값들을 받아옴
+             * 2. 1에서 받아온 데이터들을 가지고, store_fund 테이블에서 비교 후, fund_status 들을 가져옴
+             * 3. fund_status들에 따라 store_info 테이블에서 데이터 가져옴
+             */
+            const joinQuery = `SELECT store_info.name, funding.store_idx, store_fund.due_date, store_fund.goal_money, store_fund.current_sales FROM funding JOIN store_fund ON funding.store_idx = store_fund.store_idx JOIN store_info ON funding.store_idx = store_info.store_idx WHERE user_idx = ? AND fund_status = ?`;
+            const joinResult = await pool.queryParam_Arr(joinQuery, [userIdx, fundStatus]);
+
+            if (!joinResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            const fundingTime = moment();
+
+            // const message = ``;
+            if (fundStatus == 0) {
+                for(const joinData of joinResult) {
+                    const storeName = joinData.name;
+                    const dueDate = moment(joinData.due_date);
+
+                    // 남은 시간 계산
+                    const remainingTime = moment.duration(dueDate.diff(fundingTime));
+                    var remainingDays = remainingTime.asDays();
+                    // console.log(remainingDays);
+
+                    // 진행률 계산
+                    const goalMoney = joinData.goal_money;
+                    const currentSales = joinData.current_sales;
+
+                    const progressPercent = currentSales / goalMoney * 100;
+
+                    const clientResult = {
+                        "storeName" : joinData.name,
+                        "remainingDays" : parseInt(remainingDays),
+                        "progressPercent" : progressPercent
+                    };
+                    console.log("*********")
+                    console.log(clientResult);
+                    console.log("*********")
+                    result.push(clientResult)
+                }
+
+                console.log(result);
+
+                resolve({
+                    code : statusCode.OK,
+                    json : authUtil.successTrue(statusCode.OK, `투자 중인 음식점 조회`, result)
+                });
+            }
+            else {
+                resolve({
+                    code : statusCode.OK,
+                    json : authUtil.successTrue(statusCode.OK, `투자 완료된 음식점 조회`, joinResult)
+                });
+                // message = `투자 완료된 음식점 조회`;
+            }
+
+
+            
+            
+            
+        });
+    },
+
     update: () => {
         // 이건 할 필요 없을듯!
     },

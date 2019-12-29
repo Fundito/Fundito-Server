@@ -9,10 +9,32 @@ const pool = require('../../module/db/pool');
 const Funding = require('../../model/Funding');
 
 /**
- * [GET] /mypage/fundlist/:userIdx
- * 내 투자내역 조회
+ * [GET] /mypage/fundlist/:userIdx/:fundStatus
  * @author ChoSooMin
- * @param user_idx
+ * @param userIdx, fundStats
+ */
+router.get('/:userIdx/:fundStatus', async (req, res) => {
+    const {
+        userIdx, 
+        fundStatus
+    } = req.params;
+
+    Funding.readUserFundingList(userIdx, fundStatus)
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
+
+/**
+ * [GET] /mypage/fundlist/:userIdx
+ * 내 투자내역 조회 (최근순)
+ * @author ChoSooMin
+ * @param userIdx
  */
 router.get('/:userIdx', async (req, res) => {
     const {
