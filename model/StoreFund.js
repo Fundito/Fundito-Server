@@ -229,9 +229,6 @@ const storeFund = {
                 getStoreNameListResult[i].currentGaolPercent = currentGaolPer[i];
             }
             
-        
-            console.log(getStoreNameListResult[0])
-
             if (!getStoreNameListResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
