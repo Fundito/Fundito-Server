@@ -151,10 +151,10 @@ const storeFund = {
 
                 // 펀딩 성공 여부를 체크
                 if (goalMoney <= currentSales) {
-                    const fundStatus = fundStatus.Success;
+                    const fund_status = fundStatus.Success;
                     // 펀딩 성공 업데이트
                     const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
-                    const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fundStatus, result.store_idx]);
+                    const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
                     if (!updateStoreFundInfoResult) {
                         resolve({
                             code: statusCode.INTERNAL_SERVER_ERROR,
@@ -164,10 +164,10 @@ const storeFund = {
                         return;
                     }
                 } else {
-                    const fundStatus = fundStatus.Fail;
+                    const fund_status = fundStatus.Fail;
                     
                     const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
-                    const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fundStatus, result.store_idx]);
+                    const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_Status, result.store_idx]);
 
                     if (!updateStoreFundInfoResult) {
                         resolve({
