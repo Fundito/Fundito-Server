@@ -92,7 +92,7 @@ const storeInfo = {
     read: (storeIdx) => {
         return new Promise(async (resolve, reject) => {
             // 식당 정보 가져오기
-            const getOneStoreQuery = `SELECT store_idx, name, business_hours, breaktime, holiday, thumbnail FROM ${storeInfoTable} WHERE store_idx = ?`;
+            const getOneStoreQuery = `SELECT store_idx, name, business_hours, breaktime, holiday, thumbnail, address FROM ${storeInfoTable} WHERE store_idx = ?`;
             const getOneStoreResult = await pool.queryParam_Arr(getOneStoreQuery, [storeIdx]);
 
             if (getOneStoreResult[0] == undefined) {
@@ -135,7 +135,7 @@ const storeInfo = {
             const fundingBenefits = getFundingBenefits(marginPercent,goalMoney,regularMoney); // 투자이윤 
             console.log(`투자이윤`);
             console.log(fundingBenefits);
-            const moneyLimit150 = getMoneyLimit150(fundingMoneySum); // C (150% 마감금액)
+            const moneyLimit150 = getMoneyLimit150(fundingBenefits); // C (150% 마감금액)
             const moneyLimit175 = getMoneyLimit175(fundingBenefits); // B (175% 마감금액)
             const moneyLimit200 = getMoneyLimit200(fundingBenefits); // A (200% 마감금액)
             console.log(`150`);
@@ -144,12 +144,14 @@ const storeInfo = {
             console.log(moneyLimit175);
             console.log(`200`);
             console.log(moneyLimit200);
+            console.log(fundingMoneySum);
             let refundPercent = 200; 
             let refundPerOfPer = getRefundPerOfPer(moneyLimit200, fundingMoneySum);
             if(isAtLimit(moneyLimit200,fundingMoneySum)){
                 refundPercent = 175;
                 refundPerOfPer = getRefundPerOfPer(moneyLimit175, fundingMoneySum);
-            } else if(isAtLimit(moneyLimit175,funding_money)) {
+            }
+            if(isAtLimit(moneyLimit175,fundingMoneySum)) {
                 refundPercent = 150;
                 refundPerOfPer = getRefundPerOfPer(moneyLimit150, fundingMoneySum);
             }
