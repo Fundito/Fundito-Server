@@ -99,7 +99,7 @@ router.get('/', async(req, res) => {
 
 /**
  * [UPDATE] /storefund/:storeIdx
- * 해당 상점의 정보 수정
+ * 해당 가게의 정보 수정
  * @author ChoSooMin
  * @param storeIdx
  * @body customerCount, marginPercent, goalMoney
@@ -130,7 +130,7 @@ router.put('/:storeIdx', async(req, res) => {
 
 /**
  * [DELETE] /storefund/:storeIdx
- * 해당 상점의 펀드 정보 삭제
+ * 해당 가게의 펀드 정보 삭제
  * @author ChoSooMin
  * @param storeIdx
  */
