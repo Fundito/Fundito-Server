@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const hangul = require('hangul-js');
+
 const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
@@ -9,27 +11,27 @@ const StoreFund = require('../../model/StoreFund');
 /**
  * [POST] /storefund
  * 가게 펀드 정보 입력
- * @author LeeSohee
+ * @author LeeSohee, ChoSooMin
  * @param storeIdx
- * @body customerCount, marginPercent, goalMoney
+ * @body marginPercent, regularMoney, goalMoney
  */
 router.post('/:storeIdx', async (req, res) => {
     try {
         const {
-            customerCount,
             marginPercent,
+            regularMoney,
             goalMoney
         } = req.body;
         const {
             storeIdx
         } = req.params;
 
-        if (!storeIdx || !customerCount || !marginPercent || !goalMoney) {
+        if (!storeIdx  || !marginPercent || !regularMoney || !goalMoney) {
             res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
             return;
         }
 
-        StoreFund.create(storeIdx, customerCount, marginPercent, goalMoney)
+        StoreFund.create(storeIdx, marginPercent, regularMoney,  goalMoney)
             .then(({
                 code,
                 json
@@ -44,6 +46,38 @@ router.post('/:storeIdx', async (req, res) => {
         } catch (err) {
                 console.log(err);
         };
+});
+
+/**
+ * [GET] /storeInfo/search?keyword={타이핑 시 검색어}
+ * 식당 이름 검색
+ * @author 100yeeun
+ * @params 검색키워드
+ */
+
+router.get('/search', async(req, res) => {
+    StoreFund.readAllName()
+    .then(({ result, code }) => {
+
+        const searcher = new hangul.Searcher(req.query.keyword);
+
+        const findStoreNameList = new Array();
+
+		for (var i =0 ; i<result.length; i++){
+			if (searcher.search(result[i].name)>=0){
+				findStoreNameList.push(result[i]); 
+			}
+		}
+
+        const json = authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS('검색'), findStoreNameList)
+
+        
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    });
 });
 
 /**
@@ -99,7 +133,7 @@ router.get('/', async(req, res) => {
 
 /**
  * [UPDATE] /storefund/:storeIdx
- * 해당 상점의 정보 수정
+ * 해당 가게의 정보 수정
  * @author ChoSooMin
  * @param storeIdx
  * @body customerCount, marginPercent, goalMoney
@@ -130,7 +164,7 @@ router.put('/:storeIdx', async(req, res) => {
 
 /**
  * [DELETE] /storefund/:storeIdx
- * 해당 상점의 펀드 정보 삭제
+ * 해당 가게의 펀드 정보 삭제
  * @author ChoSooMin
  * @param storeIdx
  */
