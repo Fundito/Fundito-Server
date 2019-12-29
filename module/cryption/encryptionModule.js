@@ -18,12 +18,9 @@ const encryption = {
                     // console.log('암호화된 암호: ', hashedPW);
 
                     const result = {
-                        "hashedPassword" : "",
-                        "salt" : ""
+                        "hashedPassword" : hashedPW,
+                        "salt" : salt
                     };
-
-                    result.hashedPassword = hashedPW;
-                    result.salt = salt;
 
                     resolve(result);
                 }
@@ -31,7 +28,7 @@ const encryption = {
             
         });
     },
-    encryption : (pw, salt) => {
+    decryption : (pw, salt) => {
         return new Promise(async (resolve, reject) => {
             crypto.randomBytes(32, (err) => {
                 if (err) {
