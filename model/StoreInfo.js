@@ -9,7 +9,7 @@ const storeInfoTable = `store_info`;
 const menuTable = `menu`;
 const userTable = `user`;
 const storeFundTable = `store_fund`;
-const THIS_LOG = '상점 정보';
+const THIS_LOG = '가게 정보';
 
 /**
  * storeInfo는 update가 없어도 된다.
