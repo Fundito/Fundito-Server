@@ -1,6 +1,3 @@
-var express = require('express');
-var router = express.Router();
-
 const csvManager = require('../module/cronManager');
 const moment = require('moment');
 const storeFund = require('../model/StoreFund');
@@ -8,7 +5,7 @@ const storeFund = require('../model/StoreFund');
 const storeFundTable = `store_fund`;
 
 // 하루에 한 번 마감기한 확인, 마감 기한이 지났으면 성공 여부 결정
-const idx1 = csvManager.addTask('*/30 * * * * *', async () => {
+const idx1 = csvManager.addTask('0 0 * * *', async () => {
     // `0 0 * * *`
     console.log(`매일 오전 12시 마다 실행`, moment().format());
 
@@ -24,4 +21,3 @@ const idx1 = csvManager.addTask('*/30 * * * * *', async () => {
 
 csvManager.startTask(idx1);
 
-module.exports = router;
