@@ -11,6 +11,8 @@ const table = `funding`;
 const storeFundTable = `store_fund`;
 const userTable = `user`;
 const THIS_LOG = `펀딩 정보`;
+const {getMoneyLimit150, isAtLimit, getFundingBenefits} = require(`../module/calculate`);
+const fundStatus = require(`../module/utils/fundStatus`);
 
 const funding = {
     create: (userIdx, payPassword, storeIdx, fundingMoney) => {
@@ -109,53 +111,6 @@ const funding = {
                     console.log(cardNumberDecryptionResult);
 
                     if (cardNumberDecryptionResult == payPassword) {
-                        /** [TODO] 펀딩 금액이 A 보다 커지면 fund_status 3으로 교체 */
-                        // 가게의 목표 금액 가져오기
-                        const selectStoreGoalMoneyQuery = `SELECT goal_money FROM ${storeFundTable} WHERE store_idx = ?`;
-                        const selectStoreGoalMoneyResult = await pool.queryParam_Arr(selectStoreGoalMoneyQuery, [storeIdx]);
-                        
-                        if (selectStoreGoalMoneyResult[0] == undefined) {
-                            resolve({
-                                code : statusCode.BAD_REQUEST,
-                                json : authUtil.successFalse(statusCode.BAD_REQUEST, `아직 펀딩에 등록하지 않은 가게입니다`)
-                            });
-                            return;
-                        }
-
-                        const goalMoney = selectStoreGoalMoneyResult[0].goal_money;
-                        console.log(goalMoney);
-
-                        // 가게에 펀딩 된 금액들을 가져오기
-                        const selectCurrentSalesQuery = `SELECT current_sales FROM ${table} WHERE store_idx = ?`;
-                        const selectCurrentSalesResult = await pool.queryParam_Arr(selectCurrentSalesQuery, [storeIdx]);
-                        console.log(selectCurrentSalesResult);
-
-                        if (!selectStoreGoalMoneyResult || !selectCurrentSalesResult) {
-                            resolve({
-                                code : statusCode.INTERNAL_SERVER_ERROR,
-                                json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
-                            });
-                            console.log(`DB ERROR`);
-                            return;
-                        }
-
-                        const currentSales = selectCurrentSalesResult[0].current_sales;
-                        // 매일 오전 12시 펀딩 성공 여부를 체크
-                        if (goalMoney <= currentSales) { 
-                                const fund_status = 1;
-                                // 펀딩 성공 업데이트
-                                const updateStoreFundInfoQuery = `UPDATE ${storeFundTable} SET fund_status = ? WHERE store_idx = ?`;
-                                const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, storeIdx]);
-                                if (!updateStoreFundInfoResult) {
-                                    resolve({
-                                        code : statusCode.INTERNAL_SERVER_ERROR,
-                                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
-                                    });
-                                    console.log(`update error`);
-                                    return;
-                                }
-                            }
-
                         // 펀딩 올렸을 때 시간 가져오기
                         const date = Date.now();
                         const fundingTime = moment(date).format('YYYY-MM-DD HH:mm:ss');
@@ -170,6 +125,66 @@ const funding = {
                             });
                             console.log(`FUND DB ERROR`);
                             return;
+                        }
+
+                        // 펀딩 성공 후 150% 투자 마감 확인
+                        // 가게 펀딩 정보 가져오기
+                        const selectStoreFundInfoQuery = `SELECT * FROM ${storeFundTable} WHERE store_idx = ?`;
+                        const selectStoreFundInfoResult = await pool.queryParam_Arr(selectStoreFundInfoQuery,[storeIdx]);
+                        const result = selectStoreFundInfoResult[0];
+
+                        if (!selectStoreFundInfoResult) {
+                            resolve({
+                                code: statusCode.INTERNAL_SERVER_ERROR,
+                                json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                            });
+                            console.log(`select StoreFund Info ERROR`);
+                            return;
+                        }
+                        
+                        // 가게에 펀딩 된 금액들을 가져오기
+                        const selectFundingMoneyQuery = `SELECT funding_money FROM ${table} WHERE store_idx = ?`;
+                        const selectFundingMoneyResult = await pool.queryParam_Arr(selectFundingMoneyQuery, [storeIdx]);
+                        console.log(selectFundingMoneyResult);
+
+                        if (!selectFundingMoneyResult) {
+                            resolve({
+                                code: statusCode.INTERNAL_SERVER_ERROR,
+                                json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                            });
+                            console.log(`DB ERROR`);
+                            return;
+                        }
+
+                        // 가게에 펀딩된 금액 합계
+                        var fundingMoneySum = 0;
+                        for(var i=0; i< selectFundingMoneyResult.length; i++){
+                            fundingMoneySum += selectFundingMoneyResult[i].funding_money;
+                        }
+                        const marginPercent = result.margin_percent;
+                        const goalMoney = result.goal_money;
+                        const regularMoney = result.regular_money;
+                        const fundingBenefits = marginPercent*goalMoney - marginPercent*regularMoney;
+                        //getFundingBenefits(marginPercent,goalMoney,regularMoney); // 투자이윤 
+                        console.log(`투자이윤`);
+                        console.log(fundingBenefits);
+                        const moneyLimit150= getMoneyLimit150(fundingBenefits); // C (150% 마감금액)
+                        console.log(`150리밋`);
+                        console.log(moneyLimit150);
+
+                        if (isAtLimit(moneyLimit150,fundingMoneySum)){
+                            // fund_status 를 3으로 변경 
+                            const fund_status = fundStatus.Disabled;
+                            const updateStoreFundInfoQuery = `UPDATE ${storeFundTable} SET fund_status = ? WHERE store_idx = ?`;
+                            const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, storeIdx]);
+                            if (!updateStoreFundInfoResult) {
+                                resolve({
+                                    code: statusCode.INTERNAL_SERVER_ERROR,
+                                    json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                                });
+                                console.log(`update error`);
+                                return;
+                            }
                         }
 
                         // 투자 성공하면 store_fund 테이블에서 해당 store_idx의 contributer_count +1
