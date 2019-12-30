@@ -127,6 +127,14 @@ const storeInfo = {
             for (var i = 0; i < getFundingMoneyResult.length; i++) {
                 fundingMoneySum += getFundingMoneyResult[i].funding_money;
             }
+
+            if (getStoreFundResult[0] == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.BAD_REQUEST)
+                });
+                return;
+            }
             
             const result = getStoreFundResult[0];
             const marginPercent = result.margin_percent;
