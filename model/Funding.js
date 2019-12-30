@@ -427,16 +427,16 @@ const funding = {
 
             const getTimelineResult = await pool.queryParam_None(getTimelineQuery);
 
-            for(let i = 0; i<getTimelineResult.length;i++){
-                getTimelineResult[i].funding_time = moment(getTimelineResult[i].funding_time).format("YYYY-MM-DD HH:MM:SS")
-            }
-
             if (!getTimelineResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
                     json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
+            }
+            
+            for(let i = 0; i<getTimelineResult.length;i++){
+                getTimelineResult[i].funding_time = moment(getTimelineResult[i].funding_time).format("YYYY-MM-DD HH:MM:SS")
             }
 
             resolve({
