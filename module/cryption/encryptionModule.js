@@ -28,7 +28,7 @@ const encryption = {
             
         });
     },
-    encryption : (pw, salt) => {
+    decryption : (pw, salt) => {
         return new Promise(async (resolve, reject) => {
             crypto.randomBytes(32, (err) => {
                 if (err) {
