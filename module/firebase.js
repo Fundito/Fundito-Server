@@ -12,7 +12,7 @@ function cloudMessaging(admin, message) {
 
 function getAccessToken() {
     return new Promise(function (resolve, reject) {
-        var key = require('./service-account.json');
+        var key = require('../config/serviceAccountKey.json');
         var jwtClient = new google.auth.JWT(
             key.client_email,
             null,
