@@ -5,6 +5,7 @@ const statusCode = require('../utils/statusCode');
 const authUtil = require('../utils/authUtil');
 const secretOrPrivateKey = require('../../config/secretKey');
 
+
 const options = {
     algorithm: "HS256",
     expiresIn: "7d",
@@ -17,7 +18,7 @@ const refreshOptions = {
     issuer: "fundito"
 };
 
-module.exports = {
+const crypto = {
     sign: (user) => {
         // 토큰 발급기
         const payload = {
@@ -77,7 +78,7 @@ module.exports = {
         if (!token) {
             return res.json(authUtil.successFalse(statusCode.BAD_REQUEST, resMessage.EMPTY_TOKEN));
         } else {
-            const user = jwt.verify(token);
+            const user = crypto.verify(token);
 
             if (user == -3) {
                 return res.json(authUtil.successFalse(statusCode.UNAUTHORIZED, resMessage.EXPIRED_TOKEN));
@@ -90,3 +91,5 @@ module.exports = {
         }
     }
 };
+
+module.exports = crypto

@@ -6,10 +6,15 @@ const authUtil = require('../../module/utils/authUtil');
 const fb = require('../../module/auth/fb-jwt');
 const User = require('../../model/User');
 
-// 로그인
+/**
+ *  [GET] /auth/signin
+ *  로그인
+ *  @author KangYeongWoo
+ *  @header facebook_access_token
+ */
 router.get('/',fb, async(req, res) => {
     const {id, name} = req.decoded;
-
+    
     User.login(id, name)
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -23,4 +28,3 @@ router.get('/',fb, async(req, res) => {
 
 
 module.exports = router;
-//강영우 바보 
