@@ -5,7 +5,6 @@ const pool = require('../module/db/pool');
 
 module.exports = {
     readAll: () => {
-
     },
 
     createAll: (userIdx, friends) => {
