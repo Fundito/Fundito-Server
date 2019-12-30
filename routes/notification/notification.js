@@ -10,7 +10,7 @@ const jwt = require('../../module/auth/jwt');
 const Notification = require('../../model/Notification');
 
 /**
- * [GET] /notification/:userIdx
+ * [GET] /notification
  * 모든 알림 조회
  * @author LeeSohee
  */
@@ -32,9 +32,7 @@ router.get('/', async (req, res) => {
  * @param userIdx
  */
 router.get('/', jwt.checkLogin, async (req, res) => {
-    const {
-        userIdx
-    } = req.decoded.idx;
+    const userIdx = req.decoded.idx;
 
     Notification.readAllUserNoti(userIdx)
     .then(({ code, json }) => {

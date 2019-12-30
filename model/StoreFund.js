@@ -4,15 +4,20 @@ const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
 const fundStatus = require(`../module/utils/fundStatus`);
 const calculate = require('../module/calculate');
+const serverKey = require('../config/serverKey');
 
-const firebase = require('../module/firebase');
-const admin = require('firebase-admin');
-const serviceAccount = require('../config/serviceAccountKey.json');
+var FCM = require('fcm-node');
+var fcmModule = require('../module/fcm');
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://fundito-123.firebaseio.com"
-});
+
+// const firebase = require('../module/firebase');
+// const admin = require('firebase-admin');
+// const serviceAccount = require('../config/serviceAccountKey.json');
+
+// admin.initializeApp({
+//     credential: admin.credential.cert(serviceAccount),
+//     databaseURL: "https://fundito-123.firebaseio.com"
+// });
 
 const moment = require('moment');
 
@@ -186,40 +191,112 @@ const storeFund = {
                             return;
                         }
                     }
-                    //Notice Data
-                    let data = {
-                        title: "fundito",
-                        notibody: "가게이름",
-                        body: "펀딩!성공 ! 또는 실패!\n\n" +
-                            "- 최원일 교수님 [GS3764_ 뇌와 인지] 월수 3교시\n\n" +
-                            "- 정원진/서준혁 교수님 [CH2105_ 화학합성실험] 2분반 추가\n\n" +
+                    // //Notice Data
+                    // let data = {
+                    //     title: "fundito",
+                    //     notibody: "가게이름",
+                    //     body: "펀딩!성공 ! 또는 실패!\n\n" +
+                    //         "- 최원일 교수님 [GS3764_ 뇌와 인지] 월수 3교시\n\n" +
+                    //         "- 정원진/서준혁 교수님 [CH2105_ 화학합성실험] 2분반 추가\n\n" +
 
-                            "* 02/07 수정사항\n\n",
-                        time: (new Date()).getTime(), // 현재시간
-                        writer: "Sohee",
-                    };
+                    //         "* 02/07 수정사항\n\n",
+                    //     time: (new Date()).getTime(), // 현재시간
+                    //     writer: "Sohee",
+                    // };
 
-                    // The topic name can be optionally prefixed with "/topics/".
-                    var topic = 'NOTICE';
+                    // // The topic name can be optionally prefixed with "/topics/".
+                    // var topic = 'NOTICE';
 
-                    var message = {
-                        data: {
-                            title: data.title,
-                            body: data.notibody
-                        },
-                        topic: topic,
-                        android: {
-                            ttl: 3600 * 1000, // 1 hour in milliseconds
-                            priority: 'high'
-                        },
-                    };
+                    // var message = {
+                    //     data: {
+                    //         title: data.title,
+                    //         body: data.notibody
+                    //     },
+                    //     topic: topic,
+                    //     android: {
+                    //         ttl: 3600 * 1000, // 1 hour in milliseconds
+                    //         priority: 'high'
+                    //     },
+                    // };
 
-                    /** [TODO] 내가 펀딩한 가게 마감했으면 알림보내기 */
-                    firebase.cloudMessaging(admin, message);
-
+                    // /** [TODO] 내가 펀딩한 가게 마감했으면 알림보내기 */
+                    // firebase.cloudMessaging(admin, message);
                 }
             }
+            const getCloseFundStoreUserQuery = `SELECT funding.user_idx FROM store_fund JOIN funding ON funding.store_idx = store_fund.store_idx WHERE fund_status = 1 OR fund_status = 2`;
+            const getCloseFundStoreUserResult = await pool.queryParam_None(getCloseFundStoreUserQuery);
+
+            console.log(getCloseFundStoreUserResult);
+
+            if (!getCloseFundStoreUserResult) {
+                resolve({
+                    code: statusCode.INTERNAL_SERVER_ERROR,
+                    json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                console.log(`get getCloseFundStoreUserResult ERROR`);
+                return;
+            }
+
+            for (var idx = 0; idx < getCloseFundStoreUserResult.length; idx++) {
+                /** Firebase(구글 개발자 사이트)에서 발급받은 서버키 */
+                // 가급적 이 값은 별도의 설정파일로 분리하는 것이 좋다.
+                var server_key = serverKey.serverKey;
+                console.log(server_key);
+
+                /** 안드로이드 단말에서 추출한 token값 */
+                // 안드로이드 App이 적절한 구현절차를 통해서 생성해야 하는 값이다.
+                // 안드로이드 단말에서 Node server로 POST방식 전송 후,
+                // Node서버는 이 값을 DB에 보관하고 있으면 된다.
+                /*
+                var getTokenQuery = `SELECT firebase_token FROM user WHERE user_idx = ?`;
+                var getTokenResult = await pool.queryParam_Arr(getTokenQuery, [selectStoreFundInfoResult[idx].user_idx]);
+                console.log(getTokenResult);
+
+                if (!getTokenResult) {
+                    resolve({
+                        code: statusCode.INTERNAL_SERVER_ERROR,
+                        json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                    });
+                    console.log(`get getCloseFundStoreUserResult ERROR`);
+                    return;
+                }
+*/
+                const client_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHgiOjI4LCJpYXQiOjE1Nzc3MTk4MjAsImV4cCI6MTU3ODMyNDYyMCwiaXNzIjoiZnVuZGl0byJ9.05rft6aV0FUj6_DZpVpnkZgSX1m9u2s3LPx4I-eCxt0';
+                //getTokenResult[0];
+                /** 발송할 Push 메시지 내용 */
+                var push_data = {
+                    // 수신대상
+                    to: client_token,
+                    // App이 실행중이지 않을 때 상태바 알림으로 등록할 내용
+                    notification: {
+                        title: "Hello Node",
+                        body: "Node로 발송하는 Push 메시지 입니다.",
+                        sound: "default",
+                        click_action: "FCM_PLUGIN_ACTIVITY",
+                        icon: "fcm_push_icon"
+                    },
+                    // 메시지 중요도
+                    priority: "high",
+                    // App 패키지 이름
+                    restricted_package_name: "com.fundito.fundito",
+                    // App에게 전달할 데이터
+                    data: {
+                        num1: 2000,
+                        num2: 3000
+                    }
+                };
+                /** 아래는 푸시메시지 발송절차 */
+                var fcm = new FCM(server_key);
+                fcmModule.fcm(fcm, push_data);
+
+            }
+
+
         });
+    },
+
+    fcm: (userIdx) => {
+
     },
 
     read: (storeIdx) => {
