@@ -18,7 +18,7 @@ var StoreInfo = require('../../model/StoreInfo');
 router.get('/:storeIdx', async(req, res) => {
     const { storeIdx } = req.params;
 
-    StoreInfo.read(storeIdx)
+    StoreInfo.readStoreInfo(storeIdx)
     .then(({ code, json }) => {
         const data = json.data;
         console.log(data);

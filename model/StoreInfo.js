@@ -89,7 +89,7 @@ const storeInfo = {
         });
     },
 
-    read: (storeIdx) => {
+    readStoreInfo : (storeIdx) => {
         return new Promise(async (resolve, reject) => {
             // 식당 정보 가져오기
             const getOneStoreQuery = `SELECT store_idx, name, business_hours, breaktime, holiday, thumbnail, address FROM ${storeInfoTable} WHERE store_idx = ?`;
@@ -108,7 +108,7 @@ const storeInfo = {
             const getStoreMenuResult = await pool.queryParam_Arr(getStoreMenuQuery, [storeIdx]);
 
             // 식당 펀딩 정보 가져오기 
-            const getStoreFundQuery = `SELECT goal_money, due_date, margin_percent, regular_money, current_sales FROM ${storeFundTable} WHERE store_idx = ?`;
+            const getStoreFundQuery = `SELECT goal_money, due_date, margin_percent, regular_money, current_sales, fund_status FROM ${storeFundTable} WHERE store_idx = ?`;
             const getStoreFundResult = await pool.queryParam_Arr(getStoreFundQuery, [storeIdx]);
             
             // 식당 펀딩 정보 가져오기 
@@ -122,14 +122,6 @@ const storeInfo = {
                 });
                 return;
             }
-            if (getStoreFundResult[0] == undefined) {
-                resolve({
-                    code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.BAD_REQUEST)
-                });
-                return;
-            }
-
             // 가게에 펀딩된 금액 합계
             var fundingMoneySum = 0;
             for (var i = 0; i < getFundingMoneyResult.length; i++) {
@@ -193,8 +185,35 @@ const storeInfo = {
             storeResult.refund_percent_of_percent = parseInt(refundPerOfPer);
             storeResult.left_day = leftDay; 
             storeResult.due_date = dueDate.format('YYYY-MM-DD HH:mm');
-
+            storeResult.fund_status = getStoreFundResult[0].fund_status;
+            
             console.log(storeResult);
+
+            resolve({
+                code : statusCode.OK,
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), storeResult)
+            });
+        });
+    },
+
+    read: (storeIdx) => {
+        return new Promise(async (resolve, reject) => {
+            const getOneStoreQuery = `SELECT * FROM ${storeInfoTable} WHERE store_idx = ?`;
+            const getOneStoreResult = await pool.queryParam_Arr(getOneStoreQuery, [storeIdx]);
+
+            const getStoreMenuQuery = `SELECT menu_name, menu_price FROM ${menuTable} WHERE store_idx = ?`;
+            const getStoreMenuResult = await pool.queryParam_Arr(getStoreMenuQuery, [storeIdx]);
+
+            if (!getOneStoreResult || !getStoreMenuResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            const storeResult = getOneStoreResult[0];
+            storeResult.menu = getStoreMenuResult;
 
             resolve({
                 code : statusCode.OK,

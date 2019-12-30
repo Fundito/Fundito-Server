@@ -78,7 +78,7 @@ router.get('/:storeIdx', async(req, res) => {
         return;
     }
 
-    StoreInfo.read(storeIdx)
+    StoreInfo.readStoreInfo(storeIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
@@ -108,7 +108,8 @@ router.post('/wifi', async(req, res) => {
     StoreInfo.read(storeIdx)
     .then(({ code, json }) => {
         const storeData = json.data;
-        console.log(storeData);
+        console.log(`storeinfo wifi`);
+        console.log(json);
 
         // storeIdx가 존재하지 않을 경우
         if (storeData == undefined) {
