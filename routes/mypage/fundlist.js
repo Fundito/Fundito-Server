@@ -5,19 +5,21 @@ const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
 const pool = require('../../module/db/pool');
+const jwt = require('../../module/auth/jwt');
 
 const Funding = require('../../model/Funding');
 
 /**
- * [GET] /mypage/fundlist/:userIdx/:fundStatus
+ * [GET] /mypage/fundlist/:fundStatus
  * @author ChoSooMin
- * @param userIdx, fundStats
+ * @header token
+ * @param fundStats
  */
-router.get('/:userIdx/:fundStatus', async (req, res) => {
+router.get('/:fundStatus', jwt.checkLogin, async (req, res) => {
     const {
-        userIdx, 
         fundStatus
     } = req.params;
+    const userIdx = req.decoded.idx;
 
     Funding.readUserFundingList(userIdx, fundStatus)
     .then(({ code, json }) => {
@@ -31,15 +33,13 @@ router.get('/:userIdx/:fundStatus', async (req, res) => {
 
 
 /**
- * [GET] /mypage/fundlist/:userIdx
+ * [GET] /mypage/fundlist
  * 내 투자내역 조회 (최근순)
  * @author ChoSooMin
- * @param userIdx
+ * @header token
  */
-router.get('/:userIdx', async (req, res) => {
-    const {
-        userIdx
-    } = req.params;
+router.get('/', jwt.checkLogin, async (req, res) => {
+    const userIdx = req.decoded.idx;
 
     Funding.read(userIdx)
     .then(({ code, json }) => {

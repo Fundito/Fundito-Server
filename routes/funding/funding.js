@@ -1,21 +1,23 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var statusCode = require('../../module/utils/statusCode');
-var responseMessage = require('../../module/utils/responseMessage');
-var authUtil = require('../../module/utils/authUtil');
-var pool = require('../../module/db/pool');
+const statusCode = require('../../module/utils/statusCode');
+const responseMessage = require('../../module/utils/responseMessage');
+const authUtil = require('../../module/utils/authUtil');
+const pool = require('../../module/db/pool');
+const jwt = require('../../module/auth/jwt');
 
-var Funding = require('../../model/Funding');
-var StoreInfo = require('../../model/StoreInfo');
+const Funding = require('../../model/Funding');
+const StoreInfo = require('../../model/StoreInfo');
 
 /**
  * [GET] /funding/:storeIdx
  * 투자 최대 이율 조회
  * @author ChoSooMin
+ * @header token
  * @param storeIdx
  */
-router.get('/:storeIdx', async(req, res) => {
+router.get('/:storeIdx', jwt.checkLogin, async(req, res) => {
     const { storeIdx } = req.params;
 
     StoreInfo.readStoreInfo(storeIdx)
@@ -44,15 +46,16 @@ router.get('/:storeIdx', async(req, res) => {
  * [POST] /funding
  * 투자 생성
  * @author ChoSooMin
- * @body userIdx, fundingPassword, storeIdx, fundingMoney
+ * @header token
+ * @body payPassword, storeIdx, fundingMoney
  */
-router.post('/', async(req, res) => {
+router.post('/', jwt.checkLogin, async(req, res) => {
     const {
-        userIdx,
         payPassword,
         storeIdx,
         fundingMoney
     } = req.body;
+    const userIdx = req.decoded.idx;
 
     if (!userIdx || !payPassword || !storeIdx || !fundingMoney) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
@@ -73,6 +76,7 @@ router.post('/', async(req, res) => {
  * [GET] /funding
  * 모든 투자 내역 조회
  * @author ChoSooMin
+ * @header token
  */
 router.get('/', async(req, res) => {
     Funding.readAll()

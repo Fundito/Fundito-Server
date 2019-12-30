@@ -1,9 +1,10 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
 const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
+const jwt = require('../../module/auth/jwt');
 
 const User = require('../../model/User');
 
@@ -11,11 +12,8 @@ const User = require('../../model/User');
  * [GET] mypage/point
  * 펀디토 머니 잔액 조회
  */
-router.get('/:userIdx', async (req, res) => {
-
-    console.log(req.params)
-
-    const userIdx = req.params.userIdx;
+router.get('/', jwt.checkLogin, async (req, res) => {
+    const userIdx = req.decoded.idx;
 
     User.readPoint(userIdx)
     .then(({ code, json }) => {
@@ -31,14 +29,14 @@ router.get('/:userIdx', async (req, res) => {
  * [PUT] mypage/point
  * 펀디토 머니 충전
  */
-router.put('/', async (req, res) => {
+router.put('/', jwt.checkLogin, async (req, res) => {
     const {
-        userIdx,
         funditoMoney,
         payPassword
     } = req.body;
+    const userIdx = req.decoded.idx;
     
-    if(req.body.userIdx == undefined || req.body.funditoMoney == undefined  || req.body.payPassword == undefined ){
+    if(userIdx == undefined || req.body.funditoMoney == undefined  || req.body.payPassword == undefined ){
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
