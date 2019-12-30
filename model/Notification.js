@@ -17,8 +17,10 @@ const user = {
 
     readAll: (userIdx) => {
         return new Promise(async (resolve,reject) => {
-            const selectNotificationQuery = `SELECT * from table WHERE user_idx = ?`;
+            const selectNotificationQuery = `SELECT  from table WHERE user_idx = ?`;
             const selectNotificationResult = pool.queryParam_Arr(selectNotificationQuery, [userIdx]);
+
+            const selectStoreNameQuery = `SELECT store_info.store_name, store_fund.fund_status, funding. FROM store_info WHERE user_idx = ?`
 
             if (!selectNotificationResult) {
                 resolve({
@@ -29,9 +31,11 @@ const user = {
                 return;
             }
 
+            const result = selectNotificationResult;
+            result.store_name = 
             resolve({
                 code: statusCode.OK,
-                json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), selectNotificationResult)
+                json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), result)
             });
         });
     },
