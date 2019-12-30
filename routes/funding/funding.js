@@ -14,6 +14,7 @@ const StoreInfo = require('../../model/StoreInfo');
  * [GET] /funding/:storeIdx
  * 투자 최대 이율 조회
  * @author ChoSooMin
+ * @header token
  * @param storeIdx
  */
 router.get('/:storeIdx', jwt.checkLogin, async(req, res) => {
@@ -45,6 +46,7 @@ router.get('/:storeIdx', jwt.checkLogin, async(req, res) => {
  * [POST] /funding
  * 투자 생성
  * @author ChoSooMin
+ * @header token
  * @body payPassword, storeIdx, fundingMoney
  */
 router.post('/', jwt.checkLogin, async(req, res) => {
@@ -74,6 +76,7 @@ router.post('/', jwt.checkLogin, async(req, res) => {
  * [GET] /funding
  * 모든 투자 내역 조회
  * @author ChoSooMin
+ * @header token
  */
 router.get('/', async(req, res) => {
     Funding.readAll()
