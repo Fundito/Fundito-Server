@@ -39,7 +39,7 @@ const user = {
         })
     },
 
-    signup: (id, name, nickname, pay_password) => {
+    signup: (id, name, nickname, pay_password, friends) => {
         return new Promise( async(resolve, reject) => {
             if (!name || !pay_password || !id || !nickname){
                 resolve({
@@ -63,7 +63,18 @@ const user = {
             // 유저의 이름,아이디,패스워드를 저장
             const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?)';
             const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt]);
-            
+
+            let friendsId = []
+            for (i of friends) {
+                friendsId.push(i.id);
+            }
+            // 친구들의 idx를 불러옴
+            // 그 값이 friend 테이블에서 이미 있는 값인지 검사 (friend1_idx, friend2_idx)
+            // 없는 값만 저장
+            const getUserIdxQuery = `SELECT user_idx FROM user WHERE id IN (${friendsId.join()})`;
+            const insertFriendIdxQuery = `INSERT INTO friend (friend1_idx, friend2_idx) VALUES ()`
+            console.log(getUserIdxResult)
+
             if (insertUserInfoResult.affectedRows == 1) {
                 const token = jwt.sign(insertUserInfoResult.insertId);
                 resolve({
@@ -71,17 +82,19 @@ const user = {
                     json: authUtil.successTrue(statusCode.CREATED, responseMessage.SIGN_UP_SUCCESS, token)
                 });
                 return;
+            } else {
+                resolve({
+                    code: statusCode.DB_ERROR,
+                    json: authUtil.successFalse(statusCode.DB_ERROR, responseMessage.DB_ERROR)
+                })
+                return;
             }
         });
     },
 
-    readAll: () => {
-
-    },
-
     read: (userIdx) => {
         return new Promise(async (resolve, reject) => {
-            const getCertainUserQuery = `SELECT * FROM ${table} user_idx = ?`;
+            const getCertainUserQuery = `SELECT name, nickname, point FROM ${table} WHERE user_idx = ?`;
             const getCertainUserResult = await pool.queryParam_Arr(getCertainUserQuery, [userIdx]);
 
             if (!getCertainUserResult) {
@@ -91,10 +104,9 @@ const user = {
                 });
                 return;
             }
-
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getCertainUserResult)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getCertainUserResult[0])
             });
         });
     },
