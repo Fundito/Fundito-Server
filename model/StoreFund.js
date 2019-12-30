@@ -216,7 +216,7 @@ const storeFund = {
     readAllName: () => {
         return new Promise(async (resolve, reject) => {
             const getStoreNameListQuery =
-            `SELECT i.name, i.thumbnail, f.* 
+            `SELECT i.*, f.* 
             FROM ${storeInfoTable} AS i JOIN ${table} AS f ON i.store_idx = f.store_idx
             WHERE i.store_idx = f.store_idx`;
 
