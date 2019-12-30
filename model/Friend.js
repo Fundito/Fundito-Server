@@ -22,6 +22,7 @@ module.exports = {
             for (i of getUserIdxResult) {
                 friendIdx.push([userIdx, i.user_idx]);
             }
+            
             const insertFriendTransaction = await pool.Transaction( async(con) => {
                 const insertFriendIdxQuery = `INSERT INTO friend (user_idx, friends_idx) VALUES ?`;
                 const insertFriendIdxResult = await con.query(insertFriendIdxQuery, [friendIdx]);
