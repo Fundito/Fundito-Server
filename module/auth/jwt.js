@@ -77,7 +77,7 @@ module.exports = {
         if (!token) {
             return res.json(authUtil.successFalse(statusCode.BAD_REQUEST, resMessage.EMPTY_TOKEN));
         } else {
-            const user = jwt.verify(token);
+            const user = verify(token);
 
             if (user == -3) {
                 return res.json(authUtil.successFalse(statusCode.UNAUTHORIZED, resMessage.EXPIRED_TOKEN));

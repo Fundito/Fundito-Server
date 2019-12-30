@@ -6,6 +6,7 @@ const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
 const pool = require('../../module/db/pool');
 
+const jwt = require('../../module/auth/jwt');
 const Notification = require('../../model/Notification');
 
 /**
@@ -30,10 +31,10 @@ router.get('/', async (req, res) => {
  * @author LeeSohee
  * @param userIdx
  */
-router.get('/:userIdx', async (req, res) => {
+router.get('/', jwt.checkLogin, async (req, res) => {
     const {
-        userIdx,
-    } = req.params;
+        userIdx
+    } = req.decoded.idx;
 
     Notification.readAllUserNoti(userIdx)
     .then(({ code, json }) => {

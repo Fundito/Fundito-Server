@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 
 require('./scheduler');
-
 router.use('/auth', require('./auth'));
 router.use('/storefund', require('./storefund'));
 router.use('/mypage', require('./mypage'));
