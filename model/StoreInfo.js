@@ -122,6 +122,14 @@ const storeInfo = {
                 });
                 return;
             }
+            if (getStoreFundResult[0] == undefined) {
+                resolve({
+                    code : statusCode.BAD_REQUEST,
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.BAD_REQUEST)
+                });
+                return;
+            }
+
             // 가게에 펀딩된 금액 합계
             var fundingMoneySum = 0;
             for (var i = 0; i < getFundingMoneyResult.length; i++) {
