@@ -10,11 +10,12 @@ const jwt = require('../../module/auth/jwt');
 const Notification = require('../../model/Notification');
 
 /**
- * [GET] /notification/:userIdx
+ * [GET] /notification
  * 모든 알림 조회
  * @author LeeSohee
+ * @header token
  */
-router.get('/', async (req, res) => {
+router.get('/', jwt.checkLogin, async (req, res) => {
     Notification.readAll()
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -26,10 +27,10 @@ router.get('/', async (req, res) => {
 });
 
 /**
- * [GET] /notification/:userIdx
+ * [GET] /notification
  * 유저 알림 조회
  * @author LeeSohee
- * @param userIdx
+ * @header token
  */
 router.get('/', jwt.checkLogin, async (req, res) => {
     const userIdx = req.decoded.idx;
