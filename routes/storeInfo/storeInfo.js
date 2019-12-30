@@ -29,11 +29,14 @@ router.post('/', upload.single('thumbnail'), async(req, res) => {
         menu
     } = req.body;
 
-    const thumbnailImg = req.file.location;
+    const thumbnailImg = ``;
 
     if (!name || !wifiSSID ) {
         res.status(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
+    }
+    if (req.file) {
+        const thumbnailImg = req.file.location;
     }
     
     StoreInfo.create(name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnailImg, wifiSSID, menu)

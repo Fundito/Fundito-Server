@@ -35,6 +35,7 @@ module.exports = {
     FUNDING_SUCCESS : "투자에 성공했습니다",
 
     CARD_CREATE_SUCCESS : "카드 생성 성공",
+    CARD_USER_NO : "카드 정보를 등록하지 않은 사용자입니다",
 
     FUND_RATE_READ_SUCCESS : "최대 이율 조회 성공",
 
