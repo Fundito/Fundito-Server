@@ -9,6 +9,7 @@ module.exports = {
 
     NO_INDEX : "존재하지 않는 인덱스 값",
     NO_STORE : "존재하지 않는 가게",
+    NO_REGISTERED_STORE : "아직 펀딩에 등록하지 않은 가게입니다",
 
     STORE_FUND_INSERT_FAILED: "가게 펀드 정보 입력 실패",
     STORE_FUND_INSERT_SUCCESS: "가게 펀드 정보 입력 성공",
