@@ -122,22 +122,19 @@ const storeFund = {
 
                 if (nowDate >= dueDate) { // 펀딩기간 끝 
                 // 가게의 목표 금액 가져오기
-                const selectStoreGoalMoneyQuery = `SELECT goal_money FROM ${table} WHERE store_idx = ?`;
+                const selectStoreGoalMoneyQuery = `SELECT goal_money, current_sales FROM ${table} WHERE store_idx = ?`;
                 const selectStoreGoalMoneyResult = await pool.queryParam_Arr(selectStoreGoalMoneyQuery, [result.store_idx]);
+                console.log(selectStoreGoalMoneyResult);
 
                 if (selectStoreGoalMoneyResult[0] == undefined) {
                     resolve({
                         code: statusCode.BAD_REQUEST,
-                        json: authUtil.successFalse(statusCode.BAD_REQUEST, `아직 펀딩에 등록하지 않은 가게입니다`)
+                        json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_REGISTERED_STORE)
                     });
                     return;
                 }
-                // 가게에 펀딩 된 금액들을 가져오기
-                const selectCurrentSalesQuery = `SELECT current_sales FROM ${table} WHERE store_idx = ?`;
-                const selectCurrentSalesResult = await pool.queryParam_Arr(selectCurrentSalesQuery, [result.store_idx]);
-                console.log(selectCurrentSalesResult);
 
-                if (!selectStoreGoalMoneyResult || !selectCurrentSalesResult) {
+                if (!selectStoreGoalMoneyResult) {
                     resolve({
                         code: statusCode.INTERNAL_SERVER_ERROR,
                         json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
@@ -148,7 +145,7 @@ const storeFund = {
 
                 const goalMoney = selectStoreGoalMoneyResult[0].goal_money;
                 console.log(goalMoney);
-                const currentSales = selectCurrentSalesResult[0].current_sales;
+                const currentSales = selectStoreGoalMoneyResult[0].current_sales;
                 console.log(currentSales)
 
                 // 펀딩 성공 여부를 체크
@@ -169,7 +166,7 @@ const storeFund = {
                     const fund_status = fundStatus.Fail;
                     
                     const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
-                    const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_Status, result.store_idx]);
+                    const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
 
                     if (!updateStoreFundInfoResult) {
                         resolve({
