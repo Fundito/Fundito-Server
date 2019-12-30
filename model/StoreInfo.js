@@ -127,7 +127,7 @@ const storeInfo = {
             for (var i = 0; i < getFundingMoneyResult.length; i++) {
                 fundingMoneySum += getFundingMoneyResult[i].funding_money;
             }
-
+            
             if (getStoreFundResult[0] == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
