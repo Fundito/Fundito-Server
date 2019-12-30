@@ -32,9 +32,7 @@ router.get('/', async (req, res) => {
  * @param userIdx
  */
 router.get('/', jwt.checkLogin, async (req, res) => {
-    const {
-        userIdx
-    } = req.decoded.idx;
+    const userIdx = req.decoded.idx;
 
     Notification.readAllUserNoti(userIdx)
     .then(({ code, json }) => {
