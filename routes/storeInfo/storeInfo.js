@@ -121,7 +121,7 @@ router.post('/wifi', async(req, res) => {
             res.status(code).send(authUtil.successTrue(code, responseMessage.WIFI_CHECK_SUCCESS));
         }
         else {
-            res.status(code).send(authUtil.successTrue(code, responseMessage.WIFI_CHECK_FAIL));
+            res.status(statusCode.UNAUTHORIZED).send(authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.WIFI_CHECK_FAIL));
         }
     })
     .catch((err) => {
