@@ -2,10 +2,14 @@ const statusCode = require('../module/utils/statusCode');
 const responseMessage = require('../module/utils/responseMessage');
 const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
+const {isAtLimit, getMoneyLimit150, getMoneyLimit175, getMoneyLimit200, getRefundPerOfPer, getFundingBenefits, getCurGoalPer} = require('../module/calculate');
+const moment = require('moment');
 
 const storeInfoTable = `store_info`;
 const menuTable = `menu`;
-const THIS_LOG = '상점 정보';
+const userTable = `user`;
+const storeFundTable = `store_fund`;
+const THIS_LOG = '가게 정보';
 
 /**
  * storeInfo는 update가 없어도 된다.
@@ -88,7 +92,7 @@ const storeInfo = {
     read: (storeIdx) => {
         return new Promise(async (resolve, reject) => {
             // 식당 정보 가져오기
-            const getOneStoreQuery = `SELECT * FROM ${storeInfoTable} WHERE store_idx = ?`;
+            const getOneStoreQuery = `SELECT store_idx, name, business_hours, breaktime, holiday, thumbnail, address FROM ${storeInfoTable} WHERE store_idx = ?`;
             const getOneStoreResult = await pool.queryParam_Arr(getOneStoreQuery, [storeIdx]);
 
             if (getOneStoreResult[0] == undefined) {
@@ -103,7 +107,68 @@ const storeInfo = {
             const getStoreMenuQuery = `SELECT menu_name, menu_price FROM ${menuTable} WHERE store_idx = ?`;
             const getStoreMenuResult = await pool.queryParam_Arr(getStoreMenuQuery, [storeIdx]);
 
-            if (!getOneStoreResult || !getStoreMenuResult) {
+            // 식당 펀딩 정보 가져오기 
+            const getStoreFundQuery = `SELECT goal_money, due_date, margin_percent, regular_money, current_sales FROM ${storeFundTable} WHERE store_idx = ?`;
+            const getStoreFundResult = await pool.queryParam_Arr(getStoreFundQuery, [storeIdx]);
+            
+            // 식당 펀딩 정보 가져오기 
+            const getFundingMoneyQuery = `SELECT funding_money FROM funding WHERE store_idx = ?`;
+            const getFundingMoneyResult = await pool.queryParam_Arr(getFundingMoneyQuery, [storeIdx]);
+            
+            if (!getStoreMenuResult || !getStoreFundResult || !getFundingMoneyResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+            // 가게에 펀딩된 금액 합계
+            var fundingMoneySum = 0;
+            for (var i = 0; i < getFundingMoneyResult.length; i++) {
+                fundingMoneySum += getFundingMoneyResult[i].funding_money;
+            }
+            
+            const result = getStoreFundResult[0];
+            const marginPercent = result.margin_percent;
+            const goalMoney = result.goal_money;
+            const regularMoney = result.regular_money;
+            const fundingBenefits = getFundingBenefits(marginPercent,goalMoney,regularMoney); // 투자이윤 
+            console.log(`투자이윤`);
+            console.log(fundingBenefits);
+            const moneyLimit150 = getMoneyLimit150(fundingBenefits); // C (150% 마감금액)
+            const moneyLimit175 = getMoneyLimit175(fundingBenefits); // B (175% 마감금액)
+            const moneyLimit200 = getMoneyLimit200(fundingBenefits); // A (200% 마감금액)
+            console.log(`150`);
+            console.log(moneyLimit150);
+            console.log(`175`);
+            console.log(moneyLimit175);
+            console.log(`200`);
+            console.log(moneyLimit200);
+            console.log(fundingMoneySum);
+            let refundPercent = 200; 
+            let refundPerOfPer = getRefundPerOfPer(moneyLimit200, fundingMoneySum);
+            if(isAtLimit(moneyLimit200,fundingMoneySum)){
+                refundPercent = 175;
+                refundPerOfPer = getRefundPerOfPer(moneyLimit175, fundingMoneySum);
+            }
+            if(isAtLimit(moneyLimit175,fundingMoneySum)) {
+                refundPercent = 150;
+                refundPerOfPer = getRefundPerOfPer(moneyLimit150, fundingMoneySum);
+            }
+            console.log(`환급률`);
+            console.log(refundPercent);
+            console.log(`환급률의 퍼센트`);
+            console.log(refundPerOfPer);
+            const now = moment(Date.now());
+            const dueDate = moment(getStoreFundResult[0].due_date);
+            const leftDay = parseInt(moment.duration(dueDate.diff(now)).asDays());
+            console.log(`남은 기간`);
+            console.log(leftDay);
+            console.log(`커런트세일즈`);
+            console.log(getStoreFundResult[0].current_sales);
+            console.log(getStoreFundResult[0].goal_money);
+            const currentGoalPercent = parseInt(getCurGoalPer(getStoreFundResult[0].current_sales,getStoreFundResult[0].goal_money));
+            if (!getOneStoreResult || !getStoreMenuResult || !getStoreFundResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
                     json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
@@ -111,41 +176,21 @@ const storeInfo = {
                 return;
             }
 
-            /** [TODO] : 지금 펀딩하면 000% 환급 ! 계산하기
-             * 마목 - 마기 = 투자이윤 
-             * 투자 이윤 / 3 
-             */
-            var refund_percent;
-            
+            // 클라이언트에 보낼 결과 값
             const storeResult = getOneStoreResult[0];
-            storeResult.refund_percent = refund_percent;
             storeResult.menu = getStoreMenuResult;
+            storeResult.goal_money = goalMoney;
+            storeResult.current_goal_percent = currentGoalPercent;
+            storeResult.refund_percent = refundPercent;
+            storeResult.refund_percent_of_percent = parseInt(refundPerOfPer);
+            storeResult.left_day = leftDay; 
+            storeResult.due_date = dueDate.format('YYYY-MM-DD HH:mm');
 
             console.log(storeResult);
 
             resolve({
                 code : statusCode.OK,
                 json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), storeResult)
-            });
-        });
-    },
-
-    readAllName: () => {
-        return new Promise(async (resolve, reject) => {
-            const getStoreNameListQuery = `SELECT store_idx, name FROM ${storeInfoTable}`;
-            const getStoreNameListResult = await pool.queryParam_None(getStoreNameListQuery);
-
-            if (!getStoreNameListResult) {
-                resolve({
-                    code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
-                });
-                return;
-            }
-
-            resolve({
-                result: getStoreNameListResult,
-                code : statusCode.OK
             });
         });
     },
@@ -165,7 +210,7 @@ const storeInfo = {
             if (storeIdxResult[0] == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `존재하지 않는 상점입니다`)
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_STORE)
                 });
                 return;
             }

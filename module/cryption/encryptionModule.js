@@ -18,12 +18,9 @@ const encryption = {
                     // console.log('암호화된 암호: ', hashedPW);
 
                     const result = {
-                        "hashedPassword" : "",
-                        "salt" : ""
+                        "hashedPassword" : hashedPW,
+                        "salt" : salt
                     };
-
-                    result.hashedPassword = hashedPW;
-                    result.salt = salt;
 
                     resolve(result);
                 }

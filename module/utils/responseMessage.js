@@ -6,12 +6,15 @@ module.exports = {
     INTERNAL_SERVER_ERROR: "서버 내부 오류",
     DUPLICATE_VALUE_ERROR: "파라미터 값 중복",
     SIGN_UP_SUCCESS: "회원가입 성공",
+    SIGN_IN_SUCCESS: "로그인 성공",
 
     NO_INDEX : "존재하지 않는 인덱스 값",
+    NO_STORE : "존재하지 않는 가게",
 
     STORE_FUND_INSERT_FAILED: "가게 펀드 정보 입력 실패",
     STORE_FUND_INSERT_SUCCESS: "가게 펀드 정보 입력 성공",
     STORE_FUND_SELECT_SUCCESS: "가게 펀드 정보 조회 성공",
+    STORE_FUND_NO_STORE: "존재하지 않는 가게 펀드 정보",
     
     // MYPAGE_FUNDLIST_INSERT_FAILED: "내 펀드 정보 입력 실패",
     MYPAGE_FUNDLIST_SELECT_SUCCESS: "내 투자 내역 조회 성공",
@@ -43,6 +46,6 @@ module.exports = {
     X_UPDATE_FAIL: (x) => `${x} 수정 실패`,
     X_DELETE_SUCCESS: (x) => `${x} 삭제 성공`,
     X_DELETE_FAIL: (x) => `${x} 삭제 실패`,  
-    NO_X: (x) => `존재하는 ${x} 입니다.`,
+    NO_X: (x) => `존재하지 않는 ${x} 입니다.`,
     ALREADY_X: (x) => `존재하는 ${x} 입니다.`
 }

@@ -13,12 +13,19 @@ function isAtLimit(moneyLimit,fundingMoneySum) {
 } 
 function getFundingBenefits(marginPercent,goalMoney,regularMoney) {
     return (marginPercent*goalMoney - marginPercent*regularMoney); 
+} 
+function getRefundPerOfPer(moneyLimit,fundingMoneySum) {
+    return (100 - (fundingMoneySum / moneyLimit * 100));
 }
-
+function getCurGoalPer(currentSales, goalMoney){
+    return (currentSales/ goalMoney * 100);
+}
 module.exports = {
     getMoneyLimit200,
     getMoneyLimit175,
     getMoneyLimit150,
     isAtLimit,
     getFundingBenefits,
+    getRefundPerOfPer,
+    getCurGoalPer,
 }

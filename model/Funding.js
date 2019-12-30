@@ -434,6 +434,10 @@ const funding = {
                 });
                 return;
             }
+            
+            for(let i = 0; i<getTimelineResult.length;i++){
+                getTimelineResult[i].funding_time = moment(getTimelineResult[i].funding_time).format("YYYY-MM-DD HH:MM:SS")
+            }
 
             resolve({
                 code : statusCode.OK,
