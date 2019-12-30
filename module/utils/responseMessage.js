@@ -10,6 +10,7 @@ module.exports = {
 
     NO_INDEX : "존재하지 않는 인덱스 값",
     NO_STORE : "존재하지 않는 가게",
+    NO_REGISTERED_STORE : "아직 펀딩에 등록하지 않은 가게입니다",
 
     STORE_FUND_INSERT_FAILED: "가게 펀드 정보 입력 실패",
     STORE_FUND_INSERT_SUCCESS: "가게 펀드 정보 입력 성공",
@@ -35,6 +36,7 @@ module.exports = {
     FUNDING_SUCCESS : "투자에 성공했습니다",
 
     CARD_CREATE_SUCCESS : "카드 생성 성공",
+    CARD_USER_NO : "카드 정보를 등록하지 않은 사용자입니다",
 
     FUND_RATE_READ_SUCCESS : "최대 이율 조회 성공",
 

@@ -1,23 +1,23 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
 const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
 const pool = require('../../module/db/pool');
 
+const jwt = require('../../module/auth/jwt');
+
 const Funding = require('../../model/Funding');
 
 /**
- * [GET] /mypage/fund/:userIdx
+ * [GET] /mypage/fund
  * 내 투자내역 조회
  * @author ChoSooMin
- * @param user_idx
+ * @header token
  */
-router.get('/:userIdx', async (req, res) => {
-    const {
-        userIdx
-    } = req.params;
+router.get('/', jwt.checkLogin, async (req, res) => {
+    const userIdx = req.decoded.idx;
 
     Funding.read(userIdx)
     .then(({ code, json }) => {
@@ -29,8 +29,10 @@ router.get('/:userIdx', async (req, res) => {
     });
 });
 
-router.get ('/reward/:userIdx', async (req, res) => {
-    Funding.read(req.params.userIdx)
+router.get ('/reward', jwt.checkLogin, async (req, res) => {
+    const userIdx = req.decoded.idx;
+
+    Funding.read(userIdx)
     .then(({ code, json }) => {
         
         let getMoneySum = 0;

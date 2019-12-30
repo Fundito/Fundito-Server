@@ -7,15 +7,17 @@ const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
 const StoreFund = require('../../model/StoreFund');
+const jwt = require('../../module/auth/jwt');
 
 /**
  * [POST] /storefund
  * 가게 펀드 정보 입력
  * @author LeeSohee, ChoSooMin
+ * @header token
  * @param storeIdx
  * @body marginPercent, regularMoney, goalMoney
  */
-router.post('/:storeIdx', async (req, res) => {
+router.post('/:storeIdx', jwt.checkLogin, async (req, res) => {
     try {
         const {
             marginPercent,
@@ -49,13 +51,13 @@ router.post('/:storeIdx', async (req, res) => {
 });
 
 /**
- * [GET] /storeInfo/search?keyword={타이핑 시 검색어}
+ * [GET] /storefund/search?keyword={타이핑 시 검색어}
  * 식당 검색
  * @author 100yeeun
+ * @header token
  * @params 검색키워드
  */
-
-router.get('/search', async(req, res) => {
+router.get('/search', jwt.checkLogin, async(req, res) => {
     StoreFund.readAllName()
     .then(({ result, code }) => {
 
@@ -88,11 +90,10 @@ router.get('/search', async(req, res) => {
  * [GET] /storefund/:storeIdx
  * 가게 펀드 정보 조회
  * @author LeeSohee
+ * @header token
  * @param storeIdx
- * @body 
  */
-
-router.get('/:storeIdx', async (req,res) => {
+router.get('/:storeIdx', jwt.checkLogin, async (req,res) => {
     try {
         const {
             storeIdx
@@ -122,9 +123,10 @@ router.get('/:storeIdx', async (req,res) => {
 /**
  * [GET] /storefund
  * 모든 펀드 정보 조회
+ * @header token
  * @author ChoSooMin
  */
-router.get('/', async(req, res) => {
+router.get('/', jwt.checkLogin, async(req, res) => {
     StoreFund.readAll()
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -139,10 +141,11 @@ router.get('/', async(req, res) => {
  * [UPDATE] /storefund/:storeIdx
  * 해당 가게의 정보 수정
  * @author ChoSooMin
+ * @header token
  * @param storeIdx
  * @body customerCount, marginPercent, goalMoney
  */
-router.put('/:storeIdx', async(req, res) => {
+router.put('/:storeIdx', jwt.checkLogin, async(req, res) => {
     const {
         customerCount,
         marginPercent,
@@ -170,9 +173,10 @@ router.put('/:storeIdx', async(req, res) => {
  * [DELETE] /storefund/:storeIdx
  * 해당 가게의 펀드 정보 삭제
  * @author ChoSooMin
+ * @header token
  * @param storeIdx
  */
-router.delete('/:storeIdx', async(req, res) => {
+router.delete('/:storeIdx', jwt.checkLogin, async(req, res) => {
     const {
         storeIdx
     } = req.params;

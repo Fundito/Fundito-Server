@@ -153,6 +153,8 @@ const user = {
                     return;
                 }
 
+                console.log
+
                 const checkPayPasswordEncryptionResult = await encryptionModule.encryption(payPassword, getCertainUserResult[0].salt);
 
                 if (getCertainUserResult[0].pay_password == checkPayPasswordEncryptionResult ) {

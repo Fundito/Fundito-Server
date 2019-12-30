@@ -1,18 +1,19 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var statusCode = require('../../module/utils/statusCode');
-var responseMessage = require('../../module/utils/responseMessage');
-var authUtil = require('../../module/utils/authUtil');
-var pool = require('../../module/db/pool');
+const statusCode = require('../../module/utils/statusCode');
+const responseMessage = require('../../module/utils/responseMessage');
+const authUtil = require('../../module/utils/authUtil');
+const pool = require('../../module/db/pool');
+const jwt = require('../../module/auth/jwt');
 
-var Card = require('../../model/Card');
+const Card = require('../../model/Card');
 
 /**
- * [POST] /mypage/card/:userIdx
+ * [POST] /mypage/card
  * 카드 생성
  * @author ChoSooMin
- * @param userIdx
+ * @header token
  * @body cardCompany, cardNumber, cvc, password
  */
 /**
@@ -24,18 +25,21 @@ var Card = require('../../model/Card');
 	"cvc" : "123",
 	"password" : "123123123"
     }
+
  */
-router.post('/:userIdx', async (req, res) => {
+router.post('/', jwt.checkLogin, async (req, res) => {
     const {
         cardCompany, 
         cardNickname, 
         cardNumber, 
         cvc, 
-        password
+        cardPassword
     } = req.body;
-    const { userIdx } = req.params;
+    const userIdx = req.decoded.idx;
 
-    if (!userIdx || !cardCompany || !cardNickname || !cardNumber || !cvc || !password) {
+    console.log(`userIdx = ${userIdx}`);
+
+    if (!cardCompany || !cardNickname || !cardNumber || !cvc || !cardPassword) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
@@ -43,12 +47,12 @@ router.post('/:userIdx', async (req, res) => {
     // console.log(typeof(cardNumber));
 
     // cardNumber, cvc, password 형이 string이 아니면 오류 (암호화, 복호화를 위해)
-    if (typeof(cardNumber) != `string` || typeof(cvc) != `string` || typeof(password) != `string`) {
+    if (typeof(cardNumber) != `string` || typeof(cvc) != `string` || typeof(cardPassword) != `string`) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.BODY_VALUE_ERROR));
         return;
     }
     
-    Card.create(userIdx, cardCompany, cardNickname, cardNumber, cvc, password)
+    Card.create(userIdx, cardCompany, cardNickname, cardNumber, cvc, cardPassword)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
@@ -59,38 +63,50 @@ router.post('/:userIdx', async (req, res) => {
 });
 
 /**
- * [GET] /mypage/card/:cardIdx
+ * [GET] /mypage/card/:userIdx
  * 카드 조회
  * @author ChoSooMin
  * @param cardIdx
  */
-router.get('/:cardIdx', async(req, res) => {
-    const { cardIdx } = req.params;
+router.get('/', jwt.checkLogin, async(req, res) => {
+    const userIdx = req.decoded.idx;
 
-    Card.read(cardIdx)
+    Card.read(userIdx)
     .then(({ code, json }) => {
         console.log(json);
 
         const cardData = json.data;
 
+        if (json.data == undefined) {
+            res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.CARD_USER_NO));
+        }
+
         console.log(cardData);
 
         let sendData = new Object();
-        sendData.cardNickname = cardData.cardNickname;
+        // sendData.cardNickname = cardData.cardNickname;
         sendData.userName = cardData.userName
 
-        if (sendData.cardNickname == '') {
-            const cardNumber = cardData.cardNumber;
-            const subStrNumber = (cardData.cardNumber).substr(cardNumber.length - 4, 4);
-            console.log(subStrNumber);
+        const cardNumber = cardData.cardNumber;
+        const subStrNumber = (cardData.cardNumber).substr(0, 4);
+        console.log(subStrNumber);
 
-            sendData.cardNickname = `${cardData.cardCompany}(${subStrNumber})`;
+        sendData.cardNickname = `${cardData.cardCompany} ${subStrNumber}-**`;
 
-            res.status(code).send(authUtil.successTrue(code, json.message, sendData));
-        }
-        else {
-            res.status(code).send(authUtil.successTrue(code, json.message, sendData));
-        }
+        res.status(code).send(authUtil.successTrue(code, json.message, sendData));
+
+        // if (sendData.cardNickname == '') {
+        //     const cardNumber = cardData.cardNumber;
+        //     const subStrNumber = (cardData.cardNumber).substr(0, 4);
+        //     console.log(subStrNumber);
+
+        //     sendData.cardNickname = `${cardData.cardCompany}(${subStrNumber})`;
+
+        //     res.status(code).send(authUtil.successTrue(code, json.message, sendData));
+        // }
+        // else {
+        //     res.status(code).send(authUtil.successTrue(code, json.message, sendData));
+        // }
     })
     .catch((err) => {
         console.log(err);
@@ -99,19 +115,15 @@ router.get('/:cardIdx', async(req, res) => {
 });
 
 /**
- * [DELETE] /mypage/card/:userIdx
+ * [DELETE] /mypage/card
  * 카드 삭제
  * @author ChoSooMin
- * @param userIdx
- * @body cardIdx
+ * @header token
  */
-router.delete('/:userIdx', async(req, res) => {
-    const {
-        cardIdx
-    } = req.body;
-    const { userIdx } = req.params;
+router.delete('/', jwt.checkLogin, async(req, res) => {
+    const userIdx = req.decoded.idx;
 
-    Card.delete(userIdx, cardIdx)
+    Card.delete(userIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
