@@ -213,7 +213,7 @@ const storeFund = {
     readAllName: () => {
         return new Promise(async (resolve, reject) => {
             const getStoreNameListQuery =
-            `SELECT i.name, i.thumbnail, f.* 
+            `SELECT i.*, f.* 
             FROM ${storeInfoTable} AS i JOIN ${table} AS f ON i.store_idx = f.store_idx
             WHERE i.store_idx = f.store_idx`;
 
@@ -224,10 +224,10 @@ const storeFund = {
             for(let i = 0; i<getStoreNameListResult.length;i++){
                 currentGaolPer[i] = parseInt(calculate.getCurGoalPer(getStoreNameListResult[i].current_sales, getStoreNameListResult[i].goal_money));
                 getStoreNameListResult[i].currentGaolPercent = currentGaolPer[i];
+                getStoreNameListResult[i].register_time = moment(getStoreNameListResult[i].register_time).format("YYYY-MM-DD HH:MM:SS");
+                getStoreNameListResult[i].due_date = moment(getStoreNameListResult[i].due_date).format("YYYY-MM-DD HH:MM:SS");
             }
             
-        
-            console.log(getStoreNameListResult[0])
 
             if (!getStoreNameListResult) {
                 resolve({

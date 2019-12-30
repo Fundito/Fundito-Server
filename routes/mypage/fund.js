@@ -36,23 +36,25 @@ router.get ('/reward/:userIdx', async (req, res) => {
         let getMoneySum = 0;
         let fundedMoneySum = 0;
 
+        if (json.status < 300) { 
 
-        for(let i = 0; i < json.data.length; i++){
-            getMoneySum += ((json.data[i].funding_money * json.data[i].reward_percent) * 0.01);
-            fundedMoneySum += json.data[i].funding_money;
+            for(let i = 0; i < json.data.length; i++){
+                getMoneySum += ((json.data[i].funding_money * json.data[i].reward_percent) * 0.01);
+                fundedMoneySum += json.data[i].funding_money;
+            }
+
+            const totalRewardPercent = Math.floor((getMoneySum / fundedMoneySum) * 100);
+            const rewardMoney = getMoneySum - fundedMoneySum;
+
+            const sendJson = new Object();
+
+            sendJson.totalGetMoney = getMoneySum;
+            sendJson.totalFundedMoney = fundedMoneySum;
+            sendJson.totalRewardMoney = rewardMoney;
+            sendJson.totalRewardPercent = totalRewardPercent;
+
+            json.data = sendJson;
         }
-
-        const totalRewardPercent = Math.floor((getMoneySum / fundedMoneySum) * 100);
-        const rewardMoney = getMoneySum - fundedMoneySum;
-
-        const sendJson = new Object();
-
-        sendJson.totalGetMoney = getMoneySum;
-        sendJson.totalFundedMoney = fundedMoneySum;
-        sendJson.totalRewardMoney = rewardMoney;
-        sendJson.totalRewardPercent = totalRewardPercent;
-
-        json.data = sendJson;
 
         res.status(code).send(json);
     })

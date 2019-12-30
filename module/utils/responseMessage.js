@@ -6,6 +6,7 @@ module.exports = {
     INTERNAL_SERVER_ERROR: "서버 내부 오류",
     DUPLICATE_VALUE_ERROR: "파라미터 값 중복",
     SIGN_UP_SUCCESS: "회원가입 성공",
+    SIGN_IN_SUCCESS: "로그인 성공",
 
     NO_INDEX : "존재하지 않는 인덱스 값",
     NO_STORE : "존재하지 않는 가게",
@@ -36,6 +37,8 @@ module.exports = {
 
     CARD_CREATE_SUCCESS : "카드 생성 성공",
 
+    FUND_RATE_READ_SUCCESS : "최대 이율 조회 성공",
+
     X_CREATE_SUCCESS: (x) => `${x} 작성 성공`,
     X_CREATE_FAIL: (x) => `${x} 작성 실패`,
     X_READ_ALL_SUCCESS: (x) => `${x} 전체 조회 성공`,
@@ -46,6 +49,6 @@ module.exports = {
     X_UPDATE_FAIL: (x) => `${x} 수정 실패`,
     X_DELETE_SUCCESS: (x) => `${x} 삭제 성공`,
     X_DELETE_FAIL: (x) => `${x} 삭제 실패`,  
-    NO_X: (x) => `존재하는 ${x} 입니다.`,
+    NO_X: (x) => `존재하지 않는 ${x} 입니다.`,
     ALREADY_X: (x) => `존재하는 ${x} 입니다.`
 }

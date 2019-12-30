@@ -4,18 +4,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var assert = require('assert');
+const helmet = require('helmet');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
 
-const session = require('express-session'); // 세션 설정
-const passport = require('passport');
-const passportConfig = require('./config/passport');
-app.use(session({ secret: 'jdjajfklajfekaf;lkj', resave: true, saveUninitialized: false })); // 세션 활성화
-app.use(passport.initialize()); // passport 구동 (꼭 필요)
-app.use(passport.session()); // 세션 연결 (꼭 필요)
-passportConfig(); // 이 부분 추가
+// helmet
+app.use(helmet());
 
 // view engine setups
 app.set('views', path.join(__dirname, 'views'));

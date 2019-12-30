@@ -50,7 +50,7 @@ router.post('/:storeIdx', async (req, res) => {
 
 /**
  * [GET] /storeInfo/search?keyword={타이핑 시 검색어}
- * 식당 이름 검색
+ * 식당 검색
  * @author 100yeeun
  * @params 검색키워드
  */
@@ -59,6 +59,10 @@ router.get('/search', async(req, res) => {
     StoreFund.readAllName()
     .then(({ result, code }) => {
 
+        if (req.query.keyword == undefined){
+            res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+            return;
+        }
         const searcher = new hangul.Searcher(req.query.keyword);
 
         const findStoreNameList = new Array();

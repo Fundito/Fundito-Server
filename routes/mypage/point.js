@@ -1,6 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
+const statusCode = require('../../module/utils/statusCode');
+const responseMessage = require('../../module/utils/responseMessage');
+const authUtil = require('../../module/utils/authUtil');
+
 const User = require('../../model/User');
 
 /**
@@ -29,11 +33,15 @@ router.get('/:userIdx', async (req, res) => {
  */
 router.put('/', async (req, res) => {
     const {
-        /////////////////////////////////로그인 구현되면 userIdx 토큰에서 뽑는걸루!
         userIdx,
         funditoMoney,
         payPassword
     } = req.body;
+    
+    if(req.body.userIdx == undefined || req.body.funditoMoney == undefined  || req.body.payPassword == undefined ){
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+        return;
+    }
 
     User.updatePoint(userIdx,funditoMoney,payPassword)
     .then(({ code, json }) => {

@@ -6,6 +6,7 @@ const decryptionModule = require('../module/cryption/decryptionModule');
 
 const moment = require('moment');
 const User = require('../model/User');
+const StoreInfo = require('../model/StoreInfo');
 
 const table = `funding`;
 const storeFundTable = `store_fund`;
@@ -265,7 +266,7 @@ const funding = {
                 return;
             }
 
-            const getMyFundListQuery = `SELECT * FROM ${table} WHERE user_idx = ?`; 
+            const getMyFundListQuery = `SELECT * FROM ${table} WHERE user_idx = ? ORDER BY funding_time DESC`; 
             const getMyFundListResult = await pool.queryParam_Arr(getMyFundListQuery, [userIdx]);
 
             if (!getMyFundListResult) {
@@ -434,42 +435,14 @@ const funding = {
                 });
                 return;
             }
+            
+            for(let i = 0; i<getTimelineResult.length;i++){
+                getTimelineResult[i].funding_time = moment(getTimelineResult[i].funding_time).format("YYYY-MM-DD HH:MM:SS")
+            }
 
             resolve({
                 code : statusCode.OK,
                 json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getTimelineResult)
-            });
-        });
-    },
-
-    update: () => {
-        // 이건 할 필요 없을듯!
-    },
-
-    delete: (userIdx, storeIdx) => {
-        return new Promise(async (resolve, reject) => {
-            const deleteFundingQuery = `DELETE FROM ${table} WHERE user_idx = ? AND store_idx = ?`;
-            const deleteFundingResult = await pool.queryParam_Arr(deleteFundingQuery, [userIdx, storeIdx]);
-
-            if (!deleteFundingResult) {
-                resolve({
-                    code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
-                });
-                return;
-            }
-
-            if (deleteFundingResult[0] == undefined) {
-                resolve({
-                    code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, `존재하지 않는 펀딩입니다.`)
-                });
-                return;
-            }
-
-            resolve({
-                code : statusCode.OK,
-                json : authUtil.successTrue(statusCode.OK, responseMessage.X_DELETE_SUCCESS(THIS_LOG))
             });
         });
     }
