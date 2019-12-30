@@ -21,7 +21,6 @@ module.exports = {
             const getUserIdxResult = await pool.queryParam_Parse(getUserIdxQuery);
             console.log(getUserIdxResult);
 
-            const getExistFriendIdxQuery = `SELECT `
             let friendIdx = [];
             let friendsIdx = [];
             for (i of getUserIdxResult) {
@@ -33,8 +32,9 @@ module.exports = {
             // 없는 값만 저장
             // const insertFriendIdxQuery = `INSERT INTO friend (user_idx, friends_idx) VALUES (?)`;
             // const insertFriendIdxQuery = `INSERT INTO friend (user_idx, friends_idx) SELECT ? FROM DUAL WHERE NOT EXISTS (SELECT friends_idx FROM friend WHERE friends_idx IN (?)) LIMIT 1`;
-            // const insertFriendIdxResult = await pool.queryParam_Parse(insertFriendIdxQuery, [friendIdx, friendsIdx.join()]);
-            // console.log(insertFriendIdxResult);
+            const insertFriendIdxQuery = `INSERT INTO friend (user_idx, friend_idx) VALUES (?)`;
+            const insertFriendIdxResult = await pool.queryParam_Parse(insertFriendIdxQuery, [friendIdx]);//, friendsIdx.join()]);
+            console.log(insertFriendIdxResult);
         })
     }
 }
