@@ -215,7 +215,7 @@ const storeFund = {
             });
         });
     },
-    update: (storeIdx, customerCount, marginPercent, goalMoney, remaining_days, fund_status ) => {
+    update: (storeIdx, marginPercent, goalMoney, fund_status ) => {
         return new Promise(async (resolve, reject) => {
             const storeIdxQuery = `SELECT * FROM ${table} WHERE store_idx = ?`;
             const storeIdxResult = await pool.queryParam_Arr(storeIdxQuery, [storeIdx]);
@@ -228,8 +228,8 @@ const storeFund = {
                 return;
             }
             
-            const updateStoreFundInfoQuery = `UPDATE ${table} SET customer_count = ?, margin_percent = ?, goal_money = ?, fund_status = ? WHERE store_idx = ?`;
-            const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [customerCount, marginPercent, goalMoney, fund_status, storeIdx]);
+            const updateStoreFundInfoQuery = `UPDATE ${table} SET margin_percent = ?, goal_money = ?, fund_status = ? WHERE store_idx = ?`;
+            const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [marginPercent, goalMoney, fund_status, storeIdx]);
 
             if(!updateStoreFundInfoResult){
                 resolve({
