@@ -6,6 +6,7 @@ const decryptionModule = require('../module/cryption/decryptionModule');
 
 const moment = require('moment');
 const User = require('../model/User');
+const StoreInfo = require('../model/StoreInfo');
 
 const table = `funding`;
 const storeFundTable = `store_fund`;

@@ -7,6 +7,38 @@ var authUtil = require('../../module/utils/authUtil');
 var pool = require('../../module/db/pool');
 
 var Funding = require('../../model/Funding');
+var StoreInfo = require('../../model/StoreInfo');
+
+/**
+ * [GET] /funding/:storeIdx
+ * 투자 최대 이율 조회
+ * @author ChoSooMin
+ * @param storeIdx
+ */
+router.get('/:storeIdx', async(req, res) => {
+    const { storeIdx } = req.params;
+
+    StoreInfo.read(storeIdx)
+    .then(({ code, json }) => {
+        const data = json.data;
+        console.log(data);
+
+        if (data == undefined) {
+            res.status(statusCode.DB_ERROR).send(authUtil.successFalse(statusCode.DB_ERROR, responseMessage.DB_ERROR));
+        }
+
+        const refundPercent = data.refund_percent;
+        const result = {
+            "refundPercent" : refundPercent
+        };
+
+        res.status(code).send(authUtil.successTrue(code, responseMessage.FUND_RATE_READ_SUCCESS, result));
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
 
 /**
  * [POST] /funding
