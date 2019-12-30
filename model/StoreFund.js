@@ -7,7 +7,7 @@ const calculate = require('../module/calculate');
 
 const firebase = require('../module/firebase');
 const admin = require('firebase-admin');
-const serviceAccount = require('../node_modules/serviceAccountKey/serviceAccountKey.json');
+const serviceAccount = require('../config/serviceAccountKey.json');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
