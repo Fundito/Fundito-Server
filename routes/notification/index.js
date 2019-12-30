@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-router.use('/notification', require('./notification'));
+router.use('/', require('./notification'));
 
 module.exports = router;

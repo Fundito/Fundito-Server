@@ -10,7 +10,23 @@ const Notification = require('../../model/Notification');
 
 /**
  * [GET] /notification/:userIdx
- * 알림 전체 조회
+ * 모든 알림 조회
+ * @author LeeSohee
+ */
+router.get('/', async (req, res) => {
+    Notification.readAll()
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
+/**
+ * [GET] /notification/:userIdx
+ * 유저 알림 조회
  * @author LeeSohee
  * @param userIdx
  */
@@ -19,7 +35,7 @@ router.get('/:userIdx', async (req, res) => {
         userIdx,
     } = req.params;
 
-    Notification.readAll(userIdx)
+    Notification.readAllUserNoti(userIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
