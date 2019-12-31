@@ -5,7 +5,7 @@ const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
 const upload = require('../../config/multer');
-
+const jwt = require('../../module/auth/jwt');
 
 const StoreInfo = require('../../model/StoreInfo');
 
@@ -13,9 +13,10 @@ const StoreInfo = require('../../model/StoreInfo');
  * [POST] /storeInfo
  * 식당 추가
  * @author ChoSooMin
+ * @header token
  * @body name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID, menu
  */
-router.post('/', upload.single('thumbnail'), async(req, res) => {
+router.post('/', jwt.checkLogin, upload.single('thumbnail'), async(req, res) => {
     const {
         name,
         telNumber,
@@ -54,7 +55,7 @@ router.post('/', upload.single('thumbnail'), async(req, res) => {
  * 전체 식당 정보 조회
  * @author ChoSooMin
  */
-router.get('/', async(req, res) => {
+router.get('/', jwt.checkLogin, async(req, res) => {
     StoreInfo.readAll()
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -69,9 +70,10 @@ router.get('/', async(req, res) => {
  * [GET] /storeInfo/:storeIdx
  * 식당 정보 조회
  * @author ChoSooMin, LeeSohee
+ * @header token
  * @param storeIdx
  */
-router.get('/:storeIdx', async(req, res) => {
+router.get('/:storeIdx', jwt.checkLogin, async(req, res) => {
     const {
         storeIdx
     } = req.params;
@@ -80,6 +82,8 @@ router.get('/:storeIdx', async(req, res) => {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX));
         return;
     }
+
+    console.log(storeIdx);
 
     StoreInfo.readStoreInfo(storeIdx)
     .then(({ code, json }) => {
@@ -97,7 +101,7 @@ router.get('/:storeIdx', async(req, res) => {
  * @author ChoSooMin
  * @body wifiSSID, store_idx
  */
-router.post('/wifi', async(req, res) => {
+router.post('/wifi', jwt.checkLogin, async(req, res) => {
     const {
         wifiSSID,
         storeIdx
@@ -139,7 +143,7 @@ router.post('/wifi', async(req, res) => {
  * @author ChoSooMin
  * @param storeIdx
  */
-router.delete('/:storeIdx', async(req, res) => {
+router.delete('/:storeIdx', jwt.checkLogin, async(req, res) => {
     const {
         storeIdx
     } = req.params;

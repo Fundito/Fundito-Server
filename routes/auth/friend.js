@@ -3,21 +3,19 @@ const router = express.Router();
 const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
-const User = require('../../model/User');
-const fb = require('../../module/auth/fb-jwt');
+const Friend = require('../../model/Friend');
+const jwt = require('../../module/auth/jwt');
 
 /**
- *  [POST] /auth/signup
- *  회원 가입
+ *  [GET] /auth/friend
+ *  친구 전체 정보 조회
  *  @author KangYeongWoo
- *  @body pay_password, nickname
- *  @header facebook_access_token
+ *  @headers token
  */
-router.post('/',fb, async(req, res) => {
-    const {id, name, friends} = req.decoded;
-    const {pay_password, nickname} = req.body;
-
-    User.signup(id, name, nickname, pay_password, friends)
+router.get('/',jwt.checkLogin, async(req, res) => {
+    const userIdx = req.decoded.idx
+    
+    Friend.readAll(userIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })

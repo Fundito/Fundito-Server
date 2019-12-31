@@ -4,7 +4,7 @@ const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
 const encryptionModule = require('../module/cryption/encryptionModule');
 const jwt = require('../module/auth/jwt');
-
+const Friend = require('../model/Friend');
 const table = `user`;
 const THIS_LOG = `사용자`;
 
@@ -39,7 +39,7 @@ const user = {
         })
     },
 
-    signup: (id, name, nickname, pay_password) => {
+    signup: (id, name, nickname, pay_password, friends) => {
         return new Promise( async(resolve, reject) => {
             if (!name || !pay_password || !id || !nickname){
                 resolve({
@@ -63,7 +63,9 @@ const user = {
             // 유저의 이름,아이디,패스워드를 저장
             const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?)';
             const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt]);
-            
+
+            Friend.createAll(insertUserInfoResult.insertId, friends);
+
             if (insertUserInfoResult.affectedRows == 1) {
                 const token = jwt.sign(insertUserInfoResult.insertId);
                 resolve({
@@ -71,17 +73,19 @@ const user = {
                     json: authUtil.successTrue(statusCode.CREATED, responseMessage.SIGN_UP_SUCCESS, token)
                 });
                 return;
+            } else {
+                resolve({
+                    code: statusCode.DB_ERROR,
+                    json: authUtil.successFalse(statusCode.DB_ERROR, responseMessage.DB_ERROR)
+                })
+                return;
             }
         });
     },
 
-    readAll: () => {
-
-    },
-
     read: (userIdx) => {
         return new Promise(async (resolve, reject) => {
-            const getCertainUserQuery = `SELECT * FROM ${table} user_idx = ?`;
+            const getCertainUserQuery = `SELECT name, nickname, point FROM ${table} WHERE user_idx = ?`;
             const getCertainUserResult = await pool.queryParam_Arr(getCertainUserQuery, [userIdx]);
 
             if (!getCertainUserResult) {
@@ -91,10 +95,9 @@ const user = {
                 });
                 return;
             }
-
             resolve({
                 code : statusCode.OK,
-                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getCertainUserResult)
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getCertainUserResult[0])
             });
         });
     },

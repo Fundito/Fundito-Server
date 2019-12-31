@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
             };
             next();
         } else {
-            res.status(500).send(authUtil.successFalse(statusCode.BAD_REQUEST, resMessage.INTERNAL_SERVER_ERROR));
+            res.status(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, resMessage.INVALID_TOKEN));
         }
     });
 }
