@@ -2,12 +2,14 @@ const statusCode = require('../module/utils/statusCode');
 const responseMessage = require('../module/utils/responseMessage');
 const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
+const Funding = require('./Funding');
+const StoreInfo = require('./StoreInfo');
 
-module.exports = {
+Friend = {
     readAll: (userIdx) => {
         return new Promise(async (resolve, reject) => {
             const getFriendIdxQuery = `SELECT friends_idx FROM friend WHERE user_idx = '${userIdx}'`;
-            const getFriendInfoQuery = `SELECT user_idx, id, name, nickname FROM user WHERE user_idx IN (${getFriendIdxQuery})`
+            const getFriendInfoQuery = `SELECT user_idx, id, name, nickname FROM user WHERE user_idx IN (${getFriendIdxQuery}) ORDER BY name ASC`
             const getFriendInfoResult = await pool.queryParam_Parse(getFriendInfoQuery);
             if (!getFriendInfoResult) {
                 resolve({
@@ -18,7 +20,7 @@ module.exports = {
             } else if (getFriendInfoResult[0] == null) {
                 resolve({
                     code: statusCode.OK,
-                    json: authUtil.successFalse(statusCode.DB_ERROR, responseMessage.NO_X("친구"))
+                    json: authUtil.successFalse(statusCode.OK, responseMessage.NO_X("친구"))
                 });
                 return;
             } else {
@@ -28,7 +30,7 @@ module.exports = {
                 });
                 return;
             }
-        })
+        });
     },
 
     createAll: (userIdx, friends) => {
@@ -68,5 +70,36 @@ module.exports = {
                 return;
             }
         });
+    },
+
+    feed: (userIdx) => {
+        return new Promise (async(resolve, reject) => {
+
+            let result = (await Friend.readAll(userIdx)).json.data;
+            for (i in result) {
+                result[i].fund = (await Funding.read(result[i].user_idx)).json.data;
+                result[i].fundCount = (result[i].fund).length
+            }
+            for (i in result) {
+                for (j in result[i].fund) {
+                    result[i].fund[j].storeInfo = (await StoreInfo.readStoreInfo(result[i].fund[j].store_idx)).json.data;
+                }
+            }
+            if (!result) {
+                resolve({
+                    code: statusCode.BAD_REQUEST,
+                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_X("정보"))
+                });
+                return;
+            } else {
+                resolve({
+                    code: statusCode.OK,
+                    json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS("피드"), result)
+                });
+                return;
+            }
+        });
     }
 }
+
+module.exports = Friend;
