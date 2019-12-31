@@ -355,6 +355,7 @@ const funding = {
             // const message = ``;
             if (fundStatus == 0) {
                 for(const joinData of joinResult) {
+                    const storeIdx = joinData.store_idx;
                     const storeName = joinData.name;
                     const dueDate = moment(joinData.due_date);
 
@@ -370,6 +371,7 @@ const funding = {
                     const progressPercent = currentSales / goalMoney * 100;
 
                     const clientResult = {
+                        "storeIdx" : storeIdx,
                         "storeName" : joinData.name,
                         "remainingDays" : parseInt(remainingDays),
                         "progressPercent" : progressPercent
@@ -389,6 +391,7 @@ const funding = {
             }
             else { // 투자 완료된 음식점
                 for(const joinData of joinResult) {
+                    const storeIdx = joinData.store_idx;
                     const storeName = joinData.name;
                     const dueDate = joinData.due_date;
                     const fundingMoney = joinData.funding_money;
@@ -396,6 +399,7 @@ const funding = {
                     const refundMoney = fundingMoney + rewardMoney;
 
                     const clientResult = {
+                        "storeIdx" : storeIdx,
                         "storeName" : storeName,
                         "dueDate" : dueDate,
                         "fundingMoney" : fundingMoney,
