@@ -44,7 +44,7 @@ const user = {
         });
     },
 
-    readAllUserNoti: (userIdx) => {
+    readUserAllNoti: (userIdx) => {
         return new Promise(async (resolve,reject) => {
             const selectNotificationQuery = `SELECT * FROM ${table} WHERE user_idx = ?`;
             let selectNotificationResult = await pool.queryParam_Arr(selectNotificationQuery, [userIdx]);
@@ -61,7 +61,7 @@ const user = {
             if (selectNotificationResult[0] == undefined) {
                 resolve({
                     code: statusCode.BAD_REQUEST,
-                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
+                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_NOTIFICATION)
                 });
                 return;
             }

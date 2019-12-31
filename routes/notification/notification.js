@@ -35,7 +35,7 @@ router.get('/', jwt.checkLogin, async (req, res) => {
 router.get('/', jwt.checkLogin, async (req, res) => {
     const userIdx = req.decoded.idx;
 
-    Notification.readAllUserNoti(userIdx)
+    Notification.readUserAllNoti(userIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
