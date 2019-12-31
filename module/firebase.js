@@ -10,6 +10,8 @@ function cloudMessaging(admin, message) {
         });
 }
 
+// git test
+
 function getAccessToken() {
     return new Promise(function (resolve, reject) {
         var key = require('../config/serviceAccountKey.json');
