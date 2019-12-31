@@ -4,6 +4,7 @@ const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
 const Funding = require('./Funding');
 const StoreInfo = require('./StoreInfo');
+const StoreFund = require('./StoreFund');
 
 Friend = {
     readAll: (userIdx) => {
@@ -78,7 +79,6 @@ Friend = {
             let result = (await Friend.readAll(userIdx)).json.data;
             for (i in result) {
                 result[i].fund = (await Funding.read(result[i].user_idx)).json.data;
-                result[i].fundCount = (result[i].fund).length
             }
             for (i in result) {
                 for (j in result[i].fund) {
@@ -95,6 +95,33 @@ Friend = {
                 resolve({
                     code: statusCode.OK,
                     json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS("피드"), result)
+                });
+                return;
+            }
+        });
+    },
+
+    readAllStore: (friendIdx) => {
+        return new Promise (async(resolve, reject) => {
+
+            let result = {
+                "proceeding": (await Funding.readUserFundingList(friendIdx, 0)).json.data,
+                "success": (await Funding.readUserFundingList(friendIdx, 1)).json.data,
+                "fail": (await Funding.readUserFundingList(friendIdx, 2)).json.data
+            };
+            // console.log(result);
+
+            if (!result) {
+                resolve({
+                    code: statusCode.BAD_REQUEST,
+                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_X("정보"))
+                });
+                return;
+            } else {
+                console.log(result)
+                resolve({
+                    code: statusCode.OK,
+                    json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS("친구 투자 상세정보"), result)
                 });
                 return;
             }

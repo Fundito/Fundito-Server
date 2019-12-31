@@ -46,4 +46,24 @@ router.get('/fund',jwt.checkLogin, async(req, res) => {
     });
 });
 
+/**
+ *  [GET] /friend/fund/:friend_idx
+ *  친구 투자현황 조회
+ *  @author KangYeongWoo
+ *  @headers token
+ */
+router.get('/fund/:friend_idx',jwt.checkLogin, async(req, res) => {
+    const friendIdx = req.params.friend_idx;
+    
+    Friend.readAllStore(friendIdx)
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR)
+        .send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
 module.exports = router;
