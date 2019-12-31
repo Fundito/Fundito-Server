@@ -153,9 +153,7 @@ const user = {
                     return;
                 }
 
-                console.log
-
-                const checkPayPasswordEncryptionResult = await encryptionModule.encryption(payPassword, getCertainUserResult[0].salt);
+                const checkPayPasswordEncryptionResult = await encryptionModule.decryption(payPassword, getCertainUserResult[0].salt);
 
                 if (getCertainUserResult[0].pay_password == checkPayPasswordEncryptionResult ) {
                     const putUserPointResult = await pool.queryParam_Arr(putUserPointQuery,[Number(point) + Number(getCertainUserResult[0].point)]);
