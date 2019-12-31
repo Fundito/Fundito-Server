@@ -28,7 +28,7 @@ const user = {
                 console.log(`select Notification ERROR`);
                 return;
             }
-
+            
             if (selectNotificationResult[0] == undefined) {
                 resolve({
                     code: statusCode.BAD_REQUEST,
@@ -49,6 +49,7 @@ const user = {
             const selectNotificationQuery = `SELECT * FROM ${table} WHERE user_idx = ?`;
             let selectNotificationResult = await pool.queryParam_Arr(selectNotificationQuery, [userIdx]);
 
+            console.log(selectNotificationResult);
             if (!selectNotificationResult) {
                 resolve({
                     code: statusCode.INTERNAL_SERVER_ERROR,
@@ -67,9 +68,11 @@ const user = {
             }
 
             for (var i=0; i<selectNotificationResult.length ; i++) {
+                console.log(selectNotificationResult[i].store_idx);
                 await storeInfo.readStoreInfo(selectNotificationResult[i].store_idx)
                 .then(({ code, json }) => {
                     selectNotificationResult[i].store_info = json.data;
+                    console.log(json.data);
                 })
                 .catch((err) => {
                     console.log(err);

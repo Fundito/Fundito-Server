@@ -9,8 +9,8 @@ const table = `user`;
 const THIS_LOG = `사용자`;
 
 const user = {
-    login: (id, name) => {
-        return new Promise( async(resolve, reject) => {
+    login: (id, name, firebase_token) => {
+        return new Promise(async (resolve, reject) => {
             if (!id || !name) {
                 resolve({
                     code: statusCode.BAD_REQUEST,
@@ -18,11 +18,19 @@ const user = {
                 });
                 return;
             }
-            
+
+            if (!firebase_token) {
+                resolve({
+                    code: statusCode.BAD_REQUEST,
+                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.EMPTY_TOKEN)
+                });
+                return;
+            }
+
             const getUserIndexQuery = `SELECT user_idx FROM user WHERE id = '${id}' AND name = '${name}'`;
             const getUserIndexResult = await pool.queryParam_Parse(getUserIndexQuery);
-            
-            if (getUserIndexResult[0] === undefined){
+
+            if (getUserIndexResult[0] === undefined) {
                 resolve({
                     code: statusCode.UNAUTHORIZED,
                     json: authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.NO_X("user"))
@@ -30,6 +38,18 @@ const user = {
                 return;
             } else {
                 const token = jwt.sign(getUserIndexResult[0].user_idx);
+
+                const putFirebaseTokenQuery = `UPDATE user SET firebase_token = ? WHERE user_idx = ?`;
+                const putFirebaseTokenResult = await pool.queryParam_Arr(putFirebaseTokenQuery, [firebase_token, getUserIndexResult[0].user_idx]);
+
+                if(!putFirebaseTokenResult) {
+                    resolve({
+                        code: statusCode.INTERNAL_SERVER_ERROR,
+                        json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                    });
+                    return;
+                }
+
                 resolve({
                     code: statusCode.OK,
                     json: authUtil.successTrue(statusCode.OK, responseMessage.SIGN_IN_SUCCESS, token)
@@ -40,8 +60,8 @@ const user = {
     },
 
     signup: (id, name, nickname, pay_password, friends) => {
-        return new Promise( async(resolve, reject) => {
-            if (!name || !pay_password || !id || !nickname){
+        return new Promise(async (resolve, reject) => {
+            if (!name || !pay_password || !id || !nickname) {
                 resolve({
                     code: statusCode.BAD_REQUEST,
                     json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE)
@@ -58,7 +78,10 @@ const user = {
                 });
                 return;
             }
-            const { salt, hashedPassword } = await encryptionModule.encryption(pay_password);
+            const {
+                salt,
+                hashedPassword
+            } = await encryptionModule.encryption(pay_password);
 
             // 유저의 이름,아이디,패스워드를 저장
             const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?)';
@@ -90,14 +113,14 @@ const user = {
 
             if (!getCertainUserResult) {
                 resolve({
-                    code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                    code: statusCode.INTERNAL_SERVER_ERROR,
+                    json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
             resolve({
-                code : statusCode.OK,
-                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getCertainUserResult[0])
+                code: statusCode.OK,
+                json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getCertainUserResult[0])
             });
         });
     },
@@ -109,29 +132,29 @@ const user = {
 
             if (getUserPointResult[0] == undefined) {
                 resolve({
-                    code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
+                    code: statusCode.BAD_REQUEST,
+                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
                 });
                 return;
             }
 
             if (!getUserPointResult) {
                 resolve({
-                    code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                    code: statusCode.INTERNAL_SERVER_ERROR,
+                    json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             }
 
-            resolve ({
-                code : statusCode.OK,
-                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getUserPointResult)
+            resolve({
+                code: statusCode.OK,
+                json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), getUserPointResult)
             });
         });
     },
 
     updatePoint: (userIdx, point, payPassword) => {
-        return new Promise (async (resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const putUserPointQuery = `UPDATE ${table} SET point = ? WHERE user_idx = ${userIdx}`;
             const getCertainUserQuery = `SELECT * FROM ${table} WHERE user_idx = ?`;
 
@@ -139,41 +162,39 @@ const user = {
 
             if (!getCertainUserResult) {
                 resolve({
-                    code : statusCode.INTERNAL_SERVER_ERROR,
-                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                    code: statusCode.INTERNAL_SERVER_ERROR,
+                    json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
                 return;
             } else {
 
                 if (getCertainUserResult[0] == undefined) {
                     resolve({
-                        code : statusCode.BAD_REQUEST,
-                        json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
+                        code: statusCode.BAD_REQUEST,
+                        json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
                     });
                     return;
                 }
 
-                console.log
+                const checkPayPasswordEncryptionResult = await encryptionModule.decryption(payPassword, getCertainUserResult[0].salt);
 
-                const checkPayPasswordEncryptionResult = await encryptionModule.encryption(payPassword, getCertainUserResult[0].salt);
-
-                if (getCertainUserResult[0].pay_password == checkPayPasswordEncryptionResult ) {
-                    const putUserPointResult = await pool.queryParam_Arr(putUserPointQuery,[Number(point) + Number(getCertainUserResult[0].point)]);
-                    resolve ({
-                        code : statusCode.OK,
-                        json : authUtil.successTrue(statusCode.OK, responseMessage.X_UPDATE_SUCCESS(THIS_LOG), putUserPointResult)
+                if (getCertainUserResult[0].pay_password == checkPayPasswordEncryptionResult) {
+                    const putUserPointResult = await pool.queryParam_Arr(putUserPointQuery, [Number(point) + Number(getCertainUserResult[0].point)]);
+                    resolve({
+                        code: statusCode.OK,
+                        json: authUtil.successTrue(statusCode.OK, responseMessage.X_UPDATE_SUCCESS(THIS_LOG), putUserPointResult)
                     });
                 } else {
                     resolve({
-                        code : statusCode.UNAUTHORIZED,
-                        json : authUtil.successTrue(statusCode.UNAUTHORIZED, responseMessage.MISS_MATCH_PASSWORD)
+                        code: statusCode.UNAUTHORIZED,
+                        json: authUtil.successTrue(statusCode.UNAUTHORIZED, responseMessage.MISS_MATCH_PASSWORD)
                     });
                 }
             }
         });
     },
 
-    delete : () => {
+    delete: () => {
 
     }
 };
