@@ -10,12 +10,12 @@ const jwt = require('../../module/auth/jwt');
 const Notification = require('../../model/Notification');
 
 /**
- * [GET] /notification
+ * [GET] /notification/all
  * 모든 알림 조회
  * @author LeeSohee
  * @header token
  */
-router.get('/', jwt.checkLogin, async (req, res) => {
+router.get('/all', jwt.checkLogin, async (req, res) => {
     Notification.readAll()
     .then(({ code, json }) => {
         res.status(code).send(json);
