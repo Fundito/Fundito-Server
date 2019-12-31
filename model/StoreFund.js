@@ -4,6 +4,7 @@ const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
 const fundStatus = require(`../module/utils/fundStatus`);
 const calculate = require('../module/calculate');
+const notification = require('../model/Notification');
 const serverKey = require('../config/serverKey');
 const admin = require('firebase-admin');
 
@@ -323,10 +324,11 @@ const storeFund = {
         var registrationToken = getFirebaseTokenResult[0].firebase_token;
         console.log(registrationToken);
 
+        let notificationData = (await notification.readUserAllNoti(userIdx)).json.data;
+
         var message = {
             data: {
-                score: '850',
-                time: '2:45'
+                notificationData
             },
             token: registrationToken
         };
@@ -342,6 +344,8 @@ const storeFund = {
                 console.log('Error sending message:', error);
             });
         });
+
+
     },
 
     read: (storeIdx) => {
