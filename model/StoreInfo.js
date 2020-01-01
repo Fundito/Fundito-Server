@@ -89,7 +89,7 @@ const storeInfo = {
         });
     },
 
-    readStoreInfo : (storeIdx) => {
+    readStoreInfo : (userIdx, storeIdx) => {
         return new Promise(async (resolve, reject) => {
             // 식당 정보 가져오기
             const getOneStoreQuery = `SELECT store_idx, name, business_hours, breaktime, holiday, thumbnail, address FROM ${storeInfoTable} WHERE store_idx = ?`;
@@ -112,10 +112,14 @@ const storeInfo = {
             const getStoreFundResult = await pool.queryParam_Arr(getStoreFundQuery, [storeIdx]);
             
             // 식당 펀딩 정보 가져오기 
-            const getFundingMoneyQuery = `SELECT funding_money FROM funding WHERE store_idx = ?`;
-            const getFundingMoneyResult = await pool.queryParam_Arr(getFundingMoneyQuery, [storeIdx]);
+            const getFundingInfoQuery = `SELECT * FROM funding WHERE store_idx = ?`;
+            var getFundingInfoResult = await pool.queryParam_Arr(getFundingInfoQuery, [storeIdx]);
+
+            // 유저 네임 가져오기
+            const getUserNameQuery = `SELECT name FROM user WHERE user_idx = ?`;
+            const getUserNameResult = await pool.queryParam_Arr(getUserNameQuery, [userIdx]);
             
-            if (!getStoreMenuResult || !getStoreFundResult || !getFundingMoneyResult) {
+            if (!getStoreMenuResult || !getStoreFundResult || !getFundingInfoResult || !getUserNameResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
                     json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
@@ -124,8 +128,8 @@ const storeInfo = {
             }
             // 가게에 펀딩된 금액 합계
             var fundingMoneySum = 0;
-            for (var i = 0; i < getFundingMoneyResult.length; i++) {
-                fundingMoneySum += getFundingMoneyResult[i].funding_money;
+            for (var i = 0; i < getFundingInfoResult.length; i++) {
+                fundingMoneySum += getFundingInfoResult[i].funding_money;
             }
             
             if (getStoreFundResult[0] == undefined) {
@@ -140,18 +144,12 @@ const storeInfo = {
             const marginPercent = result.margin_percent;
             const goalMoney = result.goal_money;
             const regularMoney = result.regular_money;
+            const fundStatus = result.fund_status;
             const fundingBenefits = getFundingBenefits(marginPercent,goalMoney,regularMoney); // 투자이윤 
-            console.log(`투자이윤`);
-            console.log(fundingBenefits);
             const moneyLimit150 = getMoneyLimit150(fundingBenefits); // C (150% 마감금액)
             const moneyLimit175 = getMoneyLimit175(fundingBenefits); // B (175% 마감금액)
             const moneyLimit200 = getMoneyLimit200(fundingBenefits); // A (200% 마감금액)
-            console.log(`150`);
-            console.log(moneyLimit150);
-            console.log(`175`);
-            console.log(moneyLimit175);
-            console.log(`200`);
-            console.log(moneyLimit200);
+            console.log(`가게에 모인 금액`);
             console.log(fundingMoneySum);
             let refundPercent = 200; 
             let refundPerOfPer = getRefundPerOfPer(moneyLimit200, fundingMoneySum);
@@ -163,18 +161,9 @@ const storeInfo = {
                 refundPercent = 150;
                 refundPerOfPer = getRefundPerOfPer(moneyLimit150, fundingMoneySum);
             }
-            console.log(`환급률`);
-            console.log(refundPercent);
-            console.log(`환급률의 퍼센트`);
-            console.log(refundPerOfPer);
             const now = moment(Date.now());
             const dueDate = moment(getStoreFundResult[0].due_date);
             const leftDay = parseInt(moment.duration(dueDate.diff(now)).asDays());
-            console.log(`남은 기간`);
-            console.log(leftDay);
-            console.log(`커런트세일즈`);
-            console.log(getStoreFundResult[0].current_sales);
-            console.log(getStoreFundResult[0].goal_money);
             const currentGoalPercent = parseInt(getCurGoalPer(getStoreFundResult[0].current_sales,getStoreFundResult[0].goal_money));
             if (!getOneStoreResult || !getStoreMenuResult || !getStoreFundResult) {
                 resolve({
@@ -192,8 +181,28 @@ const storeInfo = {
             storeResult.refund_percent = refundPercent;
             storeResult.refund_percent_of_percent = parseInt(refundPerOfPer);
             storeResult.left_day = leftDay; 
+            storeResult.fund_status = fundStatus;
             storeResult.due_date = dueDate.format('YYYY-MM-DD HH:mm');
-            storeResult.fund_status = getStoreFundResult[0].fund_status;
+            /** [TODO] 펀딩에 user_idx값에 해당 되는거 다 더해서 보내기 */
+            var fundingMoneySum = 0;
+            var profitMoneySum = 0;
+            var rewardMoneySum = 0;
+            
+            for(var i=0; i< getFundingInfoResult.length; i++) {
+                fundingMoneySum += getFundingInfoResult[i].funding_money;
+                profitMoneySum += getFundingInfoResult[i].profit_money;
+                rewardMoneySum += getFundingInfoResult[i].reward_money;
+            }
+            if(fundStatus == 1) {
+                getFundingInfoResult[0].profit_money = 0;
+                getFundingInfoResult[0].reward_money = fundingMoneySum;
+            }else{
+                getFundingInfoResult[0].profit_money = profitMoneySum;
+                getFundingInfoResult[0].reward_money = rewardMoneySum;
+            }
+            getFundingInfoResult[0].funding_money = fundingMoneySum;
+            getFundingInfoResult[0].user_name = getUserNameResult[0].name;
+            storeResult.funding = getFundingInfoResult[0];
             
             console.log(storeResult);
 
