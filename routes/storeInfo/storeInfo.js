@@ -77,15 +77,16 @@ router.get('/:storeIdx', jwt.checkLogin, async(req, res) => {
     const {
         storeIdx
     } = req.params;
+    const userIdx = req.decoded.idx;
 
     if (!storeIdx) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX));
         return;
     }
 
-    console.log(storeIdx);
+    console.log(storeIdx, userIdx);
 
-    StoreInfo.readStoreInfo(storeIdx)
+    StoreInfo.readStoreInfo(userIdx, storeIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })

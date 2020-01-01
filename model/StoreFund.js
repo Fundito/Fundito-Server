@@ -328,7 +328,9 @@ const storeFund = {
 
         var message = {
             data: {
-                notificationData
+                // notificationData
+                "score" : "123",
+                "time" : "12:34"
             },
             token: registrationToken
         };
