@@ -132,10 +132,10 @@ const storeInfo = {
                 fundingMoneySum += getFundingInfoResult[i].funding_money;
             }
             
-            if (getStoreFundResult[0] == undefined) {
+            if (getStoreFundResult[0] == undefined || getUserNameResult[0] == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.BAD_REQUEST)
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
                 });
                 return;
             }
@@ -179,7 +179,9 @@ const storeInfo = {
             var fundingMoneySum = 0;
             var profitMoneySum = 0;
             var rewardMoneySum = 0;
-            
+            if(getFundingInfoResult[0]==undefined) {
+                storeResult.funding = {};
+            } else {
             for(var i=0; i< getFundingInfoResult.length; i++) {
                 fundingMoneySum += getFundingInfoResult[i].funding_money;
                 profitMoneySum += getFundingInfoResult[i].profit_money;
@@ -195,7 +197,7 @@ const storeInfo = {
             getFundingInfoResult[0].funding_money = fundingMoneySum;
             getFundingInfoResult[0].user_name = getUserNameResult[0].name;
             storeResult.funding = getFundingInfoResult[0];
-            
+            }
             console.log(storeResult);
 
             resolve({
