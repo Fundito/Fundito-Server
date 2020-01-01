@@ -59,7 +59,7 @@ const user = {
         })
     },
 
-    signup: (id, name, nickname, pay_password, friends) => {
+    signup: (id, name, nickname, pay_password, friends, photo) => {
         return new Promise(async (resolve, reject) => {
             if (!name || !pay_password || !id || !nickname) {
                 resolve({
@@ -84,8 +84,8 @@ const user = {
             } = await encryptionModule.encryption(pay_password);
 
             // 유저의 이름,아이디,패스워드를 저장
-            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?)';
-            const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt]);
+            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?, ?)';
+            const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt, photo]);
 
             Friend.createAll(insertUserInfoResult.insertId, friends);
 

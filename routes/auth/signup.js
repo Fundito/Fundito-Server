@@ -14,10 +14,10 @@ const fb = require('../../module/auth/fb-jwt');
  *  @header facebook_access_token
  */
 router.post('/',fb, async(req, res) => {
-    const {id, name, friends} = req.decoded;
+    const {id, name, photo, friends} = req.decoded;
     const {pay_password, nickname} = req.body;
 
-    User.signup(id, name, nickname, pay_password, friends)
+    User.signup(id, name, nickname, pay_password, friends, photo)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })

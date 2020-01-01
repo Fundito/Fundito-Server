@@ -20,6 +20,7 @@ module.exports = (req, res, next) => {
             req.decoded = {
                 id: data.id,
                 name: data.name,
+                photo: data.picture.data.url,
                 friends: data.friends.data
             };
             next();
