@@ -91,8 +91,30 @@ const user = {
 
     },
 
-    delete: () => {
+    delete: (notificationIdx) => {
+        const deleteNotificationQuery = `DELETE FROM ${table} WHERE notification_idx = ?`;
+        const deleteNotificationResult = await pool.queryParam_Arr(deleteNotificationQuery, [notificationIdx]);
 
+        if(deleteNotificationResult[0] == undefined) {
+            resolve({
+                code : statusCode.BAD_REQUEST,
+                json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
+            });
+            return;
+        }
+
+        if (!deleteNotificationResult) {
+            resolve({
+                code : statusCode.INTERNAL_SERVER_ERROR,
+                json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+            });
+            return;
+        }
+
+        resolve({
+            code : statusCode.OK,
+            json : authUtil.successTrue(statusCode.OK, responseMessage.X_DELETE_SUCCESS(THIS_LOG))
+        });
     },
 
     update: () => {
