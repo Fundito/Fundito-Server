@@ -96,15 +96,15 @@ router.get('/:storeIdx', jwt.checkLogin, async(req, res) => {
 });
 
 /**
- * [GET] /storeInfo
+ * [GET] /storeInfo/wifi/:wifiSSID
  * 와이파이 SSID를 갖고, 해당 식당 정보 불러오기
  * @author ChoSooMin
- * @body wifiSSID
+ * @param wifiSSID
  */
-router.get('/', jwt.checkLogin, async(req, res) => {
+router.get('/wifi/:wifiSSID', jwt.checkLogin, async(req, res) => {
     const {
         wifiSSID
-    } = req.body;
+    } = req.params;
 
     if (!wifiSSID) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
