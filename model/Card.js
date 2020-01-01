@@ -10,7 +10,7 @@ const THIS_LOG = `카드`;
 const USER_LOG = `카드 유저`
 
 const card = {
-    create: (userIdx, cardCompany, cardNickname, cardNumber, cvc, cardPassword) => {
+    create: (userIdx, cardCompany, cardNickname, cardNumber, cardExpirationDate, cardPassword) => {
         return new Promise(async (resolve, reject) => {
             const userCardQuery = `SELECT * FROM ${table} WHERE user_idx = ?`;
             const userCardResult = await pool.queryParam_Arr(userCardQuery, [userIdx]);
@@ -31,15 +31,15 @@ const card = {
             }
 
             const cardEncryptionResult = await encryptionModule.encryption(cardNumber);
-            const cvcEncryptionResult = await encryptionModule.encryption(cvc);
+            const expirationDateEncryptionResult = await encryptionModule.encryption(cardExpirationDate);
             const passwordEncryptionResult = await encryptionModule.encryption(cardPassword);
 
             console.log(cardEncryptionResult);
-            console.log(cvcEncryptionResult);
+            console.log(expirationDateEncryptionResult);
             console.log(passwordEncryptionResult);
 
-            const cardCreateQuery = `INSERT INTO card(user_idx, card_company_name, card_nickname, card_number, cvc, card_password, card_salt, cvc_salt, card_password_salt) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            const cardCreateResult = await pool.queryParam_Arr(cardCreateQuery, [userIdx, cardCompany, cardNickname, cardEncryptionResult.hashedPassword, cvcEncryptionResult.hashedPassword, passwordEncryptionResult.hashedPassword, cardEncryptionResult.salt, cvcEncryptionResult.salt, passwordEncryptionResult.salt]);
+            const cardCreateQuery = `INSERT INTO card(user_idx, card_company_name, card_nickname, card_number, card_expiration_date, card_password, card_salt, card_expiration_date_salt, card_password_salt) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const cardCreateResult = await pool.queryParam_Arr(cardCreateQuery, [userIdx, cardCompany, cardNickname, cardEncryptionResult.hashedPassword, expirationDateEncryptionResult.hashedPassword, passwordEncryptionResult.hashedPassword, cardEncryptionResult.salt, expirationDateEncryptionResult.salt, passwordEncryptionResult.salt]);
 
             if (!cardCreateResult) {
                 resolve({

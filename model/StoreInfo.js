@@ -2,7 +2,7 @@ const statusCode = require('../module/utils/statusCode');
 const responseMessage = require('../module/utils/responseMessage');
 const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
-const {isAtLimit, getMoneyLimit150, getMoneyLimit175, getMoneyLimit200, getRefundPerOfPer, getFundingBenefits, getCurGoalPer} = require('../module/calculate');
+const {getMoneyLimit150, getMoneyLimit175, getMoneyLimit200, getRefundPerOfPer, getFundingBenefits, getCurGoalPer, getRefundPercent} = require('../module/calculate');
 const moment = require('moment');
 
 const storeInfoTable = `store_info`;
@@ -151,16 +151,8 @@ const storeInfo = {
             const moneyLimit200 = getMoneyLimit200(fundingBenefits); // A (200% 마감금액)
             console.log(`가게에 모인 금액`);
             console.log(fundingMoneySum);
-            let refundPercent = 200; 
+            let refundPercent = getRefundPercent(moneyLimit150,moneyLimit175,moneyLimit200,fundingMoneySum); 
             let refundPerOfPer = getRefundPerOfPer(moneyLimit200, fundingMoneySum);
-            if(isAtLimit(moneyLimit200,fundingMoneySum)){
-                refundPercent = 175;
-                refundPerOfPer = getRefundPerOfPer(moneyLimit175, fundingMoneySum);
-            }
-            if(isAtLimit(moneyLimit175,fundingMoneySum)) {
-                refundPercent = 150;
-                refundPerOfPer = getRefundPerOfPer(moneyLimit150, fundingMoneySum);
-            }
             const now = moment(Date.now());
             const dueDate = moment(getStoreFundResult[0].due_date);
             const leftDay = parseInt(moment.duration(dueDate.diff(now)).asDays());

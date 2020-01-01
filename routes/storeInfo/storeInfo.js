@@ -124,6 +124,18 @@ router.get('/wifi/:wifiSSID', jwt.checkLogin, async(req, res) => {
     });
 });
 
+router.get('/wifi', jwt.checkLogin, async(req, res) => {
+    const{
+        wifiSSID
+    } = req.body;
+
+    if (!wifiSSID) {
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+        return;
+    }
+    
+});
+
 /**
  * [POST] /storeInfo/wifi
  * 와이파이 SSID 확인

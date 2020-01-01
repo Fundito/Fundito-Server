@@ -17,6 +17,30 @@ const storeInfo = require(`../model/StoreInfo`);
 const funding = {
     create: (userIdx, payPassword, storeIdx, fundingMoney) => {
         return new Promise(async (resolve, reject) => {
+            // 사용자 정보 가져오기
+            const userQuery = `SELECT * FROM ${userTable} WHERE user_idx = ?`;
+            const userResult = await pool.queryParam_Arr(userQuery, [userIdx]);
+            console.log(userResult);
+            console.log(userResult[0]);
+
+            if (userResult[0] == undefined) {
+                resolve({
+                    code : statusCode.DB_ERROR,
+                    json : authUtil.successFalse(statusCode.DB_ERROR, `해당하지 않는 userIdx값입니다.`)
+                });
+                return;
+            }
+
+            // 펀디토 머니가 부족할 때
+            if (userResult[0].point < fundingMoney) {
+                resolve({
+                    code : statusCode.UNAUTHORIZED,
+                    json : authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.USER_MONEY_LESS_THAN_FUNDING_MONEY)
+                });
+                return;
+            }
+
+
             // 가게 정보 가져오기
             const storeIdxQuery = `SELECT * FROM store_info WHERE store_idx = ?`;
             const storeIdxResult = await pool.queryParam_Arr(storeIdxQuery, [storeIdx]);
@@ -76,19 +100,6 @@ const funding = {
                     resolve({
                         code : statusCode.BAD_REQUEST,
                         json : authUtil.successFalse(statusCode.BAD_REQUEST, `이미 마감된 펀딩입니다`)
-                    });
-                    return;
-                }
-
-                const userQuery = `SELECT * FROM ${userTable} WHERE user_idx = ?`;
-                const userResult = await pool.queryParam_Arr(userQuery, [userIdx]);
-                console.log(userResult);
-                console.log(userResult[0]);
-
-                if (userResult[0] == undefined) {
-                    resolve({
-                        code : statusCode.DB_ERROR,
-                        json : authUtil.successFalse(statusCode.DB_ERROR, `해당하지 않는 userIdx값입니다.`)
                     });
                     return;
                 }
@@ -213,6 +224,18 @@ const funding = {
                                 json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
                             console.log(`FUND DB ERROR`);
+                            return;
+                        }
+
+                        const funditoMoney = userResult[0].point - fundingMoney;
+                        const minusFundingMoneyQuery = `UPDATE user SET point = ? WHERE user_idx = ?`;
+                        const minusFundingMoneyResult = await pool.queryParam_Arr(minusFundingMoneyQuery, [funditoMoney, userIdx]);
+
+                        if (!minusFundingMoneyResult) {
+                            resolve({
+                                code : statusCode.INTERNAL_SERVER_ERROR,
+                                json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                            });
                             return;
                         }
             

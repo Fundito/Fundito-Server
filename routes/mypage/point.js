@@ -51,4 +51,25 @@ router.put('/', jwt.checkLogin, async (req, res) => {
     });
 });
 
+router.put('/withdraw', jwt.checkLogin, async (req, res) => {
+    const {
+        point
+    } = req.body;
+
+    const userIdx = req.decoded.idx;
+
+    if (point == undefined) {
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+        return;
+    }
+
+    User.withdrawPoint(userIdx,point)
+    .then(({code, json})=>{
+        res.status(code).send(json);
+    }).catch((err) => {
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR))
+    });
+
+});
+
 module.exports = router;

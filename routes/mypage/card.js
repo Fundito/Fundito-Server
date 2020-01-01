@@ -14,7 +14,7 @@ const Card = require('../../model/Card');
  * 카드 생성
  * @author ChoSooMin
  * @header token
- * @body cardCompany, cardNumber, cvc, password
+ * @body cardCompany, cardNumber, cardExpirationDate, password
  */
 /**
  * Request Body
@@ -22,7 +22,7 @@ const Card = require('../../model/Card');
 	"cardCompany" : "국민",
 	"cardNickname" : "별칭",
 	"cardNumber" : "12312312",
-	"cvc" : "123",
+	"cardExpirationDate" : "123",
 	"password" : "123123123"
     }
 
@@ -32,14 +32,14 @@ router.post('/', jwt.checkLogin, async (req, res) => {
         cardCompany, 
         cardNickname, 
         cardNumber, 
-        cvc, 
+        cardExpirationDate, 
         cardPassword
     } = req.body;
     const userIdx = req.decoded.idx;
 
     console.log(`userIdx = ${userIdx}`);
 
-    if (!cardCompany || !cardNickname || !cardNumber || !cvc || !cardPassword) {
+    if (!cardCompany || !cardNickname || !cardNumber || !cardExpirationDate || !cardPassword) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
@@ -47,12 +47,12 @@ router.post('/', jwt.checkLogin, async (req, res) => {
     // console.log(typeof(cardNumber));
 
     // cardNumber, cvc, password 형이 string이 아니면 오류 (암호화, 복호화를 위해)
-    if (typeof(cardNumber) != `string` || typeof(cvc) != `string` || typeof(cardPassword) != `string`) {
+    if (typeof(cardNumber) != `string` || typeof(cardExpirationDate) != `string` || typeof(cardPassword) != `string`) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.BODY_VALUE_ERROR));
         return;
     }
     
-    Card.create(userIdx, cardCompany, cardNickname, cardNumber, cvc, cardPassword)
+    Card.create(userIdx, cardCompany, cardNickname, cardNumber, cardExpirationDate, cardPassword)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
