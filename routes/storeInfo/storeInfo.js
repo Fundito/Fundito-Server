@@ -85,8 +85,6 @@ router.get('/:storeIdx', jwt.checkLogin, async(req, res) => {
         return;
     }
 
-    console.log(storeIdx, userIdx);
-
     StoreInfo.readStoreInfo(userIdx, storeIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -112,8 +110,6 @@ router.get('/wifi/:wifiSSID', jwt.checkLogin, async(req, res) => {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
-
-    console.log(wifiSSID);
 
     StoreInfo.readByWifi(wifiSSID)
     .then(({ code, json }) => {
@@ -157,8 +153,6 @@ router.post('/wifi', jwt.checkLogin, async(req, res) => {
     StoreInfo.read(storeIdx)
     .then(({ code, json }) => {
         const storeData = json.data;
-        console.log(`storeinfo wifi`);
-        console.log(json);
 
         // storeIdx가 존재하지 않을 경우
         if (storeData == undefined) {

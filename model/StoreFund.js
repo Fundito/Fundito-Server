@@ -69,17 +69,14 @@ const storeFund = {
 
             // registerTime 구하기
             const date = Date.now();
-            console.log(date);
             const registerTime = moment(date).format('YYYY-MM-DD HH:mm:ss');
-            console.log(registerTime);
 
             // dueDate 구하기
             const d = new Date();
             const dueDate = moment(d.getTime()).add('1', 'M').format('YYYY-MM-DD HH:mm:ss');
-            console.log(dueDate);
 
             const insertStoreFundInfoResult = await pool.queryParam_Arr(insertStoreFundInfoQuery, [storeIdx, marginPercent, registerTime, dueDate, regularMoney, goalMoney]);
-            console.log(insertStoreFundInfoResult);
+            
             if (!insertStoreFundInfoResult) {
                 resolve({
                     code: statusCode.BAD_REQUEST,
@@ -124,7 +121,6 @@ const storeFund = {
                     code: statusCode.INTERNAL_SERVER_ERROR,
                     json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
-                console.log(`select StoreFund Info ERROR`);
                 return;
             }
 
@@ -139,7 +135,6 @@ const storeFund = {
                     // 가게의 목표 금액 가져오기
                     const selectStoreGoalMoneyQuery = `SELECT goal_money, current_sales FROM ${table} WHERE store_idx = ?`;
                     const selectStoreGoalMoneyResult = await pool.queryParam_Arr(selectStoreGoalMoneyQuery, [result.store_idx]);
-                    console.log(selectStoreGoalMoneyResult);
 
                     if (selectStoreGoalMoneyResult[0] == undefined) {
                         resolve({
@@ -154,14 +149,11 @@ const storeFund = {
                             code: statusCode.INTERNAL_SERVER_ERROR,
                             json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                         });
-                        console.log(`DB ERROR`);
                         return;
                     }
 
                     const goalMoney = selectStoreGoalMoneyResult[0].goal_money;
-                    console.log(goalMoney);
                     const currentSales = selectStoreGoalMoneyResult[0].current_sales;
-                    console.log(currentSales)
 
                     // 펀딩 성공 여부를 체크
                     if (goalMoney <= currentSales) {
@@ -174,7 +166,6 @@ const storeFund = {
                                 code: statusCode.INTERNAL_SERVER_ERROR,
                                 json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
-                            console.log(`update error`);
                             return;
                         }
                     } else {
@@ -188,7 +179,6 @@ const storeFund = {
                                 code: statusCode.INTERNAL_SERVER_ERROR,
                                 json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
-                            console.log(`update StoreFund Info ERROR`);
                             return;
                         }
                     }
@@ -227,14 +217,11 @@ const storeFund = {
             const getCloseFundStoreUserQuery = `SELECT funding.user_idx FROM store_fund JOIN funding ON funding.store_idx = store_fund.store_idx WHERE fund_status = 1 OR fund_status = 2`;
             const getCloseFundStoreUserResult = await pool.queryParam_None(getCloseFundStoreUserQuery);
 
-            console.log(getCloseFundStoreUserResult);
-
             if (!getCloseFundStoreUserResult) {
                 resolve({
                     code: statusCode.INTERNAL_SERVER_ERROR,
                     json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
-                console.log(`get getCloseFundStoreUserResult ERROR`);
                 return;
             }
 
@@ -322,7 +309,6 @@ const storeFund = {
         }
         
         var registrationToken = getFirebaseTokenResult[0].firebase_token;
-        console.log(registrationToken);
 
         let notificationData = (await notification.readUserAllNoti(userIdx)).json.data;
 

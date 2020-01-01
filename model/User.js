@@ -59,7 +59,7 @@ const user = {
         })
     },
 
-    signup: (id, name, nickname, pay_password, friends) => {
+    signup: (id, name, nickname, pay_password, friends, photo) => {
         return new Promise(async (resolve, reject) => {
             if (!name || !pay_password || !id || !nickname) {
                 resolve({
@@ -84,8 +84,8 @@ const user = {
             } = await encryptionModule.encryption(pay_password);
 
             // 유저의 이름,아이디,패스워드를 저장
-            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?)';
-            const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt]);
+            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?, ?)';
+            const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt, photo]);
 
             Friend.createAll(insertUserInfoResult.insertId, friends);
 
@@ -108,7 +108,7 @@ const user = {
 
     read: (userIdx) => {
         return new Promise(async (resolve, reject) => {
-            const getCertainUserQuery = `SELECT name, nickname, point FROM ${table} WHERE user_idx = ?`;
+            const getCertainUserQuery = `SELECT name, nickname, photo, point FROM ${table} WHERE user_idx = ?`;
             const getCertainUserResult = await pool.queryParam_Arr(getCertainUserQuery, [userIdx]);
 
             if (!getCertainUserResult) {
@@ -193,7 +193,12 @@ const user = {
             }
         });
     },
+<<<<<<< HEAD
     updatePointWithoutPassword : (userIdx, point) => {
+=======
+    
+    withdrawPoint : (userIdx, point) => {
+>>>>>>> 19367a300025733479f5651c91e20ede76ee8e91
         return new Promise (async (resolve, reject) => {
             const updatePointQuery = `UPDATE ${table} SET point = ? WHERE user_idx = ?`;
             const getCertainUserQuery = `SELECT * FROM ${table} WHERE user_idx = ?`;
@@ -231,6 +236,7 @@ const user = {
                 }
             }
         });
+<<<<<<< HEAD
     },
 
     withdrawPoint : (userIdx, storeIdx) => {
@@ -251,6 +257,8 @@ const user = {
                 });
             }
         });
+=======
+>>>>>>> 19367a300025733479f5651c91e20ede76ee8e91
     },
 
     delete : () => {
