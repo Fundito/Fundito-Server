@@ -226,6 +226,18 @@ const funding = {
                             console.log(`FUND DB ERROR`);
                             return;
                         }
+
+                        const funditoMoney = userResult[0].point - fundingMoney;
+                        const minusFundingMoneyQuery = `UPDATE user SET point = ? WHERE user_idx = ?`;
+                        const minusFundingMoneyResult = await pool.queryParam_Arr(minusFundingMoneyQuery, [funditoMoney, userIdx]);
+
+                        if (!minusFundingMoneyResult) {
+                            resolve({
+                                code : statusCode.INTERNAL_SERVER_ERROR,
+                                json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                            });
+                            return;
+                        }
             
                         resolve({
                             code : statusCode.OK,
