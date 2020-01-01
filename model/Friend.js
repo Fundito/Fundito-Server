@@ -85,19 +85,11 @@ Friend = {
                     result[i].fund[j] = ((await StoreFund.read(result[i].fund[j].store_idx)).json.data)[0];
                 }
             }
-            if (!result) {
-                resolve({
-                    code: statusCode.BAD_REQUEST,
-                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_X("정보"))
-                });
-                return;
-            } else {
-                resolve({
-                    code: statusCode.OK,
-                    json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS("피드"), result)
-                });
-                return;
-            }
+            resolve({
+                code: statusCode.OK,
+                json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS("피드"), result)
+            });
+            return;
         });
     },
 
