@@ -279,6 +279,52 @@ const storeInfo = {
         })
     },
 
+    createCheer : (userIdx, storeIdx) => {
+        return new Promise (async (resolve, reject) => {
+            const insertCheerQuery = `INSERT INTO cheer(store_idx ,user_idx) VALUES (${storeIdx}, ${userIdx})`;
+            const insertCheerResult = await pool.queryParam_None(insertCheerQuery);
+
+            if(!insertCheerResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            } else {
+                resolve({
+                    code : statusCode.OK,
+                    json : authUtil.successTrue(statusCode.OK, responseMessage.X_CREATE_SUCCESS(THIS_LOG))
+                });
+            }
+
+        });
+    },
+
+    readCheer : (userIdx, storeIdx) => {
+        return new Promise (async (resolve, reject) => {
+            const getCheerQuery = `SELECT * FROM cheer WHERE user_idx = ${userIdx} AND store_idx = ${storeIdx}`;
+            const getCheerResult = await pool.queryParam_None(getCheerQuery);
+            if(!getCheerResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            } else {
+
+                if(getCheerResult[0] != undefined) {
+                    resolve({
+                        result : 500
+                    });
+                } else {
+                    resolve({
+                        result : 0
+                    });
+                }
+            }
+        });
+    },
+
     delete: (storeIdx) => {
         return new Promise(async (resolve, reject) => {
             const storeIdxQuery = `SELECT * FROM store_info WHERE store_idx = ?`;
