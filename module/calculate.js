@@ -20,6 +20,12 @@ function getRefundPerOfPer(moneyLimit,fundingMoneySum) {
 function getCurGoalPer(currentSales, goalMoney){
     return (currentSales/ goalMoney * 100);
 }
+function getRewardMoney(fundingMoney, rewardPercent) {
+    return (fundingMoney * rewardPercent / 100);
+}
+function getProfit(fundingMoney, rewardPercent) {
+    return (getRewardMoney(fundingMoney, rewardPercent) - fundingMoney);
+}
 module.exports = {
     getMoneyLimit200,
     getMoneyLimit175,
@@ -28,4 +34,6 @@ module.exports = {
     getFundingBenefits,
     getRefundPerOfPer,
     getCurGoalPer,
+    getRewardMoney,
+    getProfit,
 }
