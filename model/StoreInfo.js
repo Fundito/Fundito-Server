@@ -20,8 +20,6 @@ const storeInfo = {
             const createStoreQuery = `INSERT INTO ${storeInfoTable}(name, tel_number, location_latitude, location_longitude, address, business_hours, breaktime, holiday, thumbnail, wifi_SSID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             const createStoreResult = await pool.queryParam_Arr(createStoreQuery, [name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID]);
 
-            console.log(createStoreResult);
-
             // 클라이언트에서 menu는 배열로 넘어온다.
             for (const i in menu) {
                 const currentMenu = menu[i];
@@ -79,8 +77,6 @@ const storeInfo = {
                 storeListResult[i] = getStoreListResult[i];
                 storeListResult[i].menu = getStoreMenuResult;
             }
-
-            console.log(storeListResult);
 
             resolve({
                 code : statusCode.OK,
@@ -149,8 +145,6 @@ const storeInfo = {
             const moneyLimit150 = getMoneyLimit150(fundingBenefits); // C (150% 마감금액)
             const moneyLimit175 = getMoneyLimit175(fundingBenefits); // B (175% 마감금액)
             const moneyLimit200 = getMoneyLimit200(fundingBenefits); // A (200% 마감금액)
-            console.log(`가게에 모인 금액`);
-            console.log(fundingMoneySum);
             let refundPercent = getRefundPercent(moneyLimit150,moneyLimit175,moneyLimit200,fundingMoneySum); 
             let refundPerOfPer = getRefundPerOfPer(moneyLimit200, fundingMoneySum);
             const now = moment(Date.now());
@@ -198,7 +192,6 @@ const storeInfo = {
             getFundingInfoResult[0].user_name = getUserNameResult[0].name;
             storeResult.funding = getFundingInfoResult[0];
             }
-            console.log(storeResult);
 
             resolve({
                 code : statusCode.OK,
@@ -254,8 +247,6 @@ const storeInfo = {
                 });
                 return;
             }
-
-            console.log(getData);
 
             const storeIdx = getData.store_idx;
             const thumbnail = getData.thumbnail;

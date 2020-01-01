@@ -102,7 +102,6 @@ Friend = {
                 "fail": (await Funding.readUserFundingList(friendIdx, 2)).json.data
             };
             
-            console.log(result)
             resolve({
                 code: statusCode.OK,
                 json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS("친구 투자 상세정보"), result)

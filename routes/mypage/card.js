@@ -37,14 +37,10 @@ router.post('/', jwt.checkLogin, async (req, res) => {
     } = req.body;
     const userIdx = req.decoded.idx;
 
-    console.log(`userIdx = ${userIdx}`);
-
     if (!cardCompany || !cardNickname || !cardNumber || !cardExpirationDate || !cardPassword) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
-
-    // console.log(typeof(cardNumber));
 
     // cardNumber, cvc, password 형이 string이 아니면 오류 (암호화, 복호화를 위해)
     if (typeof(cardNumber) != `string` || typeof(cardExpirationDate) != `string` || typeof(cardPassword) != `string`) {
@@ -73,7 +69,6 @@ router.get('/', jwt.checkLogin, async(req, res) => {
 
     Card.read(userIdx)
     .then(({ code, json }) => {
-        console.log(json);
 
         const cardData = json.data;
 
@@ -81,15 +76,12 @@ router.get('/', jwt.checkLogin, async(req, res) => {
             res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.CARD_USER_NO));
         }
 
-        console.log(cardData);
-
         let sendData = new Object();
         // sendData.cardNickname = cardData.cardNickname;
         sendData.userName = cardData.userName
 
         const cardNumber = cardData.cardNumber;
         const subStrNumber = (cardData.cardNumber).substr(0, 4);
-        console.log(subStrNumber);
 
         sendData.cardNickname = `${cardData.cardCompany} ${subStrNumber}-**`;
 

@@ -23,7 +23,6 @@ const notification = {
                     code: statusCode.INTERNAL_SERVER_ERROR,
                     json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
-                console.log(`select Notification ERROR`);
                 return;
             }
 
@@ -47,13 +46,11 @@ const notification = {
             const selectNotificationQuery = `SELECT * FROM ${table} WHERE user_idx = ?`;
             let selectNotificationResult = await pool.queryParam_Arr(selectNotificationQuery, [userIdx]);
 
-            console.log(selectNotificationResult);
             if (!selectNotificationResult) {
                 resolve({
                     code: statusCode.INTERNAL_SERVER_ERROR,
                     json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
-                console.log(`select Notification ERROR`);
                 return;
             }
 
@@ -66,17 +63,14 @@ const notification = {
             }
 
             for (var i = 0; i < selectNotificationResult.length; i++) {
-                console.log(selectNotificationResult[i].store_idx);
                 await storeInfo.readStoreInfo(selectNotificationResult[i].store_idx)
                     .then(({
                         code,
                         json
                     }) => {
                         selectNotificationResult[i].store_info = json.data;
-                        console.log(json.data);
                     })
                     .catch((err) => {
-                        console.log(err);
                         res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
                     });
             }
