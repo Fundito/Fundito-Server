@@ -239,6 +239,61 @@ const storeInfo = {
         });
     },
 
+    readByWifi: (wifiSSID) => {
+        return new Promise(async (resolve, reject) => {
+            const getStoreByWifiQuery = `SELECT i.*, f.* FROM store_info AS i INNER JOIN store_fund AS f ON i.store_idx = f.store_idx WHERE i.wifi_SSID = ${wifiSSID}`;
+            const getStoreByWifiResult = await pool.queryParam_None(getStoreByWifiQuery);
+
+            if(!getStoreByWifiResult){
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            const getData = getStoreByWifiResult[0];
+            if (getData == undefined) {
+                resolve({
+                    code : statusCode.DB_ERROR,
+                    json : authUtil.successFalse(statusCode.DB_ERROR, responseMessage.DB_ERROR)
+                });
+                return;
+            }
+
+            console.log(getData);
+
+            const storeIdx = getData.store_idx;
+            const thumbnail = getData.thumbnail;
+            const storeName = getData.name;
+            const storeWifi = getData.wifi_SSID;
+            // 펀딩 남은 날짜
+            const dueDate = moment(getData.due_date); // 남은 날짜 계산해줘야 함
+            const now = moment();
+            const remainingTime = moment.duration(dueDate.diff(now));
+            var remainingDays = remainingTime.asDays(); // parseInt 해야함
+
+
+            const currentSales = getData.current_sales;
+            const goalMoney = getData.goal_money;
+            const progressPercent = currentSales / goalMoney * 100; // 현재 퍼센트 (클라에 전송할 데이터)
+
+            const responseResult = {
+                "storeIdx" : storeIdx,
+                "thumbnail" : thumbnail,
+                "storeName" : storeName,
+                "wifiSSID" : storeWifi,
+                "remainingDays" : parseInt(remainingDays),
+                "progressPercent" : progressPercent
+            };
+
+            resolve({
+                code : statusCode.OK,
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), responseResult)
+            });
+        })
+    },
+
     delete: (storeIdx) => {
         return new Promise(async (resolve, reject) => {
             const storeIdxQuery = `SELECT * FROM store_info WHERE store_idx = ?`;
