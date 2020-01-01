@@ -34,10 +34,6 @@ const card = {
             const expirationDateEncryptionResult = await encryptionModule.encryption(cardExpirationDate);
             const passwordEncryptionResult = await encryptionModule.encryption(cardPassword);
 
-            console.log(cardEncryptionResult);
-            console.log(expirationDateEncryptionResult);
-            console.log(passwordEncryptionResult);
-
             const cardCreateQuery = `INSERT INTO card(user_idx, card_company_name, card_nickname, card_number, card_expiration_date, card_password, card_salt, card_expiration_date_salt, card_password_salt) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             const cardCreateResult = await pool.queryParam_Arr(cardCreateQuery, [userIdx, cardCompany, cardNickname, cardEncryptionResult.hashedPassword, expirationDateEncryptionResult.hashedPassword, passwordEncryptionResult.hashedPassword, cardEncryptionResult.salt, expirationDateEncryptionResult.salt, passwordEncryptionResult.salt]);
 
@@ -65,7 +61,6 @@ const card = {
             const readCardResult = await pool.queryParam_Arr(readCardQuery, [userIdx]);
 
             const cardData = readCardResult[0];
-            console.log(cardData);
             if (cardData == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,

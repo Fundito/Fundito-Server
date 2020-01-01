@@ -108,7 +108,7 @@ const user = {
 
     read: (userIdx) => {
         return new Promise(async (resolve, reject) => {
-            const getCertainUserQuery = `SELECT name, nickname, point FROM ${table} WHERE user_idx = ?`;
+            const getCertainUserQuery = `SELECT name, nickname, photo, point FROM ${table} WHERE user_idx = ?`;
             const getCertainUserResult = await pool.queryParam_Arr(getCertainUserQuery, [userIdx]);
 
             if (!getCertainUserResult) {

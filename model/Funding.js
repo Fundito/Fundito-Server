@@ -20,8 +20,6 @@ const funding = {
             // 사용자 정보 가져오기
             const userQuery = `SELECT * FROM ${userTable} WHERE user_idx = ?`;
             const userResult = await pool.queryParam_Arr(userQuery, [userIdx]);
-            console.log(userResult);
-            console.log(userResult[0]);
 
             if (userResult[0] == undefined) {
                 resolve({
@@ -116,7 +114,6 @@ const funding = {
                     const userHashedPayPassword = userResult[0].pay_password;
                     const userPayPasswordSalt = userResult[0].salt;
                     const cardNumberDecryptionResult = await decryptionModule.decryption(userHashedPayPassword, userPayPasswordSalt);
-                    console.log(cardNumberDecryptionResult);
 
                     if (cardNumberDecryptionResult == payPassword) {
                         // 펀딩 올렸을 때 시간 가져오기
@@ -128,7 +125,6 @@ const funding = {
                             refundPercent = json.data.refund_percent);
                         const rewardMoney = getRewardMoney(fundingMoney,refundPercent);
                         const profitMoney = getProfit(fundingMoney, refundPercent);
-                        console.log(rewardMoney, profitMoney);
                         //펀딩하기
                         const createFundQuery = `INSERT INTO ${table}(user_idx, store_idx, funding_money, refund_percent, reward_money, profit_money, funding_time) VALUES(?, ?, ?, ?, ?, ?, ?)`;
                         const createFundResult = await pool.queryParam_Arr(createFundQuery, [userIdx, storeIdx, fundingMoney, refundPercent, rewardMoney, profitMoney, fundingTime]);
@@ -137,7 +133,6 @@ const funding = {
                                 code : statusCode.INTERNAL_SERVER_ERROR,
                                 json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
-                            console.log(`FUND DB ERROR`);
                             return;
                         }
 
@@ -152,21 +147,18 @@ const funding = {
                                 code: statusCode.INTERNAL_SERVER_ERROR,
                                 json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
-                            console.log(`select StoreFund Info ERROR`);
                             return;
                         }
                         
                         // 가게에 펀딩 된 금액들을 가져오기
                         const selectFundingMoneyQuery = `SELECT funding_money FROM ${table} WHERE store_idx = ?`;
                         const selectFundingMoneyResult = await pool.queryParam_Arr(selectFundingMoneyQuery, [storeIdx]);
-                        console.log(selectFundingMoneyResult);
 
                         if (!selectFundingMoneyResult) {
                             resolve({
                                 code: statusCode.INTERNAL_SERVER_ERROR,
                                 json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
-                            console.log(`DB ERROR`);
                             return;
                         }
 
@@ -178,12 +170,8 @@ const funding = {
                         const marginPercent = result.margin_percent;
                         const goalMoney = result.goal_money;
                         const regularMoney = result.regular_money;
-                        const fundingBenefits = getFundingBenefits(marginPercent,goalMoney,regularMoney); // 투자이윤 
-                        console.log(`투자이윤`);
-                        console.log(fundingBenefits);
+                        const fundingBenefits = getFundingBenefits(marginPercent,goalMoney,regularMoney); // 투자이윤
                         const moneyLimit150= getMoneyLimit150(fundingBenefits); // C (150% 마감금액)
-                        console.log(`150리밋`);
-                        console.log(moneyLimit150);
 
                         if (isAtLimit(moneyLimit150,fundingMoneySum)){
                             // fund_status 를 3으로 변경 
@@ -195,7 +183,6 @@ const funding = {
                                     code: statusCode.INTERNAL_SERVER_ERROR,
                                     json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                                 });
-                                console.log(`update error`);
                                 return;
                             }
                         }
@@ -209,7 +196,6 @@ const funding = {
                                 code : statusCode.INTERNAL_SERVER_ERROR,
                                 json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
-                            console.log(`FUND DB ERROR`);
                             return;
                         }
 
@@ -223,7 +209,6 @@ const funding = {
                                 code : statusCode.INTERNAL_SERVER_ERROR,
                                 json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
-                            console.log(`FUND DB ERROR`);
                             return;
                         }
 
@@ -387,7 +372,6 @@ const funding = {
                     // 남은 시간 계산
                     const remainingTime = moment.duration(dueDate.diff(fundingTime));
                     var remainingDays = remainingTime.asDays();
-                    // console.log(remainingDays);
 
                     // 진행률 계산
                     const goalMoney = joinData.goal_money;
@@ -401,13 +385,8 @@ const funding = {
                         "remainingDays" : parseInt(remainingDays),
                         "progressPercent" : progressPercent
                     };
-                    console.log("*********")
-                    console.log(clientResult);
-                    console.log("*********")
                     result.push(clientResult)
                 }
-
-                console.log(result);
 
                 resolve({
                     code : statusCode.OK,
@@ -430,13 +409,8 @@ const funding = {
                         "fundingMoney" : fundingMoney,
                         "refundMoney" : refundMoney
                     };
-                    console.log("*********")
-                    console.log(clientResult);
-                    console.log("*********")
                     result.push(clientResult)
                 }
-
-                console.log(result);
 
                 resolve({
                     code : statusCode.OK,

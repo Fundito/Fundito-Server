@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
     var options = {
         url: api_url,
     };
-
+    
     if (!accessToken) {
         return res.statusCode(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, resMessage.EMPTY_TOKEN));
     }
@@ -23,7 +23,6 @@ module.exports = (req, res, next) => {
                 photo: data.picture.data.url,
                 friends: data.friends.data
             };
-            console.log(req.decoded)
             next();
         } else {
             res.status(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, resMessage.INVALID_TOKEN));
