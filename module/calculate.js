@@ -14,11 +14,29 @@ function isAtLimit(moneyLimit,fundingMoneySum) {
 function getFundingBenefits(marginPercent,goalMoney,regularMoney) {
     return (marginPercent*goalMoney - marginPercent*regularMoney); 
 } 
+function getRefundPercent(moneyLimit150,moneyLimit175,moneyLimit200,fundingMoneySum) {
+    let refundPercent = 200;
+    if(isAtLimit(moneyLimit200,fundingMoneySum)){
+        refundPercent = 175;
+        refundPerOfPer = getRefundPerOfPer(moneyLimit175, fundingMoneySum);
+    }
+    if(isAtLimit(moneyLimit175,fundingMoneySum)) {
+        refundPercent = 150;
+        refundPerOfPer = getRefundPerOfPer(moneyLimit150, fundingMoneySum);
+    }
+    return refundPercent;
+}
 function getRefundPerOfPer(moneyLimit,fundingMoneySum) {
     return (100 - (fundingMoneySum / moneyLimit * 100));
 }
 function getCurGoalPer(currentSales, goalMoney){
     return (currentSales/ goalMoney * 100);
+}
+function getRewardMoney(fundingMoney, rewardPercent) {
+    return (fundingMoney * rewardPercent / 100);
+}
+function getProfit(fundingMoney, rewardPercent) {
+    return (getRewardMoney(fundingMoney, rewardPercent) - fundingMoney);
 }
 module.exports = {
     getMoneyLimit200,
@@ -28,4 +46,7 @@ module.exports = {
     getFundingBenefits,
     getRefundPerOfPer,
     getCurGoalPer,
+    getRewardMoney,
+    getProfit,
+    getRefundPercent,
 }

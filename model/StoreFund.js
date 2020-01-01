@@ -4,20 +4,22 @@ const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
 const fundStatus = require(`../module/utils/fundStatus`);
 const calculate = require('../module/calculate');
+const notification = require('../model/Notification');
 const serverKey = require('../config/serverKey');
+const admin = require('firebase-admin');
 
-var FCM = require('fcm-node');
-var fcmModule = require('../module/fcm');
+// var FCM = require('fcm-node');
+// var fcmModule = require('../module/fcm');
 
 
 // const firebase = require('../module/firebase');
 // const admin = require('firebase-admin');
-// const serviceAccount = require('../config/serviceAccountKey.json');
+const serviceAccount = require('../config/serviceAccountKey.json');
 
-// admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount),
-//     databaseURL: "https://fundito-123.firebaseio.com"
-// });
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://fundito-123.firebaseio.com"
+});
 
 const moment = require('moment');
 
@@ -105,7 +107,6 @@ const storeFund = {
                 });
                 return;
             }
-
             resolve({
                 code: statusCode.OK,
                 json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_ALL_SUCCESS(THIS_LOG), selectStoreFundListResult)
@@ -240,8 +241,8 @@ const storeFund = {
             for (var idx = 0; idx < getCloseFundStoreUserResult.length; idx++) {
                 /** Firebase(구글 개발자 사이트)에서 발급받은 서버키 */
                 // 가급적 이 값은 별도의 설정파일로 분리하는 것이 좋다.
-                var server_key = serverKey.serverKey;
-                console.log(server_key);
+                //var server_key = serverKey.serverKey;
+                //console.log(server_key);
 
                 /** 안드로이드 단말에서 추출한 token값 */
                 // 안드로이드 App이 적절한 구현절차를 통해서 생성해야 하는 값이다.
@@ -261,9 +262,10 @@ const storeFund = {
                     return;
                 }
 */
-                const client_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHgiOjI4LCJpYXQiOjE1Nzc3MTk4MjAsImV4cCI6MTU3ODMyNDYyMCwiaXNzIjoiZnVuZGl0byJ9.05rft6aV0FUj6_DZpVpnkZgSX1m9u2s3LPx4I-eCxt0';
+                //const client_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHgiOjI4LCJpYXQiOjE1Nzc3MTk4MjAsImV4cCI6MTU3ODMyNDYyMCwiaXNzIjoiZnVuZGl0byJ9.05rft6aV0FUj6_DZpVpnkZgSX1m9u2s3LPx4I-eCxt0';
                 //getTokenResult[0];
                 /** 발송할 Push 메시지 내용 */
+                /**
                 var push_data = {
                     // 수신대상
                     to: client_token,
@@ -284,10 +286,12 @@ const storeFund = {
                         num1: 2000,
                         num2: 3000
                     }
-                };
+                }; */
                 /** 아래는 푸시메시지 발송절차 */
-                var fcm = new FCM(server_key);
-                fcmModule.fcm(fcm, push_data);
+                //var fcm = new FCM(server_key);
+                //fcmModule.fcm(fcm, push_data);
+
+                storeFund.sendMessage(getCloseFundStoreUserResult[idx].user_idx);
 
             }
 
@@ -295,7 +299,54 @@ const storeFund = {
         });
     },
 
-    fcm: (userIdx) => {
+    sendMessage: (userIdx) => {
+        return new Promise(async (resolve, reject) => {
+        /** [TODO] firebase_token을 빼와서 넣기  */
+        const getFirebaseTokenQuery = `SELECT firebase_token FROM user WHERE user_idx = ?`;
+        const getFirebaseTokenResult = await pool.queryParam_Arr(getFirebaseTokenQuery, [userIdx]);
+
+        if(getFirebaseTokenResult[0] == undefined) {
+            resolve({
+                code: statusCode.BAD_REQUEST,
+                json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
+            });
+            return;
+        }
+
+        if(!getFirebaseTokenQuery){
+            resolve({
+                code: statusCode.INTERNAL_SERVER_ERROR,
+                json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+            });
+            return;
+        }
+        
+        var registrationToken = getFirebaseTokenResult[0].firebase_token;
+        console.log(registrationToken);
+
+        let notificationData = (await notification.readUserAllNoti(userIdx)).json.data;
+
+        var message = {
+            data: {
+                // notificationData
+                "score" : "123",
+                "time" : "12:34"
+            },
+            token: registrationToken
+        };
+
+        // Send a message to the device corresponding to the provided
+        // registration token.
+        admin.messaging().send(message)
+            .then((response) => {
+                // Response is a message ID string.
+                console.log('Successfully sent message:', response);
+            })
+            .catch((error) => {
+                console.log('Error sending message:', error);
+            });
+        });
+
 
     },
 

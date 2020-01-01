@@ -51,6 +51,7 @@ module.exports = {
     },
     Transaction: async (...args) => {
         let result = "Success"
+        const pool = await poolPromise;
         try {
             var connection = await pool.getConnection()
             await connection.beginTransaction()

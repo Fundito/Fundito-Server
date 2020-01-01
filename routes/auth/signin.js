@@ -14,8 +14,9 @@ const User = require('../../model/User');
  */
 router.get('/',fb, async(req, res) => {
     const {id, name} = req.decoded;
+    const {firebase_token} = req.headers;
     
-    User.login(id, name)
+    User.login(id, name, firebase_token)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })

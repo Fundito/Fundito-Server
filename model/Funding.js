@@ -5,15 +5,14 @@ const pool = require('../module/db/pool');
 const decryptionModule = require('../module/cryption/decryptionModule');
 
 const moment = require('moment');
-const User = require('../model/User');
-const StoreInfo = require('../model/StoreInfo');
 
 const table = `funding`;
 const storeFundTable = `store_fund`;
 const userTable = `user`;
 const THIS_LOG = `펀딩 정보`;
-const {getMoneyLimit150, isAtLimit, getFundingBenefits} = require(`../module/calculate`);
+const {getMoneyLimit150, isAtLimit, getFundingBenefits, getRewardMoney, getProfit} = require(`../module/calculate`);
 const fundStatus = require(`../module/utils/fundStatus`);
+const storeInfo = require(`../model/StoreInfo`);
 
 const funding = {
     create: (userIdx, payPassword, storeIdx, fundingMoney) => {
@@ -84,7 +83,6 @@ const funding = {
                 const userQuery = `SELECT * FROM ${userTable} WHERE user_idx = ?`;
                 const userResult = await pool.queryParam_Arr(userQuery, [userIdx]);
                 console.log(userResult);
-    
                 console.log(userResult[0]);
 
                 if (userResult[0] == undefined) {
@@ -106,19 +104,23 @@ const funding = {
                     // 암호화된 사용자의 결제 비밀번호 복호화한 후, 비교
                     const userHashedPayPassword = userResult[0].pay_password;
                     const userPayPasswordSalt = userResult[0].salt;
-    
                     const cardNumberDecryptionResult = await decryptionModule.decryption(userHashedPayPassword, userPayPasswordSalt);
-
                     console.log(cardNumberDecryptionResult);
 
                     if (cardNumberDecryptionResult == payPassword) {
                         // 펀딩 올렸을 때 시간 가져오기
                         const date = Date.now();
                         const fundingTime = moment(date).format('YYYY-MM-DD HH:mm:ss');
-                        
+
+                        var refundPercent;
+                        await storeInfo.readStoreInfo(userIdx, storeIdx).then(({data,json}) => 
+                            refundPercent = json.data.refund_percent);
+                        const rewardMoney = getRewardMoney(fundingMoney,refundPercent);
+                        const profitMoney = getProfit(fundingMoney, refundPercent);
+                        console.log(rewardMoney, profitMoney);
                         //펀딩하기
-                        const createFundQuery = `INSERT INTO ${table}(user_idx, store_idx, funding_money, funding_time) VALUES(?, ?, ?, ?)`;
-                        const createFundResult = await pool.queryParam_Arr(createFundQuery, [userIdx, storeIdx, fundingMoney, fundingTime]);
+                        const createFundQuery = `INSERT INTO ${table}(user_idx, store_idx, funding_money, refund_percent, reward_money, profit_money, funding_time) VALUES(?, ?, ?, ?, ?, ?, ?)`;
+                        const createFundResult = await pool.queryParam_Arr(createFundQuery, [userIdx, storeIdx, fundingMoney, refundPercent, rewardMoney, profitMoney, fundingTime]);
                         if (!createFundResult) {
                             resolve({
                                 code : statusCode.INTERNAL_SERVER_ERROR,
@@ -355,6 +357,7 @@ const funding = {
             // const message = ``;
             if (fundStatus == 0) {
                 for(const joinData of joinResult) {
+                    const storeIdx = joinData.store_idx;
                     const storeName = joinData.name;
                     const dueDate = moment(joinData.due_date);
 
@@ -370,6 +373,7 @@ const funding = {
                     const progressPercent = currentSales / goalMoney * 100;
 
                     const clientResult = {
+                        "storeIdx" : storeIdx,
                         "storeName" : joinData.name,
                         "remainingDays" : parseInt(remainingDays),
                         "progressPercent" : progressPercent
@@ -389,6 +393,7 @@ const funding = {
             }
             else { // 투자 완료된 음식점
                 for(const joinData of joinResult) {
+                    const storeIdx = joinData.store_idx;
                     const storeName = joinData.name;
                     const dueDate = joinData.due_date;
                     const fundingMoney = joinData.funding_money;
@@ -396,6 +401,7 @@ const funding = {
                     const refundMoney = fundingMoney + rewardMoney;
 
                     const clientResult = {
+                        "storeIdx" : storeIdx,
                         "storeName" : storeName,
                         "dueDate" : dueDate,
                         "fundingMoney" : fundingMoney,

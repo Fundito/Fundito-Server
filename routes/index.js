@@ -8,5 +8,6 @@ router.use('/mypage', require('./mypage'));
 router.use('/storeInfo', require('./storeInfo'));
 router.use('/funding', require('./funding'));
 router.use('/notification', require('./notification'));
+router.use('/friend', require('./friend'));
 
 module.exports = router;

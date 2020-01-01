@@ -41,7 +41,7 @@ router.get ('/reward', jwt.checkLogin, async (req, res) => {
         if (json.status < 300) { 
 
             for(let i = 0; i < json.data.length; i++){
-                getMoneySum += ((json.data[i].funding_money * json.data[i].reward_percent) * 0.01);
+                getMoneySum += ((json.data[i].funding_money * json.data[i].refund_percent) * 0.01);
                 fundedMoneySum += json.data[i].funding_money;
             }
 
