@@ -178,21 +178,11 @@ const user = {
 
                 const checkPayPasswordEncryptionResult = await encryptionModule.decryption(payPassword, getCertainUserResult[0].salt);
 
-<<<<<<< HEAD
-                const checkPayPasswordEncryptionResult = await encryptionModule.encryptionWithSalt(payPassword, getCertainUserResult[0].salt);
-
-                if (getCertainUserResult[0].pay_password == checkPayPasswordEncryptionResult ) {
-                    const putUserPointResult = await pool.queryParam_Arr(putUserPointQuery,[Number(point) + Number(getCertainUserResult[0].point)]);
-                    resolve ({
-                        code : statusCode.OK,
-                        json : authUtil.successTrue(statusCode.OK, responseMessage.X_UPDATE_SUCCESS(THIS_LOG), putUserPointResult)
-=======
                 if (getCertainUserResult[0].pay_password == checkPayPasswordEncryptionResult) {
                     const putUserPointResult = await pool.queryParam_Arr(putUserPointQuery, [Number(point) + Number(getCertainUserResult[0].point)]);
                     resolve({
                         code: statusCode.OK,
                         json: authUtil.successTrue(statusCode.OK, responseMessage.X_UPDATE_SUCCESS(THIS_LOG), putUserPointResult)
->>>>>>> 95350dc8ab888619ef43934b8011d5df9f87ce63
                     });
                 } else {
                     resolve({
@@ -204,7 +194,6 @@ const user = {
         });
     },
 
-<<<<<<< HEAD
     withdrawPoint : (userIdx, point) => {
         return new Promise (async (resolve, reject) => {
             const updatePointQuery = `UPDATE ${table} SET point = ? WHERE user_idx = ?`;
@@ -245,13 +234,9 @@ const user = {
 
             }
         });
-
     },
 
     delete : () => {
-=======
-    delete: () => {
->>>>>>> 95350dc8ab888619ef43934b8011d5df9f87ce63
 
     }
 };
