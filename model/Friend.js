@@ -82,7 +82,7 @@ Friend = {
             }
             for (i in result) {
                 for (j in result[i].fund) {
-                    result[i].fund[j].storeInfo = (await StoreInfo.readStoreInfo(result[i].fund[j].store_idx)).json.data;
+                    result[i].fund[j] = ((await StoreFund.read(result[i].fund[j].store_idx)).json.data)[0];
                 }
             }
             if (!result) {
