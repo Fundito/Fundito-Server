@@ -51,11 +51,11 @@ router.post('/', jwt.checkLogin, upload.single('thumbnail'), async(req, res) => 
 });
 
 /**
- * [GET] /storeInfo
+ * [GET] /storeInfo/all
  * 전체 식당 정보 조회
  * @author ChoSooMin
  */
-router.get('/', jwt.checkLogin, async(req, res) => {
+router.get('/all', jwt.checkLogin, async(req, res) => {
     StoreInfo.readAll()
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -86,6 +86,34 @@ router.get('/:storeIdx', jwt.checkLogin, async(req, res) => {
     console.log(storeIdx);
 
     StoreInfo.readStoreInfo(storeIdx)
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
+/**
+ * [GET] /storeInfo
+ * 와이파이 SSID를 갖고, 해당 식당 정보 불러오기
+ * @author ChoSooMin
+ * @body wifiSSID
+ */
+router.get('/', jwt.checkLogin, async(req, res) => {
+    const {
+        wifiSSID
+    } = req.body;
+
+    if (!wifiSSID) {
+        res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+        return;
+    }
+
+    console.log(wifiSSID);
+
+    StoreInfo.readByWifi(wifiSSID)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
