@@ -230,6 +230,28 @@ const storeInfo = {
         });
     },
 
+    readByWifi: (wifiSSID) => {
+        return new Promise(async (resolve, reject) => {
+            const getStoreByWifiQuery = `SELECT i.*, f.* FROM store_info AS i INNER JOIN store_fund AS f ON i.store_idx = f.store_idx WHERE i.wifi_SSID = ${wifiSSID}`;
+            const getStoreByWifiResult = await pool.queryParam_None(getStoreByWifiQuery);
+
+            if(!getStoreByWifiResult){
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            }
+
+            getStoreByWifiResult.currentGoalPercent = parseInt(calculate.getCurGoalPer(getStoreByWifiResult.current_sales, getStoreByWifiResult.goal_money));
+
+            resolve({
+                code : statusCode.OK,
+                json : authUtil.successTrue(statusCode.OK, responseMessage.X_DELETE_SUCCESS(THIS_LOG),getStoreByWifiResult)
+            });
+        })
+    },
+
     delete: (storeIdx) => {
         return new Promise(async (resolve, reject) => {
             const storeIdxQuery = `SELECT * FROM store_info WHERE store_idx = ?`;

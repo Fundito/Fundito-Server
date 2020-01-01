@@ -155,7 +155,7 @@ const user = {
 
                 console.log
 
-                const checkPayPasswordEncryptionResult = await encryptionModule.encryption(payPassword, getCertainUserResult[0].salt);
+                const checkPayPasswordEncryptionResult = await encryptionModule.encryptionWithSalt(payPassword, getCertainUserResult[0].salt);
 
                 if (getCertainUserResult[0].pay_password == checkPayPasswordEncryptionResult ) {
                     const putUserPointResult = await pool.queryParam_Arr(putUserPointQuery,[Number(point) + Number(getCertainUserResult[0].point)]);
@@ -171,6 +171,49 @@ const user = {
                 }
             }
         });
+    },
+
+    withdrawPoint : (userIdx, point) => {
+        return new Promise (async (resolve, reject) => {
+            const updatePointQuery = `UPDATE ${table} SET point = ? WHERE user_idx = ?`;
+            const getCertainUserQuery = `SELECT * FROM ${table} WHERE user_idx = ?`;
+
+            const getCertainUserResult = await pool.queryParam_Arr(getCertainUserQuery, [userIdx]);
+
+            if (!getCertainUserResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            } else {
+
+                if (getCertainUserResult[0] == undefined) {
+                    resolve({
+                        code : statusCode.BAD_REQUEST,
+                        json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
+                    });
+                    return;
+                }
+
+                const updatePointResult = await pool.queryParam_Arr(updatePointQuery,[Number(point) + Number(getCertainUserResult[0].point), userIdx]);
+                if (!updatePointResult) {
+                    resolve({
+                        code : statusCode.INTERNAL_SERVER_ERROR,
+                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                    });
+                    return;
+                } else {
+                    resolve({
+                        code : statusCode.OK,
+                        json : authUtil.successTrue(statusCode.OK, responseMessage.X_UPDATE_SUCCESS(THIS_LOG))
+                    });
+
+                }
+
+            }
+        });
+
     },
 
     delete : () => {
