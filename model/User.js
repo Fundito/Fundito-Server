@@ -33,7 +33,7 @@ const user = {
             if (getUserIndexResult[0] === undefined) {
                 resolve({
                     code: statusCode.UNAUTHORIZED,
-                    json: authUtil.successFalse(statusCode.UNAUTHORIZED, [responseMessage.NO_X("user") + ` [${name}]`])
+                    json: authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.NO_X("user") + ` [${name}]`)
                 });
                 return;
             } else {
