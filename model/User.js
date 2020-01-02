@@ -29,11 +29,11 @@ const user = {
 
             const getUserIndexQuery = `SELECT user_idx FROM user WHERE id = '${id}' AND name = '${name}'`;
             const getUserIndexResult = await pool.queryParam_Parse(getUserIndexQuery);
-
+            
             if (getUserIndexResult[0] === undefined) {
                 resolve({
                     code: statusCode.UNAUTHORIZED,
-                    json: authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.NO_X("user"))
+                    json: authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.NO_X("user") + ` [${name}]`)
                 });
                 return;
             } else {
@@ -193,8 +193,8 @@ const user = {
             }
         });
     },
-    
-    withdrawPoint : (userIdx, point) => {
+
+    updatePointWithoutPassword : (userIdx, point) => {
         return new Promise (async (resolve, reject) => {
             const updatePointQuery = `UPDATE ${table} SET point = ? WHERE user_idx = ?`;
             const getCertainUserQuery = `SELECT * FROM ${table} WHERE user_idx = ?`;
@@ -229,9 +229,27 @@ const user = {
                         code : statusCode.OK,
                         json : authUtil.successTrue(statusCode.OK, responseMessage.X_UPDATE_SUCCESS(THIS_LOG))
                     });
-
                 }
+            }
+        });
+    },
 
+    withdrawPoint : (userIdx, storeIdx) => {
+        return new Promise (async (resolve, reject) => {
+
+            const updateIsWithdrawQuery = `UPDATE funding SET is_withdraw = 1 WHERE user_idx = ${userIdx} AND store_idx = ${storeIdx}`;
+            const updateIsWithdrawResult = await pool.queryParam_Arr(updateIsWithdrawQuery);
+            if(!updateIsWithdrawResult){
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            } else {
+                resolve({
+                    code : statusCode.OK,
+                    json : authUtil.successTrue(statusCode.OK, responseMessage.X_UPDATE_SUCCESS(THIS_LOG))
+                });
             }
         });
     },
