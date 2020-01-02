@@ -45,7 +45,7 @@
 <br>
 
 ## 📝 ERD Diagram
-<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Fundito%20Server%20ER%20Diagram.png" width = "50%" height = "50%"/>
+<img src="https://github.com/Fundito/Fundito-Server/blob/develop/views/Fundito%20Server%20ER%20Diagram.png" width = "50%" height = "50%"/>
 <br>
 
 ## 📕 Server Architecture
