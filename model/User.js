@@ -59,9 +59,9 @@ const user = {
         })
     },
 
-    signup: (id, name, nickname, pay_password, friends, photo) => {
+    doubleCheck: (nickname) => {
         return new Promise(async (resolve, reject) => {
-            if (!name || !pay_password || !id || !nickname) {
+            if (!nickname) {
                 resolve({
                     code: statusCode.BAD_REQUEST,
                     json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE)
@@ -77,7 +77,26 @@ const user = {
                     json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.ALREADY_X("닉네임"))
                 });
                 return;
+            } else {
+                resolve({
+                    code: statusCode.OK,
+                    json: authUtil.successTrue(statusCode.OK, responseMessage.POSSIBLE_NICKNAME)
+                });
+                return;
             }
+        })
+    },
+
+    signup: (id, name, nickname, pay_password, friends, photo) => {
+        return new Promise(async (resolve, reject) => {
+            if (!name || !pay_password || !id || !nickname) {
+                resolve({
+                    code: statusCode.BAD_REQUEST,
+                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE)
+                });
+                return;
+            }
+            
             const {
                 salt,
                 hashedPassword

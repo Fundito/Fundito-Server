@@ -7,6 +7,7 @@ module.exports = {
     DUPLICATE_VALUE_ERROR: "파라미터 값 중복",
     SIGN_UP_SUCCESS: "회원가입 성공",
     SIGN_IN_SUCCESS: "로그인 성공",
+    POSSIBLE_NICKNAME: "사용 가능한 닉네임입니다.",
 
     NO_INDEX : "존재하지 않는 인덱스 값",
     NO_STORE : "존재하지 않는 가게",
