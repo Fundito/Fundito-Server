@@ -28,4 +28,25 @@ router.post('/',fb, async(req, res) => {
     });
 });
 
+/**
+ *  [POST] /auth/signup/nickname
+ *  회원 가입
+ *  @author KangYeongWoo
+ *  @body pay_password, nickname
+ *  @header facebook_access_token
+ */
+router.post('/nickname',fb, async(req, res) => {
+    const {nickname} = req.body;
+
+    User.doubleCheck(nickname)
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR)
+        .send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
 module.exports = router;
