@@ -105,7 +105,7 @@ const user = {
             // 유저의 이름,아이디,패스워드를 저장
             const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt, photo) VALUES (?, ?, ?, ?, ?, ?)';
             const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt, photo]);
-
+            console.log(insertUserInfoResult)
             Friend.createAll(insertUserInfoResult.insertId, friends);
 
             if (insertUserInfoResult.affectedRows == 1) {
