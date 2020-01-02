@@ -29,11 +29,11 @@ const user = {
 
             const getUserIndexQuery = `SELECT user_idx FROM user WHERE id = '${id}' AND name = '${name}'`;
             const getUserIndexResult = await pool.queryParam_Parse(getUserIndexQuery);
-
+            
             if (getUserIndexResult[0] === undefined) {
                 resolve({
                     code: statusCode.UNAUTHORIZED,
-                    json: authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.NO_X("user"))
+                    json: authUtil.successFalse(statusCode.UNAUTHORIZED, [responseMessage.NO_X("user"), {"name": name}])
                 });
                 return;
             } else {
