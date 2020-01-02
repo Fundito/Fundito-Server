@@ -28,7 +28,7 @@ const storeInfoTable = `store_info`;
 const THIS_LOG = `펀딩 정보`;
 
 const storeFund = {
-    create: (storeIdx, marginPercent, regularMoney, goalMoney) => {
+    create: (storeIdx, marginPercent, regularSales, goalSales) => {
         return new Promise(async (resolve, reject) => {
             const storeIdxQuery = `SELECT * FROM store_info WHERE store_idx = ?`;
             const storeIdxResult = await pool.queryParam_Arr(storeIdxQuery, [storeIdx]);
@@ -65,7 +65,7 @@ const storeFund = {
             }
 
             // 가게의 펀드 정보(기존 고객 수, 마진율, 등록날짜, 마감기한, 목표매출, 펀딩인원, 진행상태)를 삽입
-            const insertStoreFundInfoQuery = 'INSERT INTO store_fund(store_idx, margin_percent, register_time, due_date, regular_money, goal_money) VALUES (?, ?, ?, ?, ?, ?)';
+            const insertStoreFundInfoQuery = 'INSERT INTO store_fund(store_idx, margin_percent, register_time, due_date, regular_sales, goal_sales) VALUES (?, ?, ?, ?, ?, ?)';
 
             // registerTime 구하기
             const date = Date.now();
@@ -78,7 +78,7 @@ const storeFund = {
             const dueDate = moment(d.getTime()).add('1', 'M').format('YYYY-MM-DD HH:mm:ss');
             console.log(dueDate);
 
-            const insertStoreFundInfoResult = await pool.queryParam_Arr(insertStoreFundInfoQuery, [storeIdx, marginPercent, registerTime, dueDate, regularMoney, goalMoney]);
+            const insertStoreFundInfoResult = await pool.queryParam_Arr(insertStoreFundInfoQuery, [storeIdx, marginPercent, registerTime, dueDate, regularSales, goalSales]);
             console.log(insertStoreFundInfoResult);
             if (!insertStoreFundInfoResult) {
                 resolve({
@@ -127,7 +127,6 @@ const storeFund = {
                 console.log(`select StoreFund Info ERROR`);
                 return;
             }
-
             for (var idx = 0; idx < selectStoreFundInfoResult.length; idx++) {
                 /** [TODO] remaining_days 계산하기 */
                 const result = selectStoreFundInfoResult[idx];
@@ -137,7 +136,7 @@ const storeFund = {
 
                 if (nowDate >= dueDate) { // 펀딩기간 끝 
                     // 가게의 목표 금액 가져오기
-                    const selectStoreGoalMoneyQuery = `SELECT goal_money, current_sales FROM ${table} WHERE store_idx = ?`;
+                    const selectStoreGoalMoneyQuery = `SELECT goal_sales, current_sales FROM ${table} WHERE store_idx = ?`;
                     const selectStoreGoalMoneyResult = await pool.queryParam_Arr(selectStoreGoalMoneyQuery, [result.store_idx]);
                     console.log(selectStoreGoalMoneyResult);
 
@@ -158,13 +157,13 @@ const storeFund = {
                         return;
                     }
 
-                    const goalMoney = selectStoreGoalMoneyResult[0].goal_money;
-                    console.log(goalMoney);
+                    const goalSales = selectStoreGoalMoneyResult[0].goal_sales;
+                    console.log(goalSales);
                     const currentSales = selectStoreGoalMoneyResult[0].current_sales;
                     console.log(currentSales)
 
                     // 펀딩 성공 여부를 체크
-                    if (goalMoney <= currentSales) {
+                    if (goalSales <= currentSales) {
                         const fund_status = fundStatus.Success;
                         // 펀딩 성공 업데이트
                         const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
@@ -390,7 +389,7 @@ const storeFund = {
             const currentGaolPer = new Array();
 
             for (let i = 0; i < getStoreNameListResult.length; i++) {
-                currentGaolPer[i] = parseInt(calculate.getCurGoalPer(getStoreNameListResult[i].current_sales, getStoreNameListResult[i].goal_money));
+                currentGaolPer[i] = parseInt(calculate.getCurGoalPer(getStoreNameListResult[i].current_sales, getStoreNameListResult[i].goal_sales));
                 getStoreNameListResult[i].currentGaolPercent = currentGaolPer[i];
                 getStoreNameListResult[i].register_time = moment(getStoreNameListResult[i].register_time).format("YYYY-MM-DD HH:MM:SS");
                 getStoreNameListResult[i].due_date = moment(getStoreNameListResult[i].due_date).format("YYYY-MM-DD HH:MM:SS");
@@ -412,7 +411,7 @@ const storeFund = {
         });
     },
 
-    update: (storeIdx, marginPercent, goalMoney, fund_status) => {
+    update: (storeIdx, marginPercent, goalSales, fund_status) => {
         return new Promise(async (resolve, reject) => {
             const storeIdxQuery = `SELECT * FROM ${table} WHERE store_idx = ?`;
             const storeIdxResult = await pool.queryParam_Arr(storeIdxQuery, [storeIdx]);
@@ -425,8 +424,8 @@ const storeFund = {
                 return;
             }
 
-            const updateStoreFundInfoQuery = `UPDATE ${table} SET margin_percent = ?, goal_money = ?, fund_status = ? WHERE store_idx = ?`;
-            const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [marginPercent, goalMoney, fund_status, storeIdx]);
+            const updateStoreFundInfoQuery = `UPDATE ${table} SET margin_percent = ?, goal_sales = ?, fund_status = ? WHERE store_idx = ?`;
+            const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [marginPercent, goalSales, fund_status, storeIdx]);
 
             if (!updateStoreFundInfoResult) {
                 resolve({

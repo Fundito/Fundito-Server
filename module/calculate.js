@@ -11,8 +11,8 @@ function getMoneyLimit150(A) {
 function isAtLimit(moneyLimit,fundingMoneySum) {
     return (moneyLimit - fundingMoneySum) < 5000;
 } 
-function getFundingBenefits(marginPercent,goalMoney,regularMoney) {
-    return (marginPercent*goalMoney - marginPercent*regularMoney); 
+function getFundingBenefits(marginPercent,goalSales,regularSales) {
+    return (marginPercent*goalSales - marginPercent*regularSales); 
 } 
 function getRefundPercent(moneyLimit150,moneyLimit175,moneyLimit200,fundingMoneySum) {
     let refundPercent = 200;
@@ -29,8 +29,8 @@ function getRefundPercent(moneyLimit150,moneyLimit175,moneyLimit200,fundingMoney
 function getRefundPerOfPer(moneyLimit,fundingMoneySum) {
     return (100 - (fundingMoneySum / moneyLimit * 100));
 }
-function getCurGoalPer(currentSales, goalMoney){
-    return (currentSales/ goalMoney * 100);
+function getCurGoalPer(currentSales, goalSales){
+    return (currentSales/ goalSales * 100);
 }
 function getRewardMoney(fundingMoney, rewardPercent) {
     return (fundingMoney * rewardPercent / 100);
