@@ -49,7 +49,7 @@
 <br>
 
 ## 📕 Server Architecture
-<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Server%20Architecture.jpg" width = "60%" height = "60%"/>
+<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Fundito%20Server%20Architecture.jpg" width = "60%" height = "60%"/>
 <br>
 
 ## 📖 Dependency Module
