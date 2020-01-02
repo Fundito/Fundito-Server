@@ -103,10 +103,10 @@ const user = {
             } = await encryptionModule.encryption(pay_password);
 
             // 유저의 이름,아이디,패스워드를 저장
-            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?, ?)';
+            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt, photo) VALUES (?, ?, ?, ?, ?, ?)';
             const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt, photo]);
 
-            Friend.createAll(insertUserInfoResult.insertId, friends);
+            Friend.createAll(insertUserInfoResult.insloertId, friends);
 
             if (insertUserInfoResult.affectedRows == 1) {
                 const token = jwt.sign(insertUserInfoResult.insertId);
