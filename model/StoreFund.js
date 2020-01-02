@@ -5,7 +5,6 @@ const pool = require('../module/db/pool');
 const fundStatus = require(`../module/utils/fundStatus`);
 const calculate = require('../module/calculate');
 const notification = require('../model/Notification');
-const serverKey = require('../config/serverKey');
 const admin = require('firebase-admin');
 
 // var FCM = require('fcm-node');
@@ -69,19 +68,17 @@ const storeFund = {
 
             // registerTime 구하기
             const date = Date.now();
+            console.log(date);
             const registerTime = moment(date).format('YYYY-MM-DD HH:mm:ss');
+            console.log(registerTime);
 
             // dueDate 구하기
             const d = new Date();
             const dueDate = moment(d.getTime()).add('1', 'M').format('YYYY-MM-DD HH:mm:ss');
+            console.log(dueDate);
 
-<<<<<<< HEAD
-            const insertStoreFundInfoResult = await pool.queryParam_Arr(insertStoreFundInfoQuery, [storeIdx, marginPercent, registerTime, dueDate, regularMoney, goalMoney]);
-            
-=======
             const insertStoreFundInfoResult = await pool.queryParam_Arr(insertStoreFundInfoQuery, [storeIdx, marginPercent, registerTime, dueDate, regularSales, goalSales]);
             console.log(insertStoreFundInfoResult);
->>>>>>> feature/변수_이름_변경
             if (!insertStoreFundInfoResult) {
                 resolve({
                     code: statusCode.BAD_REQUEST,
@@ -137,10 +134,10 @@ const storeFund = {
 
                 if (nowDate >= dueDate) { // 펀딩기간 끝 
                     // 가게의 목표 금액 가져오기
-                    const selectStoreGoalMoneyQuery = `SELECT goal_sales, current_sales FROM ${table} WHERE store_idx = ?`;
-                    const selectStoreGoalMoneyResult = await pool.queryParam_Arr(selectStoreGoalMoneyQuery, [result.store_idx]);
+                    const selectStoreGoalSalesQuery = `SELECT goal_sales, current_sales FROM ${table} WHERE store_idx = ?`;
+                    const selectStoreGoalSalesResult = await pool.queryParam_Arr(selectStoreGoalSalesQuery, [result.store_idx]);
 
-                    if (selectStoreGoalMoneyResult[0] == undefined) {
+                    if (selectStoreGoalSalesResult[0] == undefined) {
                         resolve({
                             code: statusCode.BAD_REQUEST,
                             json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_REGISTERED_STORE)
@@ -148,7 +145,7 @@ const storeFund = {
                         return;
                     }
 
-                    if (!selectStoreGoalMoneyResult) {
+                    if (!selectStoreGoalSalesResult) {
                         resolve({
                             code: statusCode.INTERNAL_SERVER_ERROR,
                             json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
@@ -156,13 +153,10 @@ const storeFund = {
                         return;
                     }
 
-<<<<<<< HEAD
-                    const goalMoney = selectStoreGoalMoneyResult[0].goal_money;
-=======
-                    const goalSales = selectStoreGoalMoneyResult[0].goal_sales;
+                    const goalSales = selectStoreGoalSalesResult[0].goal_sales;
                     console.log(goalSales);
->>>>>>> feature/변수_이름_변경
-                    const currentSales = selectStoreGoalMoneyResult[0].current_sales;
+                    const currentSales = selectStoreGoalSalesResult[0].current_sales;
+                    console.log(currentSales)
 
                     // 펀딩 성공 여부를 체크
                     if (goalSales <= currentSales) {
@@ -175,6 +169,7 @@ const storeFund = {
                                 code: statusCode.INTERNAL_SERVER_ERROR,
                                 json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
+                            console.log(`update error`);
                             return;
                         }
                     } else {
@@ -188,6 +183,7 @@ const storeFund = {
                                 code: statusCode.INTERNAL_SERVER_ERROR,
                                 json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                             });
+                            console.log(`update StoreFund Info ERROR`);
                             return;
                         }
                     }
@@ -226,11 +222,14 @@ const storeFund = {
             const getCloseFundStoreUserQuery = `SELECT funding.user_idx FROM store_fund JOIN funding ON funding.store_idx = store_fund.store_idx WHERE fund_status = 1 OR fund_status = 2`;
             const getCloseFundStoreUserResult = await pool.queryParam_None(getCloseFundStoreUserQuery);
 
+            console.log(getCloseFundStoreUserResult);
+
             if (!getCloseFundStoreUserResult) {
                 resolve({
                     code: statusCode.INTERNAL_SERVER_ERROR,
                     json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
                 });
+                console.log(`get getCloseFundStoreUserResult ERROR`);
                 return;
             }
 
@@ -318,6 +317,7 @@ const storeFund = {
         }
         
         var registrationToken = getFirebaseTokenResult[0].firebase_token;
+        console.log(registrationToken);
 
         let notificationData = (await notification.readUserAllNoti(userIdx)).json.data;
 
