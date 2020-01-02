@@ -1,4 +1,3 @@
-
 function getMoneyLimit200(A) {
     return 4/4 * A/3;
 }
@@ -27,16 +26,19 @@ function getRefundPercent(moneyLimit150,moneyLimit175,moneyLimit200,fundingMoney
     return refundPercent;
 }
 function getRefundPerOfPer(moneyLimit,fundingMoneySum) {
-    return (100 - (fundingMoneySum / moneyLimit * 100));
+    return clamp(0,100,(100 - (fundingMoneySum / moneyLimit * 100)));
 }
 function getCurGoalPer(currentSales, goalSales){
-    return (currentSales/ goalSales * 100);
+    return clamp(0,100,(currentSales/ goalSales * 100));
 }
 function getRewardMoney(fundingMoney, rewardPercent) {
     return (fundingMoney * rewardPercent / 100);
 }
 function getProfit(fundingMoney, rewardPercent) {
     return (getRewardMoney(fundingMoney, rewardPercent) - fundingMoney);
+}
+function clamp(min, max, val) { // 변수의 최소,최대 범위 설정
+    return Math.min(Math.max(min, +val), max);
 }
 module.exports = {
     getMoneyLimit200,
@@ -49,4 +51,5 @@ module.exports = {
     getRewardMoney,
     getProfit,
     getRefundPercent,
+    clamp,
 }
