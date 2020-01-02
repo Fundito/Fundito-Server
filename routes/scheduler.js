@@ -3,7 +3,7 @@ const moment = require('moment');
 const storeFund = require('../model/StoreFund');
 
 // 하루에 한 번 마감기한 확인, 마감 기한이 지났으면 성공 여부 결정
-const idx1 = csvManager.addTask('59 * * * * *', async () => {
+const idx1 = csvManager.addTask('0 0 * * *', async () => {
 
     // `0 0 * * *`
     console.log(`매일 오전 12시 마다 실행`, moment().format());
