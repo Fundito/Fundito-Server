@@ -15,25 +15,25 @@ const jwt = require('../../module/auth/jwt');
  * @author LeeSohee, ChoSooMin
  * @header token
  * @param storeIdx
- * @body marginPercent, regularMoney, goalMoney
+ * @body marginPercent, regularSales, goalSales
  */
 router.post('/:storeIdx', jwt.checkLogin, async (req, res) => {
     try {
         const {
             marginPercent,
-            regularMoney,
-            goalMoney
+            regularSales,
+            goalSales
         } = req.body;
         const {
             storeIdx
         } = req.params;
 
-        if (!storeIdx  || !marginPercent || !regularMoney || !goalMoney) {
+        if (!storeIdx  || !marginPercent || !regularSales || !goalSales) {
             res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
             return;
         }
 
-        StoreFund.create(storeIdx, marginPercent, regularMoney,  goalMoney)
+        StoreFund.create(storeIdx, marginPercent, regularSales,  goalSales)
             .then(({
                 code,
                 json
@@ -143,23 +143,23 @@ router.get('/', jwt.checkLogin, async(req, res) => {
  * @author ChoSooMin
  * @header token
  * @param storeIdx
- * @body customerCount, marginPercent, goalMoney
+ * @body customerCount, marginPercent, goalSales
  */
 router.put('/:storeIdx', jwt.checkLogin, async(req, res) => {
     const {
         customerCount,
         marginPercent,
-        goalMoney
+        goalSales
     } = req.body;
 
     const { storeIdx } = req.params;
 
-    if (!customerCount || !marginPercent || !goalMoney) {
+    if (!customerCount || !marginPercent || !goalSales) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
 
-    StoreFund.update(storeIdx, customerCount, marginPercent, goalMoney)
+    StoreFund.update(storeIdx, customerCount, marginPercent, goalSales)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
