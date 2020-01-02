@@ -1,10 +1,8 @@
 ## Fundito
 > 나만의 맛집에 투자하라! 외식업 크라우드 펀딩 서비스, Fundito
-
 <br>
 
 ### 📂[API Doc Link](https://github.com/Fundito/Fundito-Server/wiki)
-
 <br>
 
 ### ⭐️핵심 기능
@@ -14,11 +12,9 @@
 4. 가게 펀딩
 5. 펀딩 금액 회수
 6. 알림
-
 <br>
 
 ### 👩‍👩‍👧‍👦Team Member
-
 [백예은](https://github.com/bye0520)
 * 펀디토 머니 API 구현
 * StoreInfo API 구현
@@ -49,11 +45,12 @@
 <br>
 
 ### 📝ERD Diagram
-<img src=""/>
+<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Fundito%20Server%20ER%20Diagram.png" width = "50%" height = "50%"/>
+<br>
 
-
-
-
+### 📕Server Architecture
+<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Server%20Architecture.jpg" width = "60%" height = "60%"/>
+<br>
 
 ### 📖Dependency Module
 ```
@@ -101,13 +98,3 @@
 }
 
 ```
-
-
-
-
-
-### 📕Server Architecture
-<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Server%20Architecture.jpg" width = "40%" height = "40%"/>
-
-
-
