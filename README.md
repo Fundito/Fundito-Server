@@ -107,7 +107,7 @@
 
 
 ### 📕Server Architecture
-<img src="" width = "40%" height = "40%"/>
+<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Server%20Architecture.jpg" width = "40%" height = "40%"/>
 
 
 
