@@ -219,7 +219,7 @@ const storeFund = {
                     // firebase.cloudMessaging(admin, message);
                 }
             }
-            const getCloseFundStoreUserQuery = `SELECT funding.user_idx FROM store_fund JOIN funding ON funding.store_idx = store_fund.store_idx WHERE fund_status = 1 OR fund_status = 2`;
+            const getCloseFundStoreUserQuery = `SELECT funding.user_idx, funding.store_idx FROM store_fund JOIN funding ON funding.store_idx = store_fund.store_idx WHERE fund_status = 1 OR fund_status = 2`;
             const getCloseFundStoreUserResult = await pool.queryParam_None(getCloseFundStoreUserQuery);
 
             console.log(getCloseFundStoreUserResult);
@@ -286,7 +286,7 @@ const storeFund = {
                 //var fcm = new FCM(server_key);
                 //fcmModule.fcm(fcm, push_data);
 
-                storeFund.sendMessage(getCloseFundStoreUserResult[idx].user_idx);
+                storeFund.sendMessage(getCloseFundStoreUserResult[idx].user_idx, getCloseFundStoreUserResult[idx].store_idx);
 
             }
 
@@ -294,7 +294,7 @@ const storeFund = {
         });
     },
 
-    sendMessage: (userIdx) => {
+    sendMessage: (userIdx,storeIdx) => {
         return new Promise(async (resolve, reject) => {
         /** [TODO] firebase_token을 빼와서 넣기  */
         const getFirebaseTokenQuery = `SELECT firebase_token FROM user WHERE user_idx = ?`;
@@ -336,6 +336,7 @@ const storeFund = {
             .then((response) => {
                 // Response is a message ID string.
                 console.log('Successfully sent message:', response);
+               // storeFund.insertNotification(storeIdx, userIdx)
             })
             .catch((error) => {
                 console.log('Error sending message:', error);
@@ -343,6 +344,27 @@ const storeFund = {
         });
 
 
+    },
+
+    insertNotification: (storeIdx, userIdx) => {
+        return new Promise(async (resolve, reject) => {
+            const date = moment(Date.now());
+            const insertNotificationQuery = `INSERT INTO notification(store_idx, user_idx, date) VALUES(?, ?, ?)`;
+            const insertNotificationResult = await pool.queryParam_Arr(insertNotificationQuery, [storeIdx, userIdx, date]);
+            console.log(insertNotificationResult);
+
+            if(!insertNotificationResult) {
+                console.log(responseMessage.INTERNAL_SERVER_ERROR);
+                return;
+            }
+
+            if (insertNotificationResult[0] == undefined) {
+                console.log(responseMessage.NO_INDEX);
+                return;
+            }
+
+            console.log(responseMessage.NOTIFICATION_INSERT_SUCCESS);
+        });
     },
 
     read: (storeIdx) => {

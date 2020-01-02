@@ -42,6 +42,8 @@ module.exports = {
     FUND_RATE_READ_SUCCESS : "최대 이율 조회 성공",
 
     USER_MONEY_LESS_THAN_FUNDING_MONEY : "펀디토 머니 부족",
+    
+    NOTIFICATION_INSERT_SUCCESS: "알림 입력 성공",
 
     X_CREATE_SUCCESS: (x) => `${x} 작성 성공`,
     X_CREATE_FAIL: (x) => `${x} 작성 실패`,
