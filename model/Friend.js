@@ -82,22 +82,14 @@ Friend = {
             }
             for (i in result) {
                 for (j in result[i].fund) {
-                    result[i].fund[j].storeInfo = (await StoreInfo.readStoreInfo(result[i].fund[j].store_idx)).json.data;
+                    result[i].fund[j] = ((await StoreFund.read(result[i].fund[j].store_idx)).json.data)[0];
                 }
             }
-            if (!result) {
-                resolve({
-                    code: statusCode.BAD_REQUEST,
-                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_X("정보"))
-                });
-                return;
-            } else {
-                resolve({
-                    code: statusCode.OK,
-                    json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS("피드"), result)
-                });
-                return;
-            }
+            resolve({
+                code: statusCode.OK,
+                json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS("피드"), result)
+            });
+            return;
         });
     },
 
@@ -109,22 +101,12 @@ Friend = {
                 "success": (await Funding.readUserFundingList(friendIdx, 1)).json.data,
                 "fail": (await Funding.readUserFundingList(friendIdx, 2)).json.data
             };
-            // console.log(result);
-
-            if (!result) {
-                resolve({
-                    code: statusCode.BAD_REQUEST,
-                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_X("정보"))
-                });
-                return;
-            } else {
-                console.log(result)
-                resolve({
-                    code: statusCode.OK,
-                    json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS("친구 투자 상세정보"), result)
-                });
-                return;
-            }
+            
+            resolve({
+                code: statusCode.OK,
+                json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS("친구 투자 상세정보"), result)
+            });
+            return;
         });
     }
 }

@@ -7,6 +7,7 @@ const authUtil = require('../../module/utils/authUtil');
 const jwt = require('../../module/auth/jwt');
 
 const User = require('../../model/User');
+const StoreInfo = require('../../model/StoreInfo');
 
 /**
  * [GET] mypage/point
@@ -51,24 +52,41 @@ router.put('/', jwt.checkLogin, async (req, res) => {
     });
 });
 
+
+/**
+ * [PUT] mypage/point/withdraw
+ * 펀디토 머니 회수
+ */
 router.put('/withdraw', jwt.checkLogin, async (req, res) => {
     const {
-        point
+        storeIdx,
+        rewardMoney
     } = req.body;
 
     const userIdx = req.decoded.idx;
 
-    if (point == undefined) {
+    if (storeIdx == undefined || rewardMoney == undefined) {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
 
-    User.withdrawPoint(userIdx,point)
-    .then(({code, json})=>{
-        res.status(code).send(json);
+    StoreInfo.readCheer(userIdx,storeIdx)
+    .then(({result})=>{
+        User.updatePointWithoutPassword(userIdx, parseInt(rewardMoney)+parseInt(result))
+        .then(()=>{
+            User.withdrawPoint(userIdx,storeIdx,rewardMoney)
+            .then(({code, json})=>{
+                res.status(code).send(json);
+            }).catch((err) => {
+                res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR))
+            });
+        }).catch((err) => {
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR))
+        });
     }).catch((err) => {
         res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR))
     });
+    
 
 });
 

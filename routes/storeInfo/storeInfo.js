@@ -8,6 +8,7 @@ const upload = require('../../config/multer');
 const jwt = require('../../module/auth/jwt');
 
 const StoreInfo = require('../../model/StoreInfo');
+const User = require('../../model/User');
 
 /**
  * [POST] /storeInfo
@@ -84,8 +85,6 @@ router.get('/:storeIdx', jwt.checkLogin, async(req, res) => {
         return;
     }
 
-    console.log(storeIdx, userIdx);
-
     StoreInfo.readStoreInfo(userIdx, storeIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
@@ -111,8 +110,6 @@ router.get('/wifi/:wifiSSID', jwt.checkLogin, async(req, res) => {
         res.status(statusCode.BAD_REQUEST).send(authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
         return;
     }
-
-    console.log(wifiSSID);
 
     StoreInfo.readByWifi(wifiSSID)
     .then(({ code, json }) => {
@@ -156,8 +153,6 @@ router.post('/wifi', jwt.checkLogin, async(req, res) => {
     StoreInfo.read(storeIdx)
     .then(({ code, json }) => {
         const storeData = json.data;
-        console.log(`storeinfo wifi`);
-        console.log(json);
 
         // storeIdx가 존재하지 않을 경우
         if (storeData == undefined) {
@@ -171,6 +166,32 @@ router.post('/wifi', jwt.checkLogin, async(req, res) => {
         else {
             res.status(statusCode.UNAUTHORIZED).send(authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.WIFI_CHECK_FAIL));
         }
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
+
+/**
+ * [POST] storeInfo/cheer/:storeIdx
+ * 응원하고 50P 받기
+ */
+router.post('/cheer/:storeIdx', jwt.checkLogin, async(req, res) => {
+    const {
+        storeIdx
+    } = req.params;
+
+    const userIdx = req.decoded.idx;
+
+    StoreInfo.createCheer(userIdx, storeIdx)
+    .then(() => {
+        User.updatePointWithoutPassword(userIdx,50)
+        .then(({code, json})=>{
+            res.status(code).send(json);
+        }).catch((err) => {
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR))
+        });
     })
     .catch((err) => {
         console.log(err);

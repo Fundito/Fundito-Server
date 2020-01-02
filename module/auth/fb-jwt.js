@@ -5,11 +5,11 @@ const authUtil = require('../utils/authUtil');
 
 module.exports = (req, res, next) => {
     var accessToken = req.headers.access_token;
-    var api_url = 'https://graph.facebook.com/v5.0/me?access_token=' + accessToken + '&fields=id,name,friends';
+    var api_url = 'https://graph.facebook.com/v5.0/me?access_token=' + accessToken + '&fields=id,name,friends, picture';
     var options = {
         url: api_url,
     };
-
+    
     if (!accessToken) {
         return res.statusCode(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, resMessage.EMPTY_TOKEN));
     }
@@ -20,6 +20,7 @@ module.exports = (req, res, next) => {
             req.decoded = {
                 id: data.id,
                 name: data.name,
+                photo: data.picture.data.url,
                 friends: data.friends.data
             };
             next();

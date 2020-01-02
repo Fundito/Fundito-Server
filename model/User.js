@@ -59,7 +59,7 @@ const user = {
         })
     },
 
-    signup: (id, name, nickname, pay_password, friends) => {
+    signup: (id, name, nickname, pay_password, friends, photo) => {
         return new Promise(async (resolve, reject) => {
             if (!name || !pay_password || !id || !nickname) {
                 resolve({
@@ -84,8 +84,8 @@ const user = {
             } = await encryptionModule.encryption(pay_password);
 
             // 유저의 이름,아이디,패스워드를 저장
-            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?)';
-            const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt]);
+            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?, ?)';
+            const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt, photo]);
 
             Friend.createAll(insertUserInfoResult.insertId, friends);
 
@@ -108,7 +108,7 @@ const user = {
 
     read: (userIdx) => {
         return new Promise(async (resolve, reject) => {
-            const getCertainUserQuery = `SELECT name, nickname, point FROM ${table} WHERE user_idx = ?`;
+            const getCertainUserQuery = `SELECT name, nickname, photo, point FROM ${table} WHERE user_idx = ?`;
             const getCertainUserResult = await pool.queryParam_Arr(getCertainUserQuery, [userIdx]);
 
             if (!getCertainUserResult) {
@@ -175,7 +175,7 @@ const user = {
                     });
                     return;
                 }
-                
+
                 const checkPayPasswordEncryptionResult = await encryptionModule.encryptionWithSalt(payPassword, getCertainUserResult[0].salt);
 
                 if (getCertainUserResult[0].pay_password == checkPayPasswordEncryptionResult ) {
@@ -194,7 +194,7 @@ const user = {
         });
     },
 
-    withdrawPoint : (userIdx, point) => {
+    updatePointWithoutPassword : (userIdx, point) => {
         return new Promise (async (resolve, reject) => {
             const updatePointQuery = `UPDATE ${table} SET point = ? WHERE user_idx = ?`;
             const getCertainUserQuery = `SELECT * FROM ${table} WHERE user_idx = ?`;
@@ -229,12 +229,29 @@ const user = {
                         code : statusCode.OK,
                         json : authUtil.successTrue(statusCode.OK, responseMessage.X_UPDATE_SUCCESS(THIS_LOG))
                     });
-
                 }
-
             }
         });
+    },
 
+    withdrawPoint : (userIdx, storeIdx) => {
+        return new Promise (async (resolve, reject) => {
+
+            const updateIsWithdrawQuery = `UPDATE funding SET is_withdraw = 1 WHERE user_idx = ${userIdx} AND store_idx = ${storeIdx}`;
+            const updateIsWithdrawResult = await pool.queryParam_Arr(updateIsWithdrawQuery);
+            if(!updateIsWithdrawResult){
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            } else {
+                resolve({
+                    code : statusCode.OK,
+                    json : authUtil.successTrue(statusCode.OK, responseMessage.X_UPDATE_SUCCESS(THIS_LOG))
+                });
+            }
+        });
     },
 
     delete : () => {

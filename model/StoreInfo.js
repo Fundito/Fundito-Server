@@ -20,8 +20,6 @@ const storeInfo = {
             const createStoreQuery = `INSERT INTO ${storeInfoTable}(name, tel_number, location_latitude, location_longitude, address, business_hours, breaktime, holiday, thumbnail, wifi_SSID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             const createStoreResult = await pool.queryParam_Arr(createStoreQuery, [name, telNumber, latitude, longitude, address, businessHours, breaktime, holiday, thumbnail, wifiSSID]);
 
-            console.log(createStoreResult);
-
             // 클라이언트에서 menu는 배열로 넘어온다.
             for (const i in menu) {
                 const currentMenu = menu[i];
@@ -80,8 +78,6 @@ const storeInfo = {
                 storeListResult[i].menu = getStoreMenuResult;
             }
 
-            console.log(storeListResult);
-
             resolve({
                 code : statusCode.OK,
                 json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_ALL_SUCCESS(THIS_LOG), storeListResult)
@@ -132,10 +128,10 @@ const storeInfo = {
                 fundingMoneySum += getFundingInfoResult[i].funding_money;
             }
             
-            if (getStoreFundResult[0] == undefined) {
+            if (getStoreFundResult[0] == undefined || getUserNameResult[0] == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
-                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.BAD_REQUEST)
+                    json : authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
                 });
                 return;
             }
@@ -149,8 +145,6 @@ const storeInfo = {
             const moneyLimit150 = getMoneyLimit150(fundingBenefits); // C (150% 마감금액)
             const moneyLimit175 = getMoneyLimit175(fundingBenefits); // B (175% 마감금액)
             const moneyLimit200 = getMoneyLimit200(fundingBenefits); // A (200% 마감금액)
-            console.log(`가게에 모인 금액`);
-            console.log(fundingMoneySum);
             let refundPercent = getRefundPercent(moneyLimit150,moneyLimit175,moneyLimit200,fundingMoneySum); 
             let refundPerOfPer = getRefundPerOfPer(moneyLimit200, fundingMoneySum);
             const now = moment(Date.now());
@@ -179,7 +173,9 @@ const storeInfo = {
             var fundingMoneySum = 0;
             var profitMoneySum = 0;
             var rewardMoneySum = 0;
-            
+            if(getFundingInfoResult[0]==undefined) {
+                storeResult.funding = {};
+            } else {
             for(var i=0; i< getFundingInfoResult.length; i++) {
                 fundingMoneySum += getFundingInfoResult[i].funding_money;
                 profitMoneySum += getFundingInfoResult[i].profit_money;
@@ -195,8 +191,7 @@ const storeInfo = {
             getFundingInfoResult[0].funding_money = fundingMoneySum;
             getFundingInfoResult[0].user_name = getUserNameResult[0].name;
             storeResult.funding = getFundingInfoResult[0];
-            
-            console.log(storeResult);
+            }
 
             resolve({
                 code : statusCode.OK,
@@ -253,8 +248,6 @@ const storeInfo = {
                 return;
             }
 
-            console.log(getData);
-
             const storeIdx = getData.store_idx;
             const thumbnail = getData.thumbnail;
             const storeName = getData.name;
@@ -284,6 +277,52 @@ const storeInfo = {
                 json : authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), responseResult)
             });
         })
+    },
+
+    createCheer : (userIdx, storeIdx) => {
+        return new Promise (async (resolve, reject) => {
+            const insertCheerQuery = `INSERT INTO cheer(store_idx ,user_idx) VALUES (${storeIdx}, ${userIdx})`;
+            const insertCheerResult = await pool.queryParam_None(insertCheerQuery);
+
+            if(!insertCheerResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                        json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            } else {
+                resolve({
+                    code : statusCode.OK,
+                    json : authUtil.successTrue(statusCode.OK, responseMessage.X_CREATE_SUCCESS(THIS_LOG))
+                });
+            }
+
+        });
+    },
+
+    readCheer : (userIdx, storeIdx) => {
+        return new Promise (async (resolve, reject) => {
+            const getCheerQuery = `SELECT * FROM cheer WHERE user_idx = ${userIdx} AND store_idx = ${storeIdx}`;
+            const getCheerResult = await pool.queryParam_None(getCheerQuery);
+            if(!getCheerResult) {
+                resolve({
+                    code : statusCode.INTERNAL_SERVER_ERROR,
+                    json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+                });
+                return;
+            } else {
+
+                if(getCheerResult[0] != undefined) {
+                    resolve({
+                        result : 500
+                    });
+                } else {
+                    resolve({
+                        result : 0
+                    });
+                }
+            }
+        });
     },
 
     delete: (storeIdx) => {
