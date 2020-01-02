@@ -168,9 +168,9 @@ const funding = {
                             fundingMoneySum += selectFundingMoneyResult[i].funding_money;
                         }
                         const marginPercent = result.margin_percent;
-                        const goalMoney = result.goal_money;
-                        const regularMoney = result.regular_money;
-                        const fundingBenefits = getFundingBenefits(marginPercent,goalMoney,regularMoney); // 투자이윤
+                        const goalSales = result.goal_sales;
+                        const regularSales = result.regular_sales;
+                        const fundingBenefits = getFundingBenefits(marginPercent,goalSales,regularSales); // 투자이윤 
                         const moneyLimit150= getMoneyLimit150(fundingBenefits); // C (150% 마감금액)
 
                         if (isAtLimit(moneyLimit150,fundingMoneySum)){
@@ -349,7 +349,7 @@ const funding = {
              * 2. 1에서 받아온 데이터들을 가지고, store_fund 테이블에서 비교 후, fund_status 들을 가져옴
              * 3. fund_status들에 따라 store_info 테이블에서 데이터 가져옴
              */
-            const joinQuery = `SELECT store_info.name, funding.store_idx, store_fund.due_date, store_fund.goal_money, store_fund.current_sales, funding.funding_money, funding.reward_money FROM funding JOIN store_fund ON funding.store_idx = store_fund.store_idx JOIN store_info ON funding.store_idx = store_info.store_idx WHERE user_idx = ? AND fund_status = ?`;
+            const joinQuery = `SELECT store_info.name, funding.store_idx, store_fund.due_date, store_fund.goal_sales, store_fund.current_sales, funding.funding_money, funding.reward_money FROM funding JOIN store_fund ON funding.store_idx = store_fund.store_idx JOIN store_info ON funding.store_idx = store_info.store_idx WHERE user_idx = ? AND fund_status = ?`;
             const joinResult = await pool.queryParam_Arr(joinQuery, [userIdx, fundStatus]);
 
             if (!joinResult) {
@@ -374,10 +374,10 @@ const funding = {
                     var remainingDays = remainingTime.asDays();
 
                     // 진행률 계산
-                    const goalMoney = joinData.goal_money;
+                    const goalSales = joinData.goal_sales;
                     const currentSales = joinData.current_sales;
 
-                    const progressPercent = currentSales / goalMoney * 100;
+                    const progressPercent = currentSales / goalSales * 100;
 
                     const clientResult = {
                         "storeIdx" : storeIdx,
