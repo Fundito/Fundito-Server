@@ -72,7 +72,7 @@ const notification = {
             }
 
             for (var i = 0; i < selectNotificationResult.length; i++) {
-                await storeInfo.readStoreInfo(selectNotificationResult[i].store_idx)
+                await storeInfo.readStoreInfo(userIdx,selectNotificationResult[i].store_idx)
                     .then(({
                         code,
                         json
@@ -87,10 +87,7 @@ const notification = {
             resolve({
                 code: statusCode.OK,
                 json: authUtil.successTrue(statusCode.OK, responseMessage.X_READ_SUCCESS(THIS_LOG), selectNotificationResult)
-                
             });
-
-            console.log(selectNotificationResult);
         });
     },
 
