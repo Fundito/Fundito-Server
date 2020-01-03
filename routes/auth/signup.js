@@ -35,7 +35,7 @@ router.post('/',fb, async(req, res) => {
  *  @body pay_password, nickname
  *  @header facebook_access_token
  */
-router.post('/nickname',fb, async(req, res) => {
+router.post('/nickname', async(req, res) => {
     const {nickname} = req.body;
 
     User.doubleCheck(nickname)
