@@ -234,7 +234,7 @@ const storeInfo = {
 
     readByWifi: (wifiSSID) => {
         return new Promise(async (resolve, reject) => {
-            const getStoreByWifiQuery = `SELECT i.*, f.* FROM store_info AS i INNER JOIN store_fund AS f ON i.store_idx = f.store_idx WHERE i.wifi_SSID = '${wifiSSID}' AND f.fund_status = 0`;
+            const getStoreByWifiQuery = `SELECT i.*, f.* FROM store_info AS i INNER JOIN store_fund AS f ON i.store_idx = f.store_idx WHERE i.wifi_SSID = '${wifiSSID}'`;
             const getStoreByWifiResult = await pool.queryParam_None(getStoreByWifiQuery);
 
             if(!getStoreByWifiResult){
