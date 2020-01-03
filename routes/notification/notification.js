@@ -51,9 +51,7 @@ router.get('/', jwt.checkLogin, async (req, res) => {
  * @header token
  */
 router.delete('/:notification_idx', jwt.checkLogin, async (req, res) => {
-    const {
-        notificationIdx 
-    } = req.params.notification_idx;
+    const notificationIdx = req.params.notification_idx;
 
     Notification.delete(notificationIdx)
     .then(({ code, json }) => {

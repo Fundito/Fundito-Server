@@ -103,14 +103,6 @@ const notification = {
             const deleteNotificationQuery = `DELETE FROM ${table} WHERE notification_idx = ?`;
             const deleteNotificationResult = await pool.queryParam_Arr(deleteNotificationQuery, [notificationIdx]);
 
-            if (deleteNotificationResult[0] == undefined) {
-                resolve({
-                    code: statusCode.BAD_REQUEST,
-                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NO_INDEX)
-                });
-                return;
-            }
-
             if (!deleteNotificationResult) {
                 resolve({
                     code: statusCode.INTERNAL_SERVER_ERROR,
