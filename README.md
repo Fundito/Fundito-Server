@@ -5,6 +5,9 @@
 ## 📂 [API Doc Link](https://github.com/Fundito/Fundito-Server/wiki)
 <br>
 
+## 👍 [Fundito Server Notion Link](https://www.notion.so/Server-Finito-79656f45ac5d45c9868feeeec77e506e)
+<br>
+
 ## ⭐️ 핵심 기능
 1. 페이스북 로그인 & 회원가입
 2. 가게 정보 등록
@@ -45,11 +48,11 @@
 <br>
 
 ## 📝 ERD Diagram
-<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Fundito%20Server%20ER%20Diagram.png" width = "50%" height = "50%"/>
+<img src="https://github.com/Fundito/Fundito-Server/blob/develop/views/Fundito%20Server%20ER%20Diagram.png" width = "50%" height = "50%"/>
 <br>
 
 ## 📕 Server Architecture
-<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Fundito%20Server%20Architecture.jpg" width = "60%" height = "60%"/>
+<img src="https://github.com/Fundito/Fundito-Server/blob/develop/views/Fundito%20Server%20Architecture.jpg" width = "60%" height = "60%"/>
 <br>
 
 ## 📖 Dependency Module

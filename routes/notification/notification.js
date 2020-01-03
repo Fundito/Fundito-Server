@@ -4,7 +4,6 @@ var router = express.Router();
 const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
-const pool = require('../../module/db/pool');
 
 const jwt = require('../../module/auth/jwt');
 const Notification = require('../../model/Notification');
@@ -52,9 +51,7 @@ router.get('/', jwt.checkLogin, async (req, res) => {
  * @header token
  */
 router.delete('/:notification_idx', jwt.checkLogin, async (req, res) => {
-    const {
-        notificationIdx 
-    } = req.params.notification_idx;
+    const notificationIdx = req.params.notification_idx;
 
     Notification.delete(notificationIdx)
     .then(({ code, json }) => {
