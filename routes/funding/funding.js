@@ -19,14 +19,15 @@ const StoreInfo = require('../../model/StoreInfo');
  */
 router.get('/:storeIdx', jwt.checkLogin, async(req, res) => {
     const { storeIdx } = req.params;
+    const userIdx =req.decoded.idx;
 
-    StoreInfo.readStoreInfo(storeIdx)
+    StoreInfo.readStoreInfo(userIdx,storeIdx)
     .then(({ code, json }) => {
         const data = json.data;
-        console.log(data);
 
         if (data == undefined) {
             res.status(statusCode.DB_ERROR).send(authUtil.successFalse(statusCode.DB_ERROR, responseMessage.DB_ERROR));
+            return;
         }
 
         const refundPercent = data.refund_percent;

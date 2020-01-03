@@ -455,7 +455,7 @@ const funding = {
             }
             
             for(let i = 0; i<getTimelineResult.length;i++){
-                getTimelineResult[i].funding_time = moment(getTimelineResult[i].funding_time).format("YYYY-MM-DD HH:MM:SS")
+                getTimelineResult[i].funding_time = moment(getTimelineResult[i].funding_time).format("YYYY-MM-DD HH:mm:ss")
             }
 
             resolve({

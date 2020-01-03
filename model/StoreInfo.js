@@ -88,9 +88,8 @@ const storeInfo = {
     readStoreInfo : (userIdx, storeIdx) => {
         return new Promise(async (resolve, reject) => {
             // 식당 정보 가져오기
-            const getOneStoreQuery = `SELECT store_idx, name, business_hours, breaktime, holiday, thumbnail, address FROM ${storeInfoTable} WHERE store_idx = ?`;
+            const getOneStoreQuery = `SELECT * FROM ${storeInfoTable} WHERE store_idx = ?`;
             const getOneStoreResult = await pool.queryParam_Arr(getOneStoreQuery, [storeIdx]);
-
             if (getOneStoreResult[0] == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
@@ -111,11 +110,15 @@ const storeInfo = {
             const getFundingInfoQuery = `SELECT * FROM funding WHERE store_idx = ?`;
             var getFundingInfoResult = await pool.queryParam_Arr(getFundingInfoQuery, [storeIdx]);
 
+            // 식당 유저별 펀딩 정보 가져오기 
+            const getUserFundingInfoQuery = `SELECT * FROM funding WHERE store_idx = ? AND user_idx = ?`;
+            var getUserFundingInfoResult = await pool.queryParam_Arr(getUserFundingInfoQuery, [storeIdx,userIdx]);
+
             // 유저 네임 가져오기
             const getUserNameQuery = `SELECT name FROM user WHERE user_idx = ?`;
             const getUserNameResult = await pool.queryParam_Arr(getUserNameQuery, [userIdx]);
             
-            if (!getStoreMenuResult || !getStoreFundResult || !getFundingInfoResult || !getUserNameResult) {
+            if (!getStoreMenuResult || !getStoreFundResult || !getFundingInfoResult || !getUserNameResult || !getUserFundingInfoResult) {
                 resolve({
                     code : statusCode.INTERNAL_SERVER_ERROR,
                     json : authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
@@ -179,24 +182,24 @@ const storeInfo = {
             var fundingMoneySum = 0;
             var profitMoneySum = 0;
             var rewardMoneySum = 0;
-            if(getFundingInfoResult[0]==undefined) {
+            if(getUserFundingInfoResult[0]==undefined) {
                 storeResult.funding = {};
             } else {
-            for(var i=0; i< getFundingInfoResult.length; i++) {
-                fundingMoneySum += getFundingInfoResult[i].funding_money;
-                profitMoneySum += getFundingInfoResult[i].profit_money;
-                rewardMoneySum += getFundingInfoResult[i].reward_money;
+            for(var i=0; i< getUserFundingInfoResult.length; i++) {
+                fundingMoneySum += getUserFundingInfoResult[i].funding_money;
+                profitMoneySum += getUserFundingInfoResult[i].profit_money;
+                rewardMoneySum += getUserFundingInfoResult[i].reward_money;
             }
             if(fundStatus == 1) {
-                getFundingInfoResult[0].profit_money = 0;
-                getFundingInfoResult[0].reward_money = fundingMoneySum;
+                getUserFundingInfoResult[0].profit_money = 0;
+                getUserFundingInfoResult[0].reward_money = fundingMoneySum;
             }else{
-                getFundingInfoResult[0].profit_money = profitMoneySum;
-                getFundingInfoResult[0].reward_money = rewardMoneySum;
+                getUserFundingInfoResult[0].profit_money = profitMoneySum;
+                getUserFundingInfoResult[0].reward_money = rewardMoneySum;
             }
-            getFundingInfoResult[0].funding_money = fundingMoneySum;
-            getFundingInfoResult[0].user_name = getUserNameResult[0].name;
-            storeResult.funding = getFundingInfoResult[0];
+            getUserFundingInfoResult[0].funding_money = fundingMoneySum;
+            getUserFundingInfoResult[0].user_name = getUserNameResult[0].name;
+            storeResult.funding = getUserFundingInfoResult[0];
             }
 
             resolve({

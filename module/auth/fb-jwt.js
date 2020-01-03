@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
     };
     
     if (!accessToken) {
-        return res.statusCode(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, resMessage.EMPTY_TOKEN));
+        return res.status(400).send(authUtil.successFalse(statusCode.BAD_REQUEST, resMessage.EMPTY_TOKEN));
     }
 
     request.get(options, (error, response, body) => {
