@@ -88,9 +88,8 @@ const storeInfo = {
     readStoreInfo : (userIdx, storeIdx) => {
         return new Promise(async (resolve, reject) => {
             // 식당 정보 가져오기
-            const getOneStoreQuery = `SELECT store_idx, name, business_hours, breaktime, holiday, thumbnail, address FROM ${storeInfoTable} WHERE store_idx = ?`;
+            const getOneStoreQuery = `SELECT * FROM ${storeInfoTable} WHERE store_idx = ?`;
             const getOneStoreResult = await pool.queryParam_Arr(getOneStoreQuery, [storeIdx]);
-
             if (getOneStoreResult[0] == undefined) {
                 resolve({
                     code : statusCode.BAD_REQUEST,
