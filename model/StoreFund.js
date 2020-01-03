@@ -115,7 +115,7 @@ const storeFund = {
                 const nowDate = moment(date).format('YYYY-MM-DD');
                 const dueDate = moment(result.due_date).format('YYYY-MM-DD');
 
-                if (nowDate >= dueDate) { // 펀딩기간 끝 
+                if (nowDate == dueDate) { // 펀딩기간 끝 
                     // 가게의 목표 금액 가져오기
                     const selectStoreGoalSalesQuery = `SELECT goal_sales, current_sales FROM ${table} WHERE store_idx = ?`;
                     const selectStoreGoalSalesResult = await pool.queryParam_Arr(selectStoreGoalSalesQuery, [result.store_idx]);
@@ -147,7 +147,11 @@ const storeFund = {
                         // 펀딩 성공 업데이트
                         const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
                         const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
-                        if (!updateStoreFundInfoResult) {
+
+                        const getUserIdxQuery = `SELECT user_idx FROM funding WHERE store_idx = ?`;
+                        const getUserIdxResult = await pool.queryParam_Arr(getUserIdxQuery, result.store_idx);
+                        
+                        if (!updateStoreFundInfoResult || getUserIdxResult) {
                             resolve({
                                 code: statusCode.INTERNAL_SERVER_ERROR,
                                 json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
@@ -155,12 +159,17 @@ const storeFund = {
                             console.log(`update error`);
                             return;
                         }
+                        // 알림 보내기
+                        for(var i = 0 ; i< getUserIdxResult.length ; i++) 
+                        notification.sendMessage(getUserIdxResult[i].user_idx, result.store_idx);
                     } else {
                         const fund_status = fundStatus.Fail;
 
                         const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
                         const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
 
+                        const getUserIdxQuery = `SELECT user_idx FROM funding WHERE store_idx = ?`;
+                        const getUserIdxResult = await pool.queryParam_Arr(getUserIdxQuery, result.store_idx);
                         if (!updateStoreFundInfoResult) {
                             resolve({
                                 code: statusCode.INTERNAL_SERVER_ERROR,
@@ -169,26 +178,29 @@ const storeFund = {
                             console.log(`update StoreFund Info ERROR`);
                             return;
                         }
+                        // 알림 보내기
+                        for(var i = 0 ; i< getUserIdxResult.length ; i++) 
+                        notification.sendMessage(getUserIdxResult[i].user_idx, result.store_idx);
                     }
                 }
             }
 
-            const getCloseFundStoreUserQuery = `SELECT funding.user_idx, funding.store_idx FROM store_fund JOIN funding ON funding.store_idx = store_fund.store_idx WHERE fund_status = 1 OR fund_status = 2`;
-            const getCloseFundStoreUserResult = await pool.queryParam_None(getCloseFundStoreUserQuery);
-            console.log(getCloseFundStoreUserResult);
+            // const getCloseFundStoreUserQuery = `SELECT funding.user_idx, funding.store_idx FROM store_fund JOIN funding ON funding.store_idx = store_fund.store_idx WHERE fund_status = 1 OR fund_status = 2`;
+            // const getCloseFundStoreUserResult = await pool.queryParam_None(getCloseFundStoreUserQuery);
+            // console.log(getCloseFundStoreUserResult);
 
-            if (!getCloseFundStoreUserResult) {
-                resolve({
-                    code: statusCode.INTERNAL_SERVER_ERROR,
-                    json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
-                });
-                console.log(`get getCloseFundStoreUserResult ERROR`);
-                return;
-            }
+            // if (!getCloseFundStoreUserResult) {
+            //     resolve({
+            //         code: statusCode.INTERNAL_SERVER_ERROR,
+            //         json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
+            //     });
+            //     console.log(`get getCloseFundStoreUserResult ERROR`);
+            //     return;
+            // }
 
-            for (var idx = 0; idx < getCloseFundStoreUserResult.length; idx++) {
-                notification.sendMessage(getCloseFundStoreUserResult[idx].user_idx, getCloseFundStoreUserResult[idx].store_idx);
-            }
+            // for (var idx = 0; idx < getCloseFundStoreUserResult.length; idx++) {
+            //     notification.sendMessage(getCloseFundStoreUserResult[idx].user_idx, getCloseFundStoreUserResult[idx].store_idx);
+            // }
         });
     },
 
