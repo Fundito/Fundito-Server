@@ -29,11 +29,11 @@ const user = {
 
             const getUserIndexQuery = `SELECT user_idx FROM user WHERE id = '${id}' AND name = '${name}'`;
             const getUserIndexResult = await pool.queryParam_Parse(getUserIndexQuery);
-
+            
             if (getUserIndexResult[0] === undefined) {
                 resolve({
                     code: statusCode.UNAUTHORIZED,
-                    json: authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.NO_X("user"))
+                    json: authUtil.successFalse(statusCode.UNAUTHORIZED, responseMessage.NO_X("user") + ` [${name}]`)
                 });
                 return;
             } else {
@@ -59,9 +59,9 @@ const user = {
         })
     },
 
-    signup: (id, name, nickname, pay_password, friends, photo) => {
+    doubleCheck: (nickname) => {
         return new Promise(async (resolve, reject) => {
-            if (!name || !pay_password || !id || !nickname) {
+            if (!nickname) {
                 resolve({
                     code: statusCode.BAD_REQUEST,
                     json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE)
@@ -77,16 +77,35 @@ const user = {
                     json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.ALREADY_X("닉네임"))
                 });
                 return;
+            } else {
+                resolve({
+                    code: statusCode.OK,
+                    json: authUtil.successTrue(statusCode.OK, responseMessage.POSSIBLE_NICKNAME)
+                });
+                return;
             }
+        })
+    },
+
+    signup: (id, name, nickname, pay_password, friends, photo) => {
+        return new Promise(async (resolve, reject) => {
+            if (!name || !pay_password || !id || !nickname) {
+                resolve({
+                    code: statusCode.BAD_REQUEST,
+                    json: authUtil.successFalse(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE)
+                });
+                return;
+            }
+            
             const {
                 salt,
                 hashedPassword
             } = await encryptionModule.encryption(pay_password);
 
             // 유저의 이름,아이디,패스워드를 저장
-            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt) VALUES (?, ?, ?, ?, ?, ?)';
+            const insertUserInfoQuery = 'INSERT INTO user(id, name, nickname, pay_password, salt, photo) VALUES (?, ?, ?, ?, ?, ?)';
             const insertUserInfoResult = await pool.queryParam_Arr(insertUserInfoQuery, [id, name, nickname, hashedPassword, salt, photo]);
-
+            console.log(insertUserInfoResult)
             Friend.createAll(insertUserInfoResult.insertId, friends);
 
             if (insertUserInfoResult.affectedRows == 1) {

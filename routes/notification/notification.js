@@ -4,10 +4,29 @@ var router = express.Router();
 const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
-const pool = require('../../module/db/pool');
 
 const jwt = require('../../module/auth/jwt');
 const Notification = require('../../model/Notification');
+
+
+/**
+ * [GET] /notification
+ * 유저 알림 조회
+ * @author LeeSohee
+ * @header token
+ */
+router.get('/', jwt.checkLogin, async (req, res) => {
+    const userIdx = req.decoded.idx;
+    
+    Notification.readUserAllNoti(userIdx)
+    .then(({ code, json }) => {
+        res.status(code).send(json);
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    });
+});
 
 /**
  * [GET] /notification/all
@@ -26,24 +45,6 @@ router.get('/all', jwt.checkLogin, async (req, res) => {
     });
 });
 
-/**
- * [GET] /notification
- * 유저 알림 조회
- * @author LeeSohee
- * @header token
- */
-router.get('/', jwt.checkLogin, async (req, res) => {
-    const userIdx = req.decoded.idx;
-
-    Notification.readUserAllNoti(userIdx)
-    .then(({ code, json }) => {
-        res.status(code).send(json);
-    })
-    .catch((err) => {
-        console.log(err);
-        res.status(statusCode.INTERNAL_SERVER_ERROR, authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
-    });
-});
 
 /**
  * [DELETE] /notification
@@ -52,9 +53,7 @@ router.get('/', jwt.checkLogin, async (req, res) => {
  * @header token
  */
 router.delete('/:notification_idx', jwt.checkLogin, async (req, res) => {
-    const {
-        notificationIdx 
-    } = req.params.notification_idx;
+    const notificationIdx = req.params.notification_idx;
 
     Notification.delete(notificationIdx)
     .then(({ code, json }) => {

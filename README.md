@@ -1,11 +1,14 @@
-## Fundito
+# Fundito
 > 나만의 맛집에 투자하라! 외식업 크라우드 펀딩 서비스, Fundito
 <br>
 
-### 📂 [API Doc Link](https://github.com/Fundito/Fundito-Server/wiki)
+## 📂 [API Doc Link](https://github.com/Fundito/Fundito-Server/wiki)
 <br>
 
-### ⭐️ 핵심 기능
+## 👍 [Fundito Server Notion Link](https://www.notion.so/Server-Finito-79656f45ac5d45c9868feeeec77e506e)
+<br>
+
+## ⭐️ 핵심 기능
 1. 페이스북 로그인 & 회원가입
 2. 가게 정보 등록
 3. 가게 크라우드 등록
@@ -14,7 +17,7 @@
 6. 알림
 <br>
 
-### 👩‍👩‍👧‍👦 Team Member
+## 👩‍👩‍👧‍👦 Team Member
 [백예은](https://github.com/bye0520)
 * 펀디토 머니 API 구현
 * StoreInfo API 구현
@@ -44,15 +47,15 @@
 * 소스 코드 수정 및 최적화
 <br>
 
-### 📝 ERD Diagram
-<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Fundito%20Server%20ER%20Diagram.png" width = "50%" height = "50%"/>
+## 📝 ERD Diagram
+<img src="https://github.com/Fundito/Fundito-Server/blob/develop/views/Fundito%20Server%20ER%20Diagram.png" width = "50%" height = "50%"/>
 <br>
 
-### 📕 Server Architecture
-<img src="https://github.com/Fundito/Fundito-Server/blob/develop/Server%20Architecture.jpg" width = "60%" height = "60%"/>
+## 📕 Server Architecture
+<img src="https://github.com/Fundito/Fundito-Server/blob/develop/views/Fundito%20Server%20Architecture.jpg" width = "60%" height = "60%"/>
 <br>
 
-### 📖 Dependency Module
+## 📖 Dependency Module
 ```
 {
   "name": "fundito",

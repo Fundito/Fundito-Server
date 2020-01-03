@@ -10,8 +10,9 @@ Friend = {
     readAll: (userIdx) => {
         return new Promise(async (resolve, reject) => {
             const getFriendIdxQuery = `SELECT friends_idx FROM friend WHERE user_idx = '${userIdx}'`;
-            const getFriendInfoQuery = `SELECT user_idx, id, name, nickname FROM user WHERE user_idx IN (${getFriendIdxQuery}) ORDER BY name ASC`
+            const getFriendInfoQuery = `SELECT user_idx, id, name, nickname, photo FROM user WHERE user_idx IN (${getFriendIdxQuery}) ORDER BY name ASC`
             const getFriendInfoResult = await pool.queryParam_Parse(getFriendInfoQuery);
+            
             if (!getFriendInfoResult) {
                 resolve({
                     code: statusCode.DB_ERROR,

@@ -7,6 +7,7 @@ module.exports = {
     DUPLICATE_VALUE_ERROR: "파라미터 값 중복",
     SIGN_UP_SUCCESS: "회원가입 성공",
     SIGN_IN_SUCCESS: "로그인 성공",
+    POSSIBLE_NICKNAME: "사용 가능한 닉네임입니다.",
 
     NO_INDEX : "존재하지 않는 인덱스 값",
     NO_STORE : "존재하지 않는 가게",
@@ -42,6 +43,8 @@ module.exports = {
     FUND_RATE_READ_SUCCESS : "최대 이율 조회 성공",
 
     USER_MONEY_LESS_THAN_FUNDING_MONEY : "펀디토 머니 부족",
+    
+    NOTIFICATION_INSERT_SUCCESS: "알림 입력 성공",
 
     X_CREATE_SUCCESS: (x) => `${x} 작성 성공`,
     X_CREATE_FAIL: (x) => `${x} 작성 실패`,
