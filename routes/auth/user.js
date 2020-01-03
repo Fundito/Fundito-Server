@@ -1,22 +1,21 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const statusCode = require('../../module/utils/statusCode');
 const responseMessage = require('../../module/utils/responseMessage');
 const authUtil = require('../../module/utils/authUtil');
-const fb = require('../../module/auth/fb-jwt');
 const User = require('../../model/User');
+const jwt = require('../../module/auth/jwt');
 
 /**
- *  [GET] /auth/signin
- *  로그인
+ *  [GET] /auth/user
+ *  유저 정보 조회
  *  @author KangYeongWoo
- *  @header facebook_access_token
+ *  @headers token
  */
-router.get('/',fb, async(req, res) => {
-    const {id, name} = req.decoded;
-    const {firebase_token} = req.headers;
+router.get('/',jwt.checkLogin, async(req, res) => {
+    const userIdx = req.decoded.idx
     
-    User.login(id, name, firebase_token)
+    User.read(userIdx)
     .then(({ code, json }) => {
         res.status(code).send(json);
     })
@@ -26,6 +25,5 @@ router.get('/',fb, async(req, res) => {
         .send(authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
     });
 });
-
 
 module.exports = router;

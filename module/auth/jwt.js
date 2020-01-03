@@ -3,9 +3,8 @@ const jwt = require('jsonwebtoken');
 const resMessage = require('../utils/responseMessage');
 const statusCode = require('../utils/statusCode');
 const authUtil = require('../utils/authUtil');
-const {
-    secretOrPrivateKey
-} = require('../../config/secretKey');
+const secretOrPrivateKey = require('../../config/secretKey');
+
 
 const options = {
     algorithm: "HS256",
@@ -19,16 +18,16 @@ const refreshOptions = {
     issuer: "fundito"
 };
 
-module.exports = {
+const crypto = {
     sign: (user) => {
         // 토큰 발급기
         const payload = {
-            idx: user.idx
+            idx: user
         };
         // 발급받은 refreshToken은 반드시 디비에 저장해야 한다.
         const result = {
             token: jwt.sign(payload, secretOrPrivateKey, options),
-            refreshToken: randToken.uid(256)
+            // refreshToken: randToken.uid(256)
         };
         return result;
     },
@@ -79,7 +78,7 @@ module.exports = {
         if (!token) {
             return res.json(authUtil.successFalse(statusCode.BAD_REQUEST, resMessage.EMPTY_TOKEN));
         } else {
-            const user = jwt.verify(token);
+            const user = crypto.verify(token);
 
             if (user == -3) {
                 return res.json(authUtil.successFalse(statusCode.UNAUTHORIZED, resMessage.EXPIRED_TOKEN));
@@ -92,3 +91,5 @@ module.exports = {
         }
     }
 };
+
+module.exports = crypto

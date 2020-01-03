@@ -40,7 +40,6 @@ module.exports = {
         try {
             var connection = await pool.getConnection()
             result = await connection.query(query, value) || null
-            console.log(result)
         } catch (err) {
             console.log(err)
             connection.rollback(() => {})
@@ -52,6 +51,7 @@ module.exports = {
     },
     Transaction: async (...args) => {
         let result = "Success"
+        const pool = await poolPromise;
         try {
             var connection = await pool.getConnection()
             await connection.beginTransaction()
