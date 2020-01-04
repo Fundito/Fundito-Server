@@ -144,14 +144,19 @@ const storeFund = {
                     // 펀딩 성공 여부를 체크
                     if (goalSales <= currentSales) {
                         const fund_status = fundStatus.Success;
-                        // 펀딩 성공 업데이트
-                        const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
-                        const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
+                        const updateSuccessTransaction = await pool.Transaction(async(conn) => {
+                            // 펀딩 성공 업데이트
+                            const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
+                            const updateStoreFundInfoResult = await conn.query(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
 
-                        const getUserIdxQuery = `SELECT user_idx FROM funding WHERE store_idx = ?`;
-                        const getUserIdxResult = await pool.queryParam_Arr(getUserIdxQuery, result.store_idx);
-                        
-                        if (!updateStoreFundInfoResult || getUserIdxResult) {
+                            const getUserIdxQuery = `SELECT user_idx FROM funding WHERE store_idx = ?`;
+                            const getUserIdxResult = await conn.query(getUserIdxQuery, result.store_idx);
+                            
+                            // 알림 보내기
+                            for(var i = 0 ; i< getUserIdxResult.length ; i++) 
+                                notification.sendMessage(getUserIdxResult[i].user_idx, result.store_idx);
+                        });
+                        if (!updateSuccessTransaction) {
                             resolve({
                                 code: statusCode.INTERNAL_SERVER_ERROR,
                                 json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
@@ -159,18 +164,20 @@ const storeFund = {
                             console.log(`update error`);
                             return;
                         }
-                        // 알림 보내기
-                        for(var i = 0 ; i< getUserIdxResult.length ; i++) 
-                        notification.sendMessage(getUserIdxResult[i].user_idx, result.store_idx);
                     } else {
                         const fund_status = fundStatus.Fail;
-
-                        const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
-                        const updateStoreFundInfoResult = await pool.queryParam_Arr(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
-
-                        const getUserIdxQuery = `SELECT user_idx FROM funding WHERE store_idx = ?`;
-                        const getUserIdxResult = await pool.queryParam_Arr(getUserIdxQuery, result.store_idx);
-                        if (!updateStoreFundInfoResult) {
+                        const updateFailTransaction = await pool.Transaction(async(conn) => {
+                            const updateStoreFundInfoQuery = `UPDATE ${table} SET fund_status = ? WHERE store_idx = ?`;
+                            const updateStoreFundInfoResult = await conn.query(updateStoreFundInfoQuery, [fund_status, result.store_idx]);
+    
+                            const getUserIdxQuery = `SELECT user_idx FROM funding WHERE store_idx = ?`;
+                            const getUserIdxResult = await conn.query(getUserIdxQuery, result.store_idx);
+                            // 알림 보내기
+                            for(var i = 0 ; i< getUserIdxResult.length ; i++) 
+                            notification.sendMessage(getUserIdxResult[i].user_idx, result.store_idx);
+                        })
+                        
+                        if (!updateFailTransaction) {
                             resolve({
                                 code: statusCode.INTERNAL_SERVER_ERROR,
                                 json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
@@ -178,9 +185,6 @@ const storeFund = {
                             console.log(`update StoreFund Info ERROR`);
                             return;
                         }
-                        // 알림 보내기
-                        for(var i = 0 ; i< getUserIdxResult.length ; i++) 
-                        notification.sendMessage(getUserIdxResult[i].user_idx, result.store_idx);
                     }
                 }
             }
