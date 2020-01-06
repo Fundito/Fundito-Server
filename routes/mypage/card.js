@@ -86,19 +86,6 @@ router.get('/', jwt.checkLogin, async(req, res) => {
         sendData.cardNickname = `${cardData.cardCompany} ${subStrNumber}-**`;
 
         res.status(code).send(authUtil.successTrue(code, json.message, sendData));
-
-        // if (sendData.cardNickname == '') {
-        //     const cardNumber = cardData.cardNumber;
-        //     const subStrNumber = (cardData.cardNumber).substr(0, 4);
-        //     console.log(subStrNumber);
-
-        //     sendData.cardNickname = `${cardData.cardCompany}(${subStrNumber})`;
-
-        //     res.status(code).send(authUtil.successTrue(code, json.message, sendData));
-        // }
-        // else {
-        //     res.status(code).send(authUtil.successTrue(code, json.message, sendData));
-        // }
     })
     .catch((err) => {
         console.log(err);

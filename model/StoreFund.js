@@ -188,23 +188,6 @@ const storeFund = {
                     }
                 }
             }
-
-            // const getCloseFundStoreUserQuery = `SELECT funding.user_idx, funding.store_idx FROM store_fund JOIN funding ON funding.store_idx = store_fund.store_idx WHERE fund_status = 1 OR fund_status = 2`;
-            // const getCloseFundStoreUserResult = await pool.queryParam_None(getCloseFundStoreUserQuery);
-            // console.log(getCloseFundStoreUserResult);
-
-            // if (!getCloseFundStoreUserResult) {
-            //     resolve({
-            //         code: statusCode.INTERNAL_SERVER_ERROR,
-            //         json: authUtil.successFalse(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR)
-            //     });
-            //     console.log(`get getCloseFundStoreUserResult ERROR`);
-            //     return;
-            // }
-
-            // for (var idx = 0; idx < getCloseFundStoreUserResult.length; idx++) {
-            //     notification.sendMessage(getCloseFundStoreUserResult[idx].user_idx, getCloseFundStoreUserResult[idx].store_idx);
-            // }
         });
     },
 

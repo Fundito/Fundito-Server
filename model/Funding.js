@@ -349,9 +349,6 @@ const funding = {
              * 2. 1에서 받아온 데이터들을 가지고, store_fund 테이블에서 비교 후, fund_status 들을 가져옴
              * 3. fund_status들에 따라 store_info 테이블에서 데이터 가져옴
              */
-            
-
-            // const message = ``;
             if (fundStatus == 0) {
                 const joinQuery = `SELECT store_info.name, funding.store_idx, store_fund.due_date, store_fund.goal_sales, store_fund.current_sales, funding.funding_money, funding.reward_money FROM funding JOIN store_fund ON funding.store_idx = store_fund.store_idx JOIN store_info ON funding.store_idx = store_info.store_idx WHERE user_idx = ? AND store_fund.fund_status = ?`;
                 const joinResult = await pool.queryParam_Arr(joinQuery, [userIdx, fundStatus]);
