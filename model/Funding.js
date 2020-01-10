@@ -10,7 +10,7 @@ const table = `funding`;
 const storeFundTable = `store_fund`;
 const userTable = `user`;
 const THIS_LOG = `펀딩 정보`;
-const {getMoneyLimit150, isAtLimit, getFundingBenefits, getRewardMoney, getProfit} = require(`../module/calculate`);
+const {getMoneyLimit150, isAtLimit, getFundingBenefits, getRewardMoney, getProfit} = require(`../module/tools/calculate`);
 const fundStatus = require(`../module/utils/fundStatus`);
 const storeInfo = require(`../model/StoreInfo`);
 

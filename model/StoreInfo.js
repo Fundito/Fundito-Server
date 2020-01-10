@@ -2,7 +2,7 @@ const statusCode = require('../module/utils/statusCode');
 const responseMessage = require('../module/utils/responseMessage');
 const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
-const {getMoneyLimit150, getMoneyLimit175, getMoneyLimit200, getRefundPerOfPer, getFundingBenefits, getCurGoalPer, getRefundPercent} = require('../module/tool/calculate');
+const {getMoneyLimit150, getMoneyLimit175, getMoneyLimit200, getRefundPerOfPer, getFundingBenefits, getCurGoalPer, getRefundPercent} = require('../module/tools/calculate');
 const moment = require('moment');
 
 const storeInfoTable = `store_info`;

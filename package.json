@@ -3,11 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "test": "mocha"
   },
   "dependencies": {
     "assert": "^2.0.0",
     "aws-sdk": "^2.596.0",
+    "chai": "^4.2.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
@@ -37,6 +39,10 @@
     "rand-token": "^0.4.0",
     "random-token": "0.0.8",
     "request": "^2.88.0",
-    "request-promise": "^4.2.5"
+    "request-promise": "^4.2.5",
+    "supertest": "^4.0.2"
+  },
+  "devDependencies": {
+    "mocha": "^7.0.0"
   }
 }

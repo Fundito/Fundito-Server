@@ -3,7 +3,7 @@ const responseMessage = require('../module/utils/responseMessage');
 const authUtil = require('../module/utils/authUtil');
 const pool = require('../module/db/pool');
 const fundStatus = require(`../module/utils/fundStatus`);
-const calculate = require('../module/tool/calculate');
+const calculate = require('../module/tools/calculate');
 const notification = require('../model/Notification');
 
 const moment = require('moment');
