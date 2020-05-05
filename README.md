@@ -30,7 +30,7 @@
 * Funding API 구현
 * Card API 구현
 * EC2 배포 관리
-* nginx 적용
+* DB 설계 및 구축
 
 [강영우](https://github.com/rdd9223)
 * 페이스북 로그인 & 회원가입 구현
